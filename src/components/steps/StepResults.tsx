@@ -1,12 +1,23 @@
 import { useState } from 'react'
 import { useScenarioStore } from '@/store/useScenarioStore'
-import { formatCrore, formatINR } from '@/lib/currency'
+import { formatCrore } from '@/lib/currency'
 import { formatPercent } from '@/lib/format'
 import { ChevronDown, ChevronRight, Edit2, AlertTriangle } from 'lucide-react'
 import type { ScenarioResult } from '@/domain/models/results'
 import {
-  AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+  CartesianGrid,
 } from 'recharts'
 
 const SCENARIO_COLORS = {
@@ -16,8 +27,17 @@ const SCENARIO_COLORS = {
 }
 
 const CATEGORY_COLORS = [
-  '#3b82f6','#22c55e','#f59e0b','#ef4444','#8b5cf6',
-  '#06b6d4','#f97316','#ec4899','#14b8a6','#a3e635','#64748b',
+  '#3b82f6',
+  '#22c55e',
+  '#f59e0b',
+  '#ef4444',
+  '#8b5cf6',
+  '#06b6d4',
+  '#f97316',
+  '#ec4899',
+  '#14b8a6',
+  '#a3e635',
+  '#64748b',
 ]
 
 function SummaryCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
@@ -60,7 +80,6 @@ function ScenarioTab({
 
 function ProjectionTable({ scenario }: { scenario: ScenarioResult }) {
   const [page, setPage] = useState(0)
-  const [expanded, setExpanded] = useState<number | null>(null)
   const pageSize = 10
   const rows = scenario.yearProjections
   const totalPages = Math.ceil(rows.length / pageSize)
@@ -81,8 +100,7 @@ function ProjectionTable({ scenario }: { scenario: ScenarioResult }) {
             {pageRows.map(row => (
               <tr
                 key={row.year}
-                onClick={() => setExpanded(expanded === row.year ? null : row.year)}
-                className="border-t cursor-pointer hover:bg-muted/30 transition-colors"
+                className="border-t hover:bg-muted/30 transition-colors"
               >
                 <td className="px-3 py-2">{row.year}</td>
                 <td className="px-3 py-2">{row.age}</td>
@@ -162,13 +180,26 @@ export function StepResults() {
   const pieData = categories
     .filter(c => !c.skipped)
     .map((c, i) => {
-      const total = c.parentAmount && c.parentFrequency
-        ? c.parentAmount * (c.parentFrequency === 'monthly' ? 12 : 1)
-        : c.items.filter(it => !it.skipped).reduce((s, it) => {
-            const mult: Record<string, number> = { monthly: 12, quarterly: 4, yearly: 1, weekly: 52, half_yearly: 2 }
-            return s + (it.amount * (mult[it.frequency] ?? 1))
-          }, 0)
-      return { name: c.label.replace(/^[A-K]\.\s/, ''), value: total, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }
+      const total =
+        c.parentAmount && c.parentFrequency
+          ? c.parentAmount * (c.parentFrequency === 'monthly' ? 12 : 1)
+          : c.items
+              .filter(it => !it.skipped)
+              .reduce((s, it) => {
+                const mult: Record<string, number> = {
+                  monthly: 12,
+                  quarterly: 4,
+                  yearly: 1,
+                  weekly: 52,
+                  half_yearly: 2,
+                }
+                return s + it.amount * (mult[it.frequency] ?? 1)
+              }, 0)
+      return {
+        name: c.label.replace(/^[A-K]\.\s/, ''),
+        value: total,
+        color: CATEGORY_COLORS[i % CATEGORY_COLORS.length],
+      }
     })
     .filter(d => d.value > 0)
 
@@ -190,7 +221,9 @@ export function StepResults() {
           </div>
           <ul className="space-y-1">
             {results.warnings.map((w, i) => (
-              <li key={i} className="text-xs text-amber-700 dark:text-amber-400">• {w}</li>
+              <li key={i} className="text-xs text-amber-700 dark:text-amber-400">
+                • {w}
+              </li>
             ))}
           </ul>
         </div>
@@ -237,7 +270,11 @@ export function StepResults() {
         <SummaryCard
           label="Inflation / Net return"
           value={`${formatPercent(scenario.inflationRate)} / ${formatPercent(scenario.returnRate)}`}
-          sub={assumptions.withdrawalTiming === 'end_of_year' ? 'End-of-year withdrawals' : 'Beginning-of-year withdrawals'}
+          sub={
+            assumptions.withdrawalTiming === 'end_of_year'
+              ? 'End-of-year withdrawals'
+              : 'Beginning-of-year withdrawals'
+          }
         />
       </div>
 
@@ -245,33 +282,58 @@ export function StepResults() {
       <div className="rounded-xl border-2 border-primary bg-primary/5 p-6 space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
           <div>
-            <p className="text-sm text-muted-foreground">Estimated Starting Corpus Required</p>
-            <p className="text-4xl font-bold text-primary mt-1">{formatCrore(scenario.requiredCorpus)}</p>
+            <p className="text-sm text-muted-foreground">
+              Estimated Starting Corpus Required
+            </p>
+            <p className="text-4xl font-bold text-primary mt-1">
+              {formatCrore(scenario.requiredCorpus)}
+            </p>
             <p className="text-xs text-muted-foreground mt-2">
-              Convention A · {assumptions.withdrawalTiming === 'end_of_year' ? 'End' : 'Beginning'}-of-year withdrawals ·
-              {formatPercent(scenario.inflationRate)} inflation · {formatPercent(scenario.returnRate)} net return · {profile.targetAge - profile.currentAge} years
+              Convention A ·{' '}
+              {assumptions.withdrawalTiming === 'end_of_year'
+                ? 'End'
+                : 'Beginning'}
+              -of-year withdrawals · {formatPercent(scenario.inflationRate)}{' '}
+              inflation · {formatPercent(scenario.returnRate)} net return ·{' '}
+              {profile.targetAge - profile.currentAge} years
             </p>
           </div>
           <div className="sm:text-right space-y-1">
             <p className="text-xs text-muted-foreground">Existing corpus</p>
-            <p className="text-lg font-semibold">{formatCrore(scenario.existingCorpus)}</p>
+            <p className="text-lg font-semibold">
+              {formatCrore(scenario.existingCorpus)}
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-primary/20">
           <div>
             <p className="text-xs text-muted-foreground">Funding gap</p>
-            <p className={`text-lg font-bold ${scenario.fundingGap > 0 ? 'text-red-600' : 'text-green-600'}`}>
-              {scenario.fundingGap > 0 ? formatCrore(scenario.fundingGap) : 'Surplus!'}
+            <p
+              className={`text-lg font-bold ${
+                scenario.fundingGap > 0 ? 'text-red-600' : 'text-green-600'
+              }`}
+            >
+              {scenario.fundingGap > 0
+                ? formatCrore(scenario.fundingGap)
+                : 'Surplus!'}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Safety margin ({formatPercent(assumptions.safetyMarginPercent)})</p>
-            <p className="text-lg font-bold">{formatCrore(scenario.safetyMarginAmount)}</p>
+            <p className="text-xs text-muted-foreground">
+              Safety margin ({formatPercent(assumptions.safetyMarginPercent)})
+            </p>
+            <p className="text-lg font-bold">
+              {formatCrore(scenario.safetyMarginAmount)}
+            </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Corpus with safety margin</p>
-            <p className="text-lg font-bold text-primary">{formatCrore(scenario.corpusWithSafetyMargin)}</p>
+            <p className="text-xs text-muted-foreground">
+              Corpus with safety margin
+            </p>
+            <p className="text-lg font-bold text-primary">
+              {formatCrore(scenario.corpusWithSafetyMargin)}
+            </p>
           </div>
         </div>
       </div>
@@ -281,19 +343,46 @@ export function StepResults() {
         <button
           type="button"
           onClick={() => setShowExplain(x => !x)}
-          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground cursor-pointer"
         >
-          {showExplain ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+          {showExplain ? (
+            <ChevronDown className="w-4 h-4" />
+          ) : (
+            <ChevronRight className="w-4 h-4" />
+          )}
           How was this calculated?
         </button>
         {showExplain && (
           <div className="mt-3 rounded-lg border bg-muted/30 p-4 text-xs text-muted-foreground space-y-2">
-            <p><strong>Formula:</strong> Growing annuity present value (Convention A). First year-end withdrawal equals today's annual expense E0.</p>
-            <p><strong>When r ≠ g:</strong> C = E0 × [1 − ((1+g)/(1+r))^n] / (r − g)</p>
-            <p><strong>Withdrawal timing:</strong> {assumptions.withdrawalTiming === 'end_of_year' ? 'End of year' : 'Beginning of year'}</p>
-            <p><strong>Return basis:</strong> {assumptions.returnBasis === 'net' ? 'Net of fees and taxes' : 'Gross — fees and tax drag subtracted'}</p>
-            <p><strong>Skipped categories</strong> are not included in the expense base.</p>
-            <p className="pt-2 border-t">This is a planning estimate, not a guarantee. Actual returns, inflation, and lifespan are uncertain.</p>
+            <p>
+              <strong>Formula:</strong> Growing annuity present value
+              (Convention A). First year-end withdrawal equals today's annual
+              expense E0.
+            </p>
+            <p>
+              <strong>When r ≠ g:</strong> C = E0 × [1 − ((1+g)/(1+r))^n] / (r −
+              g)
+            </p>
+            <p>
+              <strong>Withdrawal timing:</strong>{' '}
+              {assumptions.withdrawalTiming === 'end_of_year'
+                ? 'End of year'
+                : 'Beginning of year'}
+            </p>
+            <p>
+              <strong>Return basis:</strong>{' '}
+              {assumptions.returnBasis === 'net'
+                ? 'Net of fees and taxes'
+                : 'Gross — fees and tax drag subtracted'}
+            </p>
+            <p>
+              <strong>Skipped categories</strong> are not included in the
+              expense base.
+            </p>
+            <p className="pt-2 border-t">
+              This is a planning estimate, not a guarantee. Actual returns,
+              inflation, and lifespan are uncertain.
+            </p>
           </div>
         )}
       </div>
@@ -306,7 +395,7 @@ export function StepResults() {
               key={tab}
               type="button"
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors capitalize ${
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors capitalize cursor-pointer ${
                 activeTab === tab
                   ? 'bg-primary text-primary-foreground'
                   : 'border hover:bg-muted text-muted-foreground'
@@ -321,33 +410,100 @@ export function StepResults() {
           <div className="space-y-6">
             {/* Portfolio balance */}
             <div className="border rounded-lg p-4">
-              <h4 className="text-sm font-semibold mb-3">Corpus Balance Over Time — All Scenarios</h4>
+              <h4 className="text-sm font-semibold mb-3">
+                Corpus Balance Over Time — All Scenarios
+              </h4>
               <ResponsiveContainer width="100%" height={260}>
-                <AreaChart data={portfolioData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                <AreaChart
+                  data={portfolioData}
+                  margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="age" label={{ value: 'Age', position: 'insideBottom', offset: -2 }} tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={v => formatCrore(v)} tick={{ fontSize: 10 }} width={70} />
-                  <Tooltip formatter={(v: number) => formatCrore(v)} labelFormatter={l => `Age ${l}`} />
+                  <XAxis
+                    dataKey="age"
+                    label={{
+                      value: 'Age',
+                      position: 'insideBottom',
+                      offset: -2,
+                    }}
+                    tick={{ fontSize: 11 }}
+                  />
+                  <YAxis
+                    tickFormatter={v => formatCrore(v)}
+                    tick={{ fontSize: 10 }}
+                    width={70}
+                  />
+                  <Tooltip
+                    formatter={(v: any) => formatCrore(Number(v))}
+                    labelFormatter={l => `Age ${l}`}
+                  />
                   <Legend verticalAlign="top" />
-                  <Area type="monotone" dataKey="optimistic" stroke="#22c55e" fill="#22c55e20" name="Optimistic" strokeWidth={2} />
-                  <Area type="monotone" dataKey="base" stroke="#3b82f6" fill="#3b82f620" name="Base" strokeWidth={2} />
-                  <Area type="monotone" dataKey="conservative" stroke="#f59e0b" fill="#f59e0b20" name="Conservative" strokeWidth={2} />
+                  <Area
+                    type="monotone"
+                    dataKey="optimistic"
+                    stroke="#22c55e"
+                    fill="#22c55e20"
+                    name="Optimistic"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="base"
+                    stroke="#3b82f6"
+                    fill="#3b82f620"
+                    name="Base"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="conservative"
+                    stroke="#f59e0b"
+                    fill="#f59e0b20"
+                    name="Conservative"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
 
             {/* Expenses over time */}
             <div className="border rounded-lg p-4">
-              <h4 className="text-sm font-semibold mb-3">Annual Expenses & Income Over Time (Base Scenario)</h4>
+              <h4 className="text-sm font-semibold mb-3">
+                Annual Expenses & Income Over Time (Base Scenario)
+              </h4>
               <ResponsiveContainer width="100%" height={220}>
-                <AreaChart data={expenseData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
+                <AreaChart
+                  data={expenseData}
+                  margin={{ top: 5, right: 10, left: 10, bottom: 5 }}
+                >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="age" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={v => formatCrore(v)} tick={{ fontSize: 10 }} width={70} />
-                  <Tooltip formatter={(v: number) => formatCrore(v)} labelFormatter={l => `Age ${l}`} />
+                  <YAxis
+                    tickFormatter={v => formatCrore(v)}
+                    tick={{ fontSize: 10 }}
+                    width={70}
+                  />
+                  <Tooltip
+                    formatter={(v: any) => formatCrore(Number(v))}
+                    labelFormatter={l => `Age ${l}`}
+                  />
                   <Legend verticalAlign="top" />
-                  <Area type="monotone" dataKey="nominal" stroke="#ef4444" fill="#ef444420" name="Expenses" strokeWidth={2} />
-                  <Area type="monotone" dataKey="income" stroke="#22c55e" fill="#22c55e20" name="Other Income" strokeWidth={2} />
+                  <Area
+                    type="monotone"
+                    dataKey="nominal"
+                    stroke="#ef4444"
+                    fill="#ef444420"
+                    name="Expenses"
+                    strokeWidth={2}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="income"
+                    stroke="#22c55e"
+                    fill="#22c55e20"
+                    name="Other Income"
+                    strokeWidth={2}
+                  />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -355,24 +511,40 @@ export function StepResults() {
             {/* Category breakdown */}
             {pieData.length > 0 && (
               <div className="border rounded-lg p-4">
-                <h4 className="text-sm font-semibold mb-3">Annual Expense Breakdown by Category</h4>
+                <h4 className="text-sm font-semibold mb-3">
+                  Annual Expense Breakdown by Category
+                </h4>
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <ResponsiveContainer width={240} height={200}>
                     <PieChart>
-                      <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={false}>
+                      <Pie
+                        data={pieData}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="value"
+                        label={false}
+                      >
                         {pieData.map((entry, i) => (
                           <Cell key={i} fill={entry.color} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v: number) => formatCrore(v)} />
+                      <Tooltip formatter={(v: any) => formatCrore(Number(v))} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="grid grid-cols-2 gap-x-6 gap-y-1 text-xs">
                     {pieData.map(d => (
                       <div key={d.name} className="flex items-center gap-1.5">
-                        <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ backgroundColor: d.color }} />
-                        <span className="text-muted-foreground truncate">{d.name}</span>
-                        <span className="font-medium shrink-0 ml-auto">{formatCrore(d.value)}</span>
+                        <span
+                          className="w-2.5 h-2.5 rounded-sm shrink-0"
+                          style={{ backgroundColor: d.color }}
+                        />
+                        <span className="text-muted-foreground truncate">
+                          {d.name}
+                        </span>
+                        <span className="font-medium shrink-0 ml-auto">
+                          {formatCrore(d.value)}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -382,7 +554,9 @@ export function StepResults() {
 
             {/* Scenario comparison */}
             <div className="border rounded-lg p-4">
-              <h4 className="text-sm font-semibold mb-3">Scenario Comparison — Required Corpus</h4>
+              <h4 className="text-sm font-semibold mb-3">
+                Scenario Comparison — Required Corpus
+              </h4>
               <ResponsiveContainer width="100%" height={160}>
                 <BarChart
                   data={results.scenarios.map(s => ({
@@ -394,11 +568,25 @@ export function StepResults() {
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                  <YAxis tickFormatter={v => formatCrore(v)} tick={{ fontSize: 10 }} width={70} />
-                  <Tooltip formatter={(v: number) => formatCrore(v)} />
+                  <YAxis
+                    tickFormatter={v => formatCrore(v)}
+                    tick={{ fontSize: 10 }}
+                    width={70}
+                  />
+                  <Tooltip formatter={(v: any) => formatCrore(Number(v))} />
                   <Legend verticalAlign="top" />
-                  <Bar dataKey="corpus" name="Required Corpus" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="withMargin" name="With Safety Margin" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="corpus"
+                    name="Required Corpus"
+                    fill="#3b82f6"
+                    radius={[4, 4, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="withMargin"
+                    name="With Safety Margin"
+                    fill="#8b5cf6"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -413,7 +601,7 @@ export function StepResults() {
         <button
           type="button"
           onClick={() => goToStep(3)}
-          className="flex items-center gap-1.5 px-4 py-2 border rounded text-sm hover:bg-muted transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 border rounded-md text-sm font-medium hover:bg-muted transition-colors cursor-pointer"
         >
           <Edit2 className="w-3.5 h-3.5" />
           Edit Expenses
@@ -421,7 +609,7 @@ export function StepResults() {
         <button
           type="button"
           onClick={() => goToStep(4)}
-          className="flex items-center gap-1.5 px-4 py-2 border rounded text-sm hover:bg-muted transition-colors"
+          className="flex items-center gap-1.5 px-4 py-2 border rounded-md text-sm font-medium hover:bg-muted transition-colors cursor-pointer"
         >
           <Edit2 className="w-3.5 h-3.5" />
           Edit Assumptions
@@ -430,7 +618,11 @@ export function StepResults() {
 
       {/* Disclaimer */}
       <div className="rounded-lg border bg-muted/30 p-4 text-xs text-muted-foreground">
-        <strong>Disclaimer:</strong> Estimated corpus under the assumptions you entered. This is not a guaranteed safe withdrawal amount or personalised investment recommendation. Market returns, inflation, healthcare costs, tax treatment, and life circumstances are uncertain. Consult a registered financial adviser before making investment decisions.
+        <strong>Disclaimer:</strong> Estimated corpus under the assumptions you
+        entered. This is not a guaranteed safe withdrawal amount or personalised
+        investment recommendation. Market returns, inflation, healthcare costs,
+        tax treatment, and life circumstances are uncertain. Consult a
+        registered financial adviser before making investment decisions.
       </div>
     </div>
   )

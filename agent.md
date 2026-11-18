@@ -1,139 +1,100 @@
 # Lifetime Cost & Corpus Calculator — Agent Guide
 
-## Project Purpose
-A React + TypeScript web app that helps Indian households estimate the **investment corpus** required to fund their lifetime living expenses. The user walks through a **wizard flow** collecting profile, household members, categorised expenses, financial assumptions, and then sees results with projections, charts, and export options.
+## Project Overview
+A lightweight, hobby-scale web application built with **React** and **Tailwind CSS** that helps Indian households calculate their required investment corpus to fund living expenses over their chosen lifetime horizon.
+
+The core philosophy of this project is **simplicity and maintainability**:
+- **Hobby-grade, clean architecture**: Keep code straightforward and easy to understand without enterprise boilerplate.
+- **Config-Driven Forms**: All wizard steps, sections, fields, sub-fields, options, default values, and explanation texts are defined in a single configuration file (`src/config/formFields.ts` / `src/config/wizardConfig.ts`).
+- **Easy Field Modifications**: Adding, removing, reordering, or tweaking fields requires only changing the config file — the UI dynamically loops and renders them.
+- **Wizard Flow**: Clean multi-step flow keeping screens small, friendly, and responsive across desktop and mobile.
+- **Flexible Expense Categories**: Categories can have subcategories/sub-items. Users can either fill the parent category as a single total OR break it down into sub-items, or skip the category altogether.
+- **Explanations & Defaults**: Every field features clear explanation text for what it means. Sensible defaults are pre-filled so users can skip or proceed rapidly.
+- **Logic-Only Testing**: Automated unit tests focus strictly on calculation and financial logic (growing annuities, inflation projections, portfolio depletion, cash flows). No component tests are required.
 
 ---
 
 ## Tech Stack
-| Layer | Choice |
-|---|---|
-| Framework | React 18 + TypeScript (Vite) |
-| Styling | Tailwind CSS v3 |
-| UI components | shadcn/ui (Radix primitives) |
-| Charts | Recharts |
-| State | Zustand |
-| Math/decimal | decimal.js |
-| Forms | react-hook-form + zod |
-| Export | jsPDF + papaparse (CSV) |
+- **Framework**: React (Vite + TypeScript)
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Math/Precision**: `decimal.js` (for financial formulas)
+- **Charts**: Recharts (clean, responsive visualizations)
+- **Test Runner**: Vitest (pure functionality tests for calculation logic)
 
 ---
 
-## Repository Layout
+## Architecture & Directory Layout
 
 ```
 src/
+  config/
+    formFields.ts       # THE SINGLE SOURCE OF TRUTH for all steps, fields,
+                        # sub-fields, types, defaults, options, and explanations.
   domain/
-    models/           # TypeScript types/interfaces (pure data)
-    calculations/     # Pure functions: annualise, inflate, corpus formula
-    validation/       # Zod schemas + warning logic
-  store/              # Zustand slices (profile, expenses, assumptions, results)
+    models/             # TypeScript type definitions for data structures
+    calculations/       # Pure calculation functions (annualise, inflation, corpus, cashflows)
+      __tests__/        # Functionality-only unit tests for math and logic
   components/
-    wizard/           # Step shell and progress bar
-    steps/            # One component per wizard step
-    expenses/         # Category accordion, sub-item rows, inline edit
-    results/          # Summary cards, charts, projection table
-    ui/               # Generic reusable UI (shadcn wrappers, tooltips)
-  lib/                # Utility helpers (formatting, currency, etc.)
-  pages/              # Route-level pages (Wizard, Results, About)
-  App.tsx
-  main.tsx
+    wizard/             # Dynamic wizard shell, progress bar, navigation
+    form/               # Dynamic field renderer (number, text, select, radio, slider, array, etc.)
+    expenses/           # Dynamic category renderer (parent total vs sub-items toggle)
+    results/            # Summary cards, charts, and projection table
+  lib/                  # Utilities (currency formatting INR/L/Cr, math helpers)
+  App.tsx               # Root component hosting the wizard
+  main.tsx              # App entrypoint
 docs/
-  plans/              # PRD and task-level planning docs
-    tasks/            # Individual task breakdown files
+  plans/
+    tasks/              # Task breakdowns for building the simplified project
 ```
 
 ---
 
-## Wizard Steps (in order)
-1. **Profile** – age, target age, location, currency, lifestyle scenario
-2. **Household** – members list (name, relationship, age, dependency)
-3. **Expenses** – accordion by category (A–K); parent total OR sub-items; skip allowed
-4. **Assumptions** – inflation mode, investment return, withdrawal timing, safety margin
-5. **Assets & Income** – existing corpus, pensions, lump sums, other income
-6. **Results** – summary cards, charts, year-by-year table, scenario comparison
+## The Config-Driven Field Schema (`src/config/formFields.ts`)
 
----
+Every field in the application is represented as a structured object:
 
-## Expense Categories (A–K)
-A Housing & Property · B Food & Consumables · C Utilities & Communication · D Transport & Vehicles · E Healthcare & Insurance · F Personal & Lifestyle · G Household Technology & Devices · H Family & Dependents · I Financial & Admin · J Emergencies & Contingencies · K Custom
-
-Each category supports:
-- **Parent-level amount** (enter total, skip sub-items) OR
-- **Sub-item breakdown** (open accordion, fill individually)
-- Per-item: amount, frequency, essential/discretionary flag, inflation override, start/end year
-
----
-
-## Calculation Engine Rules
-- All math in **pure TypeScript functions** in `src/domain/calculations/`
-- Internal rates stored as **decimals** (5% = 0.05)
-- Use `decimal.js` for all financial arithmetic
-- Growing annuity corpus formula: Convention A (first withdrawal = E0 at year-end)
-- Special case when r = g: `C = E0 × n / (1 + r)`
-- Portfolio simulation must reconcile with corpus formula to ~zero at end
-- Monthly return: `(1 + annual)^(1/12) - 1` — never divide annual by 12
-- Funding gap = Required corpus − existing assets − discounted future income
-
----
-
-## Key UX Rules
-- Every input field has an **info tooltip / help text** explaining what it means
-- All fields are **skippable** — the user can proceed with defaults
-- Reasonable **defaults pre-filled** (India, INR, 5% inflation, 7% return, etc.)
-- Wizard shows **progress bar** with step names; steps can be revisited
-- Expense categories show **completion indicator** (filled / skipped / empty)
-- Results page shows **three scenarios** (Optimistic/Base/Conservative) side-by-side
-- Warnings are non-blocking — shown as banners, not errors that block submission
-
----
-
-## Validation & Warnings
-Implemented in `src/domain/validation/`:
-- Target age > current age
-- Expense amounts ≥ 0
-- Inflation/return > -100%
-- Warn: return ≤ inflation (special case or very high corpus)
-- Warn: missing healthcare / housing maintenance / vehicle replacement
-- Warn: gross return entered with no fee/tax assumptions
-- Warn: planning only to age 70 (suggest testing to 90–100)
-
----
-
-## Development Commands
-```bash
-npm install          # install deps
-npm run dev          # Vite dev server
-npm run build        # production build
-npm run test         # Vitest unit tests
-npm run lint         # ESLint
+```ts
+export interface FieldConfig {
+  id: string
+  label: string
+  type: 'number' | 'text' | 'select' | 'radio' | 'slider' | 'checkbox' | 'array' | 'category-group'
+  defaultValue: any
+  help: string               // Clear explanation of what this field means
+  options?: { label: string; value: any; description?: string }[]
+  min?: number
+  max?: number
+  step?: number
+  prefix?: string            // e.g. '₹'
+  suffix?: string            // e.g. '%' or 'years'
+  skippable?: boolean        // If true, user can skip filling this field
+  subFields?: FieldConfig[]  // For array items or composite groups
+}
 ```
 
----
-
-## Testing
-- Unit tests in `src/domain/calculations/__tests__/` using Vitest
-- Cover all 10 test cases from the guide (annualisation, inflation projection, growing annuity, edge cases)
-- No UI tests in MVP; Playwright can be added later
-
----
-
-## Financial Disclaimers (always visible in Results)
-> "Estimated corpus under the assumptions you entered. This is not a guaranteed safe withdrawal amount or personalised investment recommendation. Returns and inflation are uncertain."
+### Expense Categories Schema
+Categories (A through K) contain:
+- `id`: e.g. `housing`, `food`, `healthcare`
+- `label`: Category title
+- `description`: What is covered, advice on double-counting
+- `defaultInflationRate`: e.g. `0.05` (5%), healthcare `0.07` (7%)
+- `parentInput`: Allows entering a single combined total with frequency
+- `subItems`: Array of item configurations with default amounts and frequencies
+- The UI renders a toggle allowing the user to either enter the parent total or fill sub-items.
 
 ---
 
-## MVP Scope (do first)
-1. Wizard shell + all 6 steps with skip/default support
-2. Expense accordion with parent OR sub-item entry
-3. Growing annuity quick estimate + annual cash-flow projection
-4. Three-scenario results page with charts
-5. Export to CSV and PDF
-6. All 10 calculation unit tests passing
+## Calculation Rules & Financial Logic
+- **Annualisation**: Convert weekly (×52), monthly (×12), quarterly (×4), yearly (×1), or every N years (/N) to annual baselines. One-time items are applied only in the specified planning year.
+- **Convention A Growing Annuity**:
+  - For $r \neq g$: $C = E_0 \times \frac{1 - \left(\frac{1+g}{1+r}\right)^n}{r - g}$
+  - For $r = g$: $C = E_0 \times \frac{n}{1+r}$
+  - Beginning-of-year adjustment multiplies by $(1+r)$.
+- **Cash Flow Simulation**: Year-by-year calculation with inflating expenses, reliable income offset, investment growth, and closing balance depletion check.
+- **Funding Gap**: $\text{Required Corpus} - \text{Existing Investable Corpus}$.
 
-## Out of Scope (MVP)
-- Monthly cash-flow granularity
-- Variable/stochastic return simulation
-- Multi-currency
-- Cloud storage / auth
-- Shared household planning
+---
+
+## Testing Policy
+- **Strictly Functionality / Math Tests**: Test the calculation engine against the 10 test scenarios from the guide (annualisation, inflation compounding, annuity formula, $r = g$ edge cases, horizon extension, portfolio depletion).
+- **No Component / UI Tests**: Skip testing React components or DOM rendering to keep the project light and agile.

@@ -24,6 +24,9 @@ interface ScenarioState {
   currentStep: number
   totalSteps: number
 
+  // Universal field updater for config-driven inputs
+  setStepFieldValue: (stepKey: string, fieldId: string, value: any) => void
+
   // Profile actions
   setProfile: (p: Partial<Profile>) => void
 
@@ -80,6 +83,20 @@ export const useScenarioStore = create<ScenarioState>()(
       results: null,
       currentStep: 1,
       totalSteps: 6,
+
+      setStepFieldValue: (stepKey, fieldId, value) => {
+        if (stepKey === 'profile') {
+          set(s => ({ profile: { ...s.profile, [fieldId]: value } }))
+        } else if (stepKey === 'household') {
+          if (fieldId === 'members') {
+            set({ members: value })
+          }
+        } else if (stepKey === 'assumptions') {
+          set(s => ({ assumptions: { ...s.assumptions, [fieldId]: value } }))
+        } else if (stepKey === 'assets') {
+          set(s => ({ assets: { ...s.assets, [fieldId]: value } }))
+        }
+      },
 
       setProfile: p =>
         set(s => ({ profile: { ...s.profile, ...p } })),
