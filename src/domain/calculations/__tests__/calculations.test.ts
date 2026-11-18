@@ -71,8 +71,11 @@ describe('simulatePortfolio reconciliation', () => {
     const projections: YearProjection[] = Array.from({ length: n }, (_, i) => ({
       year: i + 1,
       age: 30 + i + 1,
-      expenses: e0 * Math.pow(1 + g, i),
+      earnedIncome: 0,
       otherIncome: 0,
+      totalIncome: 0,
+      expenses: e0 * Math.pow(1 + g, i),
+      netSavings: 0,
       netWithdrawal: e0 * Math.pow(1 + g, i),
       investmentGrowth: 0,
       openingCorpus: 0,

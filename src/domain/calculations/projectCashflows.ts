@@ -66,9 +66,21 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
   }
 
   const projections: YearProjection[] = []
+  const annualEarnedBaseline = (assets.monthlyIncome || 0) * 12
 
   for (let t = 1; t <= planningYears; t++) {
-    // Recurring expenses
+    const ageAtStartOfYear = currentAge + (t - 1)
+    const ageAtEndOfYear = currentAge + t
+
+    // Active Earned Income (grows with incomeGrowthRate until incomeEndAge)
+    let earnedIncome = 0
+    if (annualEarnedBaseline > 0 && ageAtStartOfYear < assets.incomeEndAge) {
+      earnedIncome = new Decimal(annualEarnedBaseline)
+        .mul(new Decimal(1).plus(assets.incomeGrowthRate).pow(t - 1))
+        .toNumber()
+    }
+
+    // Recurring expenses inflated to year t
     const recurringExpense = recurringItems
       .filter(i => t >= i.startYear && (i.endYear == null || t <= i.endYear))
       .reduce((sum, i) => {
@@ -77,14 +89,14 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
           .toNumber()
       }, 0)
 
-    // One-time expenses
+    // One-time expenses occurring in year t
     const oneTimeExpense = oneTimeItems
       .filter(i => i.year === t)
       .reduce((sum, i) => sum + i.amount, 0)
 
     const totalExpense = recurringExpense + oneTimeExpense
 
-    // Other income
+    // Other income (pensions, rent)
     const otherIncome = assets.otherIncome
       .filter(inc => t >= inc.startYear && (inc.endYear == null || t <= inc.endYear))
       .reduce((sum, inc) => {
@@ -94,18 +106,37 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
         return sum + amount
       }, 0)
 
-    // Lump sums
+    // Scheduled future lump sums
     const lumpSum = assets.futureContributions
       .filter(ls => ls.year === t)
       .reduce((sum, ls) => sum + ls.amount, 0)
 
-    const netWithdrawal = Math.max(0, totalExpense - otherIncome - lumpSum)
+    const totalNonEarnedIncome = otherIncome + lumpSum
+    const totalIncome = earnedIncome + totalNonEarnedIncome
+
+    // Net Cash Flow: Income vs Expense
+    const netDifference = totalIncome - totalExpense
+    let netSavings = 0
+    let netWithdrawal = 0
+
+    if (netDifference >= 0) {
+      // Income exceeds expenses -> Surplus goes to investment!
+      netSavings = netDifference
+      netWithdrawal = 0
+    } else {
+      // Expenses exceed income -> Deficit withdrawn from savings!
+      netSavings = 0
+      netWithdrawal = Math.abs(netDifference)
+    }
 
     projections.push({
       year: t,
-      age: currentAge + t,
+      age: ageAtEndOfYear,
       expenses: totalExpense,
-      otherIncome: otherIncome + lumpSum,
+      earnedIncome,
+      otherIncome: totalNonEarnedIncome,
+      totalIncome,
+      netSavings,
       netWithdrawal,
       investmentGrowth: 0,
       openingCorpus: 0,

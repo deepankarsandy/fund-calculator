@@ -91,12 +91,18 @@ export function generateWarnings(ctx: WarningContext): string[] {
   const dependents = members.filter(
     m => m.financiallyDependent && m.id !== 'self',
   )
-  const familyCat = categories.find(c => c.id === 'family')
-  const hasFamilyWithEnd = familyCat?.items.some(i => i.endYear != null)
-  if (dependents.length > 0 && !hasFamilyWithEnd) {
+  if (dependents.length === 0) {
     warnings.push(
-      'You have dependents but no family expenses with an end year. Education and childcare costs typically stop at a certain age.',
+      'No dependents (spouse, children, or elderly parents) were added in Step 2. If you support family members, remember to add them to factor in their healthcare, education, and living costs.',
     )
+  } else {
+    const familyCat = categories.find(c => c.id === 'family')
+    const hasFamilyWithEnd = familyCat?.items.some(i => i.endYear != null)
+    if (!hasFamilyWithEnd) {
+      warnings.push(
+        'You have dependents but no family expenses with an end year. Education and childcare costs typically stop at a certain age.',
+      )
+    }
   }
 
   return warnings

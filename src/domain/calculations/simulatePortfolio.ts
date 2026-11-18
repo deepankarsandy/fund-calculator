@@ -18,11 +18,18 @@ export function simulatePortfolio(
 
     if (timing === 'end_of_year') {
       growth = opening.mul(r)
-      closing = opening.plus(growth).minus(row.netWithdrawal)
+      // Add savings surplus and subtract deficit withdrawals
+      closing = opening.plus(growth).plus(row.netSavings || 0).minus(row.netWithdrawal || 0)
     } else {
-      const afterWithdrawal = opening.minus(row.netWithdrawal)
-      closing = afterWithdrawal.mul(r.plus(1))
-      growth = closing.minus(afterWithdrawal)
+      // Beginning of year timing: cashflows applied before investment growth
+      const afterCashflow = opening.plus(row.netSavings || 0).minus(row.netWithdrawal || 0)
+      if (afterCashflow.greaterThan(0)) {
+        closing = afterCashflow.mul(r.plus(1))
+        growth = closing.minus(afterCashflow)
+      } else {
+        closing = afterCashflow
+        growth = new Decimal(0)
+      }
     }
 
     balance = closing
