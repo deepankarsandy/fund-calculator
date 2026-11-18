@@ -422,6 +422,7 @@ export function StepResults() {
                     contentStyle={{
                       backgroundColor: 'var(--color-card)',
                       borderColor: 'var(--color-border)',
+                      color: 'var(--color-card-foreground)',
                       borderRadius: '0.75rem',
                     }}
                   />
@@ -477,6 +478,7 @@ export function StepResults() {
                     contentStyle={{
                       backgroundColor: 'var(--color-card)',
                       borderColor: 'var(--color-border)',
+                      color: 'var(--color-card-foreground)',
                       borderRadius: '0.75rem',
                     }}
                   />
@@ -578,6 +580,7 @@ export function StepResults() {
                     contentStyle={{
                       backgroundColor: 'var(--color-card)',
                       borderColor: 'var(--color-border)',
+                      color: 'var(--color-card-foreground)',
                       borderRadius: '0.75rem',
                     }}
                   />
