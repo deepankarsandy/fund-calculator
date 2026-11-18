@@ -13,6 +13,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 
 interface HomePageProps {
   onStart: () => void
@@ -24,30 +25,28 @@ export default function HomePage({ onStart }: HomePageProps) {
       {/* Top Navbar */}
       <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
+            title="Lifetime Corpus Calculator"
+          >
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
               ₹
             </div>
-            <div>
+            <div className="hidden sm:block">
               <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
                 Lifetime Corpus Calculator
               </h1>
-              <p className="text-[11px] text-muted-foreground hidden sm:block font-medium">
+              <p className="text-[11px] text-muted-foreground font-medium">
                 India-Calibrated Living Cost & Retirement Modeling
               </p>
             </div>
-          </div>
+          </button>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <SocialLinks />
             <ThemeToggle />
-            <button
-              type="button"
-              onClick={onStart}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-blue-600 text-white rounded-lg text-xs font-bold hover:bg-blue-700 transition-all cursor-pointer shadow-xs"
-            >
-              <span>Open Calculator</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </header>

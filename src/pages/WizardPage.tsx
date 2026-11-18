@@ -2,6 +2,7 @@ import { useScenarioStore } from '@/store/useScenarioStore'
 import { WIZARD_STEPS_CONFIG } from '@/config/formFields'
 import { DynamicStepRenderer } from '@/components/wizard/DynamicStepRenderer'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { SocialLinks } from '@/components/ui/SocialLinks'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import {
   ChevronLeft,
@@ -15,7 +16,6 @@ import {
   Settings2,
   Landmark,
   BarChart2,
-  Home,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
@@ -78,42 +78,31 @@ export default function WizardPage({ onBackToHome }: WizardPageProps) {
               className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
               title="Return to Home Overview"
             >
-              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
                 ₹
               </div>
-              <div>
+              <div className="hidden sm:block">
                 <h1 className="text-base font-extrabold text-foreground leading-tight tracking-tight">
                   Lifetime Corpus Calculator
                 </h1>
-                <p className="text-[11px] text-muted-foreground hidden sm:block font-medium">
+                <p className="text-[11px] text-muted-foreground font-medium">
                   Estimate the investment corpus needed for your lifetime living expenses
                 </p>
               </div>
             </button>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <SocialLinks />
               <ThemeToggle />
-
-              {onBackToHome && (
-                <button
-                  type="button"
-                  onClick={onBackToHome}
-                  className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
-                  title="Return to Home Page"
-                >
-                  <Home className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Home</span>
-                </button>
-              )}
 
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
+                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
                 title="Reset all fields to defaults and clear storage"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Reset</span>
+                <span className="hidden md:inline">Reset</span>
               </button>
             </div>
           </div>

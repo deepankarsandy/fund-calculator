@@ -32,12 +32,15 @@ export function applyTheme(theme: Theme) {
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => getSavedTheme())
+  const [systemTheme, setSystemTheme] = useState<'light' | 'dark'>(() => getSystemTheme())
 
   useEffect(() => {
     applyTheme(theme)
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const handleChange = () => {
+      const currentSys = mediaQuery.matches ? 'dark' : 'light'
+      setSystemTheme(currentSys)
       if (getSavedTheme() === 'system') {
         applyTheme('system')
       }
@@ -47,16 +50,20 @@ export function useTheme() {
     return () => mediaQuery.removeEventListener('change', handleChange)
   }, [theme])
 
+  const resolvedTheme: 'light' | 'dark' = theme === 'system' ? systemTheme : theme
+  const isDark = resolvedTheme === 'dark'
+
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme)
     applyTheme(newTheme)
   }
 
   const toggleTheme = () => {
-    if (theme === 'light') setTheme('dark')
-    else if (theme === 'dark') setTheme('system')
-    else setTheme('light')
+    // If currently dark (via system or explicit), toggle to light.
+    // If currently light (via system or explicit), toggle to dark.
+    const nextTheme: 'light' | 'dark' = isDark ? 'light' : 'dark'
+    setTheme(nextTheme)
   }
 
-  return { theme, setTheme, toggleTheme }
+  return { theme, resolvedTheme, isDark, setTheme, toggleTheme }
 }
