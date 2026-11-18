@@ -1,4 +1,4 @@
-import { Info, Plus, Trash2 } from 'lucide-react'
+import { Info, Plus, Trash2, ChevronDown } from 'lucide-react'
 import { FieldConfig } from '@/config/formFields'
 import { formatCrore } from '@/lib/currency'
 import { cn } from '@/lib/cn'
@@ -7,37 +7,37 @@ interface DynamicFieldProps {
   field: FieldConfig
   value: any
   onChange: (value: any) => void
-  onSkip?: () => void
 }
 
 export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
   const currentValue = value !== undefined ? value : field.defaultValue
 
   return (
-    <div className="space-y-1.5 py-2">
-      {/* Label and Help */}
-      <div className="flex items-start justify-between gap-2">
+    <div className="space-y-2 py-1.5">
+      {/* Label and Optional indicator */}
+      <div className="flex items-center justify-between gap-2">
         <label
           htmlFor={field.id}
-          className="text-sm font-semibold text-foreground flex items-center gap-1.5"
+          className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5"
         >
           {field.label}
         </label>
         {field.skippable && (
-          <span className="text-[11px] text-muted-foreground bg-muted px-1.5 py-0.5 rounded">
+          <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800/90 px-2 py-0.5 rounded-full border border-zinc-200 dark:border-zinc-700">
             Optional
           </span>
         )}
       </div>
 
+      {/* Explanation text with high contrast */}
       {field.help && (
-        <div className="flex items-start gap-1.5 text-xs text-muted-foreground bg-muted/40 p-2 rounded-md">
-          <Info className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+        <div className="flex items-start gap-2 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded-lg leading-relaxed">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <span>{field.help}</span>
         </div>
       )}
 
-      {/* Field Input based on type */}
+      {/* Input Widgets */}
       {field.type === 'text' && (
         <input
           id={field.id}
@@ -45,15 +45,15 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
           value={currentValue ?? ''}
           placeholder={field.placeholder}
           onChange={e => onChange(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
+          className="w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150"
         />
       )}
 
       {field.type === 'number' && (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           <div className="relative flex items-center">
             {field.prefix && (
-              <span className="absolute left-3 text-sm font-medium text-muted-foreground pointer-events-none">
+              <span className="absolute left-3.5 text-sm font-bold text-zinc-500 dark:text-zinc-400 pointer-events-none">
                 {field.prefix}
               </span>
             )}
@@ -67,43 +67,46 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               placeholder={field.placeholder}
               onChange={e => onChange(e.target.value === '' ? '' : Number(e.target.value))}
               className={cn(
-                'w-full border rounded-lg py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary',
-                field.prefix ? 'pl-7' : 'pl-3',
-                field.suffix ? 'pr-12' : 'pr-3',
+                'w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                field.prefix ? 'pl-8' : 'pl-3.5',
+                field.suffix ? 'pr-16' : 'pr-3.5',
               )}
             />
             {field.suffix && (
-              <span className="absolute right-3 text-xs text-muted-foreground pointer-events-none">
+              <span className="absolute right-3.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400 pointer-events-none uppercase tracking-wide">
                 {field.suffix}
               </span>
             )}
           </div>
           {field.prefix === '₹' && typeof currentValue === 'number' && currentValue >= 10000 && (
-            <p className="text-xs text-primary font-medium pl-1">
-              ≈ {formatCrore(currentValue)}
-            </p>
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/60 text-xs font-semibold text-blue-700 dark:text-blue-300">
+              <span>≈ {formatCrore(currentValue)}</span>
+            </div>
           )}
         </div>
       )}
 
       {field.type === 'select' && (
-        <select
-          id={field.id}
-          value={currentValue ?? ''}
-          onChange={e => onChange(e.target.value)}
-          className="w-full border rounded-lg px-3 py-2 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary"
-        >
-          {field.options?.map(opt => (
-            <option key={String(opt.value)} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <div className="relative">
+          <select
+            id={field.id}
+            value={currentValue ?? ''}
+            onChange={e => onChange(e.target.value)}
+            className="w-full h-11 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3.5 pr-10 text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 cursor-pointer"
+          >
+            {field.options?.map(opt => (
+              <option key={String(opt.value)} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 text-zinc-400 dark:text-zinc-500 pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
+        </div>
       )}
 
       {field.type === 'slider' && (
         <div className="space-y-2 pt-1">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4 bg-zinc-50 dark:bg-zinc-900/60 p-3 rounded-xl border border-zinc-200 dark:border-zinc-800">
             <input
               id={field.id}
               type="range"
@@ -112,10 +115,10 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               step={field.step ?? 0.01}
               value={currentValue ?? field.defaultValue}
               onChange={e => onChange(Number(e.target.value))}
-              className="flex-1 accent-primary cursor-pointer"
+              className="flex-1 accent-blue-600 dark:accent-blue-500 cursor-pointer h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
             />
             <div className="w-24 text-right">
-              <span className="font-semibold text-sm">
+              <span className="font-bold text-sm text-blue-600 dark:text-blue-400">
                 {field.suffix === '%'
                   ? `${(Number(currentValue) * 100).toFixed(1)}%`
                   : `${currentValue} ${field.suffix ?? ''}`}
@@ -126,7 +129,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
       )}
 
       {field.type === 'radio' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
           {field.options?.map(opt => {
             const isSelected = currentValue === opt.value
             return (
@@ -135,15 +138,15 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
                 type="button"
                 onClick={() => onChange(opt.value)}
                 className={cn(
-                  'text-left p-3 rounded-lg border-2 transition-all',
+                  'text-left p-3.5 rounded-xl border-2 transition-all duration-150 cursor-pointer shadow-xs',
                   isSelected
-                    ? 'border-primary bg-primary/5 text-primary'
-                    : 'border-border hover:border-primary/40 text-foreground',
+                    ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/10'
+                    : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100',
                 )}
               >
-                <div className="font-semibold text-sm">{opt.label}</div>
+                <div className="font-bold text-sm">{opt.label}</div>
                 {opt.description && (
-                  <p className="text-xs text-muted-foreground mt-1 leading-snug">
+                  <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-1 leading-snug">
                     {opt.description}
                   </p>
                 )}
@@ -154,15 +157,17 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
       )}
 
       {field.type === 'checkbox' && (
-        <label className="flex items-center gap-2 cursor-pointer pt-1 text-sm text-foreground">
+        <label className="flex items-center gap-3 cursor-pointer pt-1.5 p-2 rounded-lg hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 transition-colors">
           <input
             id={field.id}
             type="checkbox"
             checked={Boolean(currentValue)}
             onChange={e => onChange(e.target.checked)}
-            className="w-4 h-4 rounded text-primary border-border focus:ring-primary"
+            className="w-4 h-4 rounded text-blue-600 dark:text-blue-500 border-zinc-300 dark:border-zinc-700 focus:ring-blue-500"
           />
-          <span>{field.label}</span>
+          <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+            {field.label}
+          </span>
         </label>
       )}
 
@@ -211,17 +216,17 @@ function ArrayField({
       {items.map((item, idx) => (
         <div
           key={item.id || idx}
-          className="border rounded-lg p-3 bg-card space-y-3 relative group"
+          className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-900/90 shadow-xs space-y-3 relative"
         >
-          <div className="flex items-center justify-between pb-1 border-b">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
+            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
               {item.label || item.name || `Item #${idx + 1}`}
             </span>
             {item.id !== 'self' && (
               <button
                 type="button"
                 onClick={() => removeItem(idx)}
-                className="text-muted-foreground hover:text-destructive p-1 rounded"
+                className="text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 title="Remove item"
               >
                 <Trash2 className="w-4 h-4" />
@@ -229,7 +234,7 @@ function ArrayField({
             )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
             {field.subFields?.map(sub => (
               <DynamicField
                 key={sub.id}
@@ -245,10 +250,10 @@ function ArrayField({
       <button
         type="button"
         onClick={addItem}
-        className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 px-3 py-2 rounded-md transition-colors"
+        className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/60 px-4 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
       >
-        <Plus className="w-3.5 h-3.5" />
-        {field.addButtonText || '+ Add Item'}
+        <Plus className="w-4 h-4" />
+        <span>{field.addButtonText || '+ Add Item'}</span>
       </button>
     </div>
   )

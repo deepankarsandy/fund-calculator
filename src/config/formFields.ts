@@ -72,7 +72,7 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
     id: 1,
     key: 'profile',
     title: 'Profile & Horizon',
-    subtitle: 'Basic details to define your time horizon and baseline currency.',
+    subtitle: 'Basic details to define your time horizon, location, and lifestyle baseline.',
     skippable: false,
     fields: [
       {
@@ -102,11 +102,40 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
         ],
       },
       {
+        id: 'areaType',
+        label: 'Area / Location Type',
+        type: 'radio',
+        defaultValue: 'small_town',
+        help: 'Living expenses vary dramatically across India. Selecting your area automatically calibrates baseline expense defaults.',
+        options: [
+          {
+            label: 'Village / Rural',
+            value: 'village',
+            description: 'Lowest cost of living (~40-60% of metro costs).',
+          },
+          {
+            label: 'Small Town (Tier 3)',
+            value: 'small_town',
+            description: 'Moderate costs (e.g. baseline sample from planning guide).',
+          },
+          {
+            label: 'City (Tier 2)',
+            value: 'city',
+            description: 'State capitals & growing urban centers (~1.6x of small town).',
+          },
+          {
+            label: 'Metro (Tier 1)',
+            value: 'tier1_metro',
+            description: 'Major metros: Mumbai, Bengaluru, Delhi NCR, Hyderabad (~2.5x).',
+          },
+        ],
+      },
+      {
         id: 'region',
         label: 'State / Region (Optional)',
         type: 'text',
         defaultValue: 'Odisha',
-        placeholder: 'e.g. Odisha, Karnataka',
+        placeholder: 'e.g. Odisha, Karnataka, Maharashtra',
         help: 'Optional geographic context for your reference.',
         skippable: true,
       },
@@ -115,8 +144,8 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
         label: 'City / Town (Optional)',
         type: 'text',
         defaultValue: '',
-        placeholder: 'e.g. Bhubaneswar, Bangalore',
-        help: 'Optional city or town to help distinguish different scenarios.',
+        placeholder: 'e.g. Bhubaneswar, Bengaluru, Pune',
+        help: 'Optional city or town name to help distinguish different saved scenarios.',
         skippable: true,
       },
       {

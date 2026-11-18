@@ -16,11 +16,21 @@ The core philosophy of this project is **simplicity and maintainability**:
 
 ## Tech Stack
 - **Framework**: React (Vite + TypeScript)
-- **Styling**: Tailwind CSS
+- **Styling**: Tailwind CSS with Dark/Light/System theme switcher and modern form styling
 - **Icons**: Lucide React
 - **Math/Precision**: `decimal.js` (for financial formulas)
 - **Charts**: Recharts (clean, responsive visualizations)
 - **Test Runner**: Vitest (pure functionality tests for calculation logic)
+
+---
+
+## Key Features & User Experience
+- **Theme Switcher**: Supports Light, Dark, and System theme defaults, persisted in `localStorage`.
+- **Modern Form Elements**: Consistent 44px (`h-11`) inputs and dropdowns, custom select indicators, and removed default browser number input arrows.
+- **Area & Location Calibrated Defaults**: Choose between **Village / Rural**, **Small Town (Tier 3)**, **City (Tier 2)**, and **Tier 1 Metro** in Profile. Default expense estimates automatically adjust according to realistic cost-of-living multipliers across India.
+- **High Contrast UI**: Distinct status badges (`Filled`, `Not filled`, `Skipped`), high-contrast alerts, and clear explanation tooltips.
+- **Complete Local Storage Persistence**: All user inputs persist across reloads and are cleared cleanly upon clicking "Reset".
+- **Dynamic Expense Management**: Categories A to K support entering a single category total or expanding sub-items, with one-click skip.
 
 ---
 

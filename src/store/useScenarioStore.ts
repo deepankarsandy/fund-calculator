@@ -9,7 +9,7 @@ import type { CalculationResults } from '@/domain/models/results'
 import { DEFAULT_PROFILE } from '@/domain/models/profile'
 import { DEFAULT_ASSUMPTIONS } from '@/domain/models/assumptions'
 import { DEFAULT_ASSETS } from '@/domain/models/assets'
-import { DEFAULT_CATEGORIES } from '@/domain/data/defaultCategories'
+import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 
 interface ScenarioState {
   // Data
@@ -40,6 +40,7 @@ interface ScenarioState {
   addExpenseItem: (categoryId: CategoryId, item: ExpenseItem) => void
   updateExpenseItem: (categoryId: CategoryId, itemId: string, patch: Partial<ExpenseItem>) => void
   removeExpenseItem: (categoryId: CategoryId, itemId: string) => void
+  recalibrateCategories: () => void
 
   // Assumption / asset actions
   setAssumptions: (a: Partial<Assumptions>) => void
@@ -77,7 +78,7 @@ export const useScenarioStore = create<ScenarioState>()(
     (set, get) => ({
       profile: DEFAULT_PROFILE,
       members: [initialSelf],
-      categories: DEFAULT_CATEGORIES,
+      categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario),
       assumptions: DEFAULT_ASSUMPTIONS,
       assets: DEFAULT_ASSETS,
       results: null,
@@ -86,7 +87,31 @@ export const useScenarioStore = create<ScenarioState>()(
 
       setStepFieldValue: (stepKey, fieldId, value) => {
         if (stepKey === 'profile') {
-          set(s => ({ profile: { ...s.profile, [fieldId]: value } }))
+          set(s => {
+            const updatedProfile = { ...s.profile, [fieldId]: value }
+            // Auto update member age if currentAge changes
+            let updatedMembers = s.members
+            if (fieldId === 'currentAge') {
+              updatedMembers = s.members.map(m =>
+                m.id === 'self' ? { ...m, age: Number(value) } : m,
+              )
+            }
+
+            // Auto calibrate categories if areaType or lifestyleScenario changes
+            let updatedCategories = s.categories
+            if (fieldId === 'areaType' || fieldId === 'lifestyleScenario') {
+              updatedCategories = buildCategoriesForProfile(
+                updatedProfile.areaType,
+                updatedProfile.lifestyleScenario,
+              )
+            }
+
+            return {
+              profile: updatedProfile,
+              members: updatedMembers,
+              categories: updatedCategories,
+            }
+          })
         } else if (stepKey === 'household') {
           if (fieldId === 'members') {
             set({ members: value })
@@ -99,7 +124,24 @@ export const useScenarioStore = create<ScenarioState>()(
       },
 
       setProfile: p =>
-        set(s => ({ profile: { ...s.profile, ...p } })),
+        set(s => {
+          const updatedProfile = { ...s.profile, ...p }
+          let updatedCategories = s.categories
+          if (p.areaType || p.lifestyleScenario) {
+            updatedCategories = buildCategoriesForProfile(
+              updatedProfile.areaType,
+              updatedProfile.lifestyleScenario,
+            )
+          }
+          return { profile: updatedProfile, categories: updatedCategories }
+        }),
+
+      recalibrateCategories: () => {
+        const { profile } = get()
+        set({
+          categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario),
+        })
+      },
 
       addMember: m =>
         set(s => ({ members: [...s.members, m] })),
@@ -193,16 +235,20 @@ export const useScenarioStore = create<ScenarioState>()(
         if (currentStep > 1) set({ currentStep: currentStep - 1 })
       },
 
-      reset: () =>
+      reset: () => {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('corpus-calc-v1')
+        }
         set({
           profile: DEFAULT_PROFILE,
-          members: [initialSelf],
-          categories: DEFAULT_CATEGORIES,
+          members: [{ ...initialSelf, age: DEFAULT_PROFILE.currentAge }],
+          categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario),
           assumptions: DEFAULT_ASSUMPTIONS,
           assets: DEFAULT_ASSETS,
           results: null,
           currentStep: 1,
-        }),
+        })
+      },
     }),
     { name: 'corpus-calc-v1' },
   ),

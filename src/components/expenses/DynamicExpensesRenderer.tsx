@@ -21,7 +21,7 @@ function categoryTotal(cat: ExpenseCategory): number {
 function StatusBadge({ cat }: { cat: ExpenseCategory }) {
   if (cat.skipped) {
     return (
-      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border border-zinc-300 dark:border-zinc-700">
         Skipped
       </span>
     )
@@ -29,13 +29,13 @@ function StatusBadge({ cat }: { cat: ExpenseCategory }) {
   const total = categoryTotal(cat)
   if (total > 0) {
     return (
-      <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300">
+      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/80">
         Filled ({formatCrore(total)}/yr)
       </span>
     )
   }
   return (
-    <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300">
+    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800/80">
       Not filled
     </span>
   )
@@ -55,7 +55,7 @@ function SubItemRow({
   return (
     <div
       className={cn(
-        'border rounded-lg p-2.5 space-y-2 text-sm bg-card transition-colors',
+        'border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2 text-sm bg-white dark:bg-zinc-900 shadow-xs transition-colors',
         item.skipped && 'opacity-40',
       )}
     >
@@ -64,52 +64,56 @@ function SubItemRow({
           type="text"
           value={item.name}
           onChange={e => onUpdate({ name: e.target.value })}
-          className="flex-1 font-medium text-xs sm:text-sm border rounded px-2.5 py-1.5 bg-background focus:ring-1 focus:ring-primary"
+          className="flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
 
         <div className="flex items-center gap-1.5 shrink-0">
-          <span className="text-xs text-muted-foreground font-semibold">₹</span>
-          <input
-            type="number"
-            min={0}
-            value={item.amount || ''}
-            placeholder="0"
-            onChange={e => onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })}
-            className="w-24 sm:w-28 border rounded px-2.5 py-1.5 text-xs text-right font-medium focus:ring-1 focus:ring-primary"
-          />
+          <div className="relative flex items-center">
+            <span className="absolute left-2.5 text-xs font-bold text-zinc-500 pointer-events-none">₹</span>
+            <input
+              type="number"
+              min={0}
+              value={item.amount || ''}
+              placeholder="0"
+              onChange={e => onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })}
+              className="w-24 sm:w-28 h-9 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            />
+          </div>
 
-          <select
-            value={item.frequency}
-            onChange={e => onUpdate({ frequency: e.target.value as Frequency })}
-            className="border rounded px-2 py-1.5 text-xs bg-background focus:ring-1 focus:ring-primary"
-          >
-            {Object.entries(FREQUENCY_LABELS).map(([k, label]) => (
-              <option key={k} value={k}>
-                {label}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={item.frequency}
+              onChange={e => onUpdate({ frequency: e.target.value as Frequency })}
+              className="h-9 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-lg pl-2.5 pr-6 text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+            >
+              {Object.entries(FREQUENCY_LABELS).map(([k, label]) => (
+                <option key={k} value={k}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="w-3 h-3 text-zinc-400 pointer-events-none absolute right-2 top-1/2 -translate-y-1/2" />
+          </div>
 
           {item.frequency === 'every_n_years' && (
-            <div className="flex items-center gap-1">
-              <span className="text-xs text-muted-foreground">Every</span>
+            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Every</span>
               <input
                 type="number"
                 min={1}
                 max={30}
                 value={item.everyNYears ?? 5}
                 onChange={e => onUpdate({ everyNYears: Number(e.target.value) })}
-                className="w-12 border rounded px-1.5 py-1 text-xs text-center"
+                className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <span className="text-xs text-muted-foreground">yrs</span>
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">yrs</span>
             </div>
           )}
 
           <button
             type="button"
             onClick={() => setShowDetails(x => !x)}
-            className="text-muted-foreground hover:text-foreground p-1 text-xs underline ml-1"
-            title="More details"
+            className="text-blue-600 dark:text-blue-400 hover:underline p-1 text-xs font-medium ml-1 cursor-pointer"
           >
             {showDetails ? 'Less' : 'More'}
           </button>
@@ -117,7 +121,7 @@ function SubItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="text-muted-foreground hover:text-destructive p-1 rounded"
+            className="text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
             title="Delete item"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -126,44 +130,44 @@ function SubItemRow({
       </div>
 
       {item.notes && !showDetails && (
-        <p className="text-[11px] text-muted-foreground pl-1 flex items-center gap-1">
-          <Info className="w-3 h-3 text-primary shrink-0" />
+        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
+          <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
         </p>
       )}
 
       {showDetails && (
-        <div className="pt-2 border-t grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs bg-muted/20 p-2 rounded">
-          <label className="flex items-center gap-1.5 cursor-pointer">
+        <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs bg-zinc-50 dark:bg-zinc-900/60 p-2.5 rounded-lg">
+          <label className="flex items-center gap-2 cursor-pointer font-medium text-zinc-800 dark:text-zinc-200">
             <input
               type="checkbox"
               checked={item.essential}
               onChange={e => onUpdate({ essential: e.target.checked })}
-              className="w-3.5 h-3.5 text-primary rounded"
+              className="w-4 h-4 text-blue-600 rounded"
             />
             <span>Essential Expense</span>
           </label>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-muted-foreground">Start Year:</span>
+            <span className="text-zinc-500 font-medium">Start Year:</span>
             <input
               type="number"
               min={1}
               value={item.startYear}
               onChange={e => onUpdate({ startYear: Number(e.target.value) })}
-              className="w-16 border rounded px-1.5 py-0.5 text-xs"
+              className="w-16 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
           </div>
 
           <div className="flex items-center gap-1.5">
-            <span className="text-muted-foreground">End Year:</span>
+            <span className="text-zinc-500 font-medium">End Year:</span>
             <input
               type="number"
               min={1}
               value={item.endYear ?? ''}
               placeholder="Lifelong"
               onChange={e => onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })}
-              className="w-20 border rounded px-1.5 py-0.5 text-xs"
+              className="w-20 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
           </div>
         </div>
@@ -206,16 +210,16 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
 
   if (cat.skipped) {
     return (
-      <div className="p-4 bg-muted/20 text-center space-y-2 rounded-b-lg">
-        <p className="text-xs text-muted-foreground">
-          This category is marked as skipped and will not add to your living costs.
+      <div className="p-4 bg-zinc-50 dark:bg-zinc-900/40 text-center space-y-2 rounded-b-xl border-t border-zinc-100 dark:border-zinc-800">
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          This category is marked as skipped and is omitted from calculations.
         </p>
         <button
           type="button"
           onClick={() => updateCategory(cat.id, { skipped: false })}
-          className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1"
+          className="text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1.5 cursor-pointer"
         >
-          <RotateCcw className="w-3 h-3" />
+          <RotateCcw className="w-3.5 h-3.5" />
           Un-skip and include this category
         </button>
       </div>
@@ -223,26 +227,28 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
   }
 
   return (
-    <div className="p-4 space-y-4 border-t bg-card/50 rounded-b-lg">
-      <div className="text-xs text-muted-foreground flex items-start gap-1.5 bg-muted/40 p-2.5 rounded-md">
-        <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+    <div className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl">
+      <div className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
+        <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
-          <p>{cat.description}</p>
-          <p className="mt-0.5 text-[11px] font-medium text-foreground/80">
-            Assumed inflation rate for this category: {(cat.defaultInflationRate * 100).toFixed(0)}% per year.
+          <p className="font-medium">{cat.description}</p>
+          <p className="mt-1 text-[11px] font-bold text-zinc-900 dark:text-zinc-200">
+            Default inflation rate for this category: {(cat.defaultInflationRate * 100).toFixed(0)}% per year.
           </p>
         </div>
       </div>
 
       {/* Mode Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b pb-3">
-        <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+      <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-zinc-200 dark:border-zinc-800 pb-3">
+        <div className="flex items-center gap-1 bg-zinc-200/80 dark:bg-zinc-800 p-1 rounded-lg">
           <button
             type="button"
             onClick={() => setMode('parent')}
             className={cn(
-              'px-3 py-1 text-xs font-medium rounded-md transition-colors',
-              isParentMode ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground',
+              'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
+              isParentMode
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
             )}
           >
             Enter Category Total
@@ -251,8 +257,10 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
             type="button"
             onClick={() => setMode('subitems')}
             className={cn(
-              'px-3 py-1 text-xs font-medium rounded-md transition-colors',
-              !isParentMode ? 'bg-background shadow-sm text-foreground font-semibold' : 'text-muted-foreground hover:text-foreground',
+              'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
+              !isParentMode
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
             )}
           >
             Fill Sub-items ({cat.items.length})
@@ -262,7 +270,7 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
         <button
           type="button"
           onClick={() => updateCategory(cat.id, { skipped: true })}
-          className="text-xs text-muted-foreground hover:text-foreground underline"
+          className="text-xs font-medium text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200 underline cursor-pointer"
         >
           Skip this category
         </button>
@@ -270,36 +278,39 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
 
       {/* Parent Total Mode */}
       {isParentMode ? (
-        <div className="space-y-3 bg-muted/30 p-4 rounded-lg">
-          <p className="text-xs text-muted-foreground">
-            Enter a single total for this whole category. Individual sub-items below are bypassed.
+        <div className="space-y-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
+          <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+            Enter a single total for this whole category. Individual sub-items are bypassed in calculations.
           </p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="relative flex items-center">
-              <span className="absolute left-3 text-xs font-medium text-muted-foreground">₹</span>
+              <span className="absolute left-3.5 text-sm font-bold text-zinc-400">₹</span>
               <input
                 type="number"
                 min={0}
                 value={cat.parentAmount || ''}
                 placeholder="0"
                 onChange={e => updateCategory(cat.id, { parentAmount: Number(e.target.value) })}
-                className="w-40 border rounded-lg pl-7 pr-3 py-2 text-sm bg-background font-semibold"
+                className="w-44 h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
             </div>
 
-            <select
-              value={cat.parentFrequency || 'monthly'}
-              onChange={e => updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })}
-              className="border rounded-lg px-3 py-2 text-sm bg-background font-medium"
-            >
-              <option value="monthly">Per Month</option>
-              <option value="quarterly">Per Quarter</option>
-              <option value="half_yearly">Half Yearly</option>
-              <option value="yearly">Per Year</option>
-            </select>
+            <div className="relative">
+              <select
+                value={cat.parentFrequency || 'monthly'}
+                onChange={e => updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })}
+                className="h-11 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3.5 pr-9 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer"
+              >
+                <option value="monthly">Per Month</option>
+                <option value="quarterly">Per Quarter</option>
+                <option value="half_yearly">Half Yearly</option>
+                <option value="yearly">Per Year</option>
+              </select>
+              <ChevronDown className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+            </div>
 
             {cat.parentAmount && cat.parentAmount > 0 && (
-              <span className="text-xs text-primary font-semibold sm:ml-2">
+              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/60">
                 = {formatCrore(categoryTotal(cat))}/year
               </span>
             )}
@@ -320,10 +331,10 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
           <button
             type="button"
             onClick={handleAddCustomItem}
-            className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 py-1.5 px-2 rounded hover:bg-primary/10 transition-colors"
+            className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 py-2 px-3.5 rounded-xl transition-all cursor-pointer shadow-xs"
           >
             <Plus className="w-3.5 h-3.5" />
-            Add Custom Line Item
+            <span>Add Custom Line Item</span>
           </button>
         </div>
       )}
@@ -332,7 +343,7 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
 }
 
 export function DynamicExpensesRenderer() {
-  const { categories } = useScenarioStore()
+  const { categories, profile, recalibrateCategories } = useScenarioStore()
   const [openIds, setOpenIds] = useState<Set<string>>(new Set(['housing', 'food', 'healthcare']))
 
   function toggle(id: string) {
@@ -355,41 +366,56 @@ export function DynamicExpensesRenderer() {
 
   return (
     <div className="space-y-4">
-      {/* Top Annual Summary Banner */}
-      <div className="rounded-xl bg-primary/10 border border-primary/20 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      {/* Top Annual Summary Banner with high visual contrast */}
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-700 dark:from-blue-700 dark:to-indigo-800 p-5 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-wider text-primary">
-            Total Current Annual Living Expenses
-          </span>
-          <p className="text-2xl font-bold text-foreground mt-0.5">
-            {formatCrore(grandTotal)} / year
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] font-bold uppercase tracking-wider bg-white/20 text-white px-2 py-0.5 rounded-full">
+              Baseline Expenses
+            </span>
+            <span className="text-xs text-blue-100">
+              Calibrated for: <strong className="capitalize">{profile.areaType.replace('_', ' ')}</strong> · <strong className="capitalize">{profile.lifestyleScenario.replace('_', ' ')}</strong>
+            </span>
+          </div>
+          <p className="text-3xl font-extrabold text-white mt-1 tracking-tight">
+            {formatCrore(grandTotal)} <span className="text-sm font-semibold text-blue-100">/ year</span>
           </p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-blue-100/90 mt-0.5">
             ≈ {formatCrore(grandTotal / 12)} / month in today's purchasing power
           </p>
         </div>
 
-        <div className="flex items-center gap-2 self-end sm:self-center">
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
           <button
             type="button"
-            onClick={expandAll}
-            className="text-xs text-muted-foreground hover:text-foreground underline"
+            onClick={recalibrateCategories}
+            className="text-xs font-semibold bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-lg transition-colors border border-white/20 cursor-pointer"
+            title="Reset default expense amounts based on your profile location"
           >
-            Expand All
+            Reset to Area Defaults
           </button>
-          <span className="text-xs text-muted-foreground">•</span>
-          <button
-            type="button"
-            onClick={collapseAll}
-            className="text-xs text-muted-foreground hover:text-foreground underline"
-          >
-            Collapse All
-          </button>
+          <div className="flex items-center gap-2 text-xs text-white/90">
+            <button
+              type="button"
+              onClick={expandAll}
+              className="hover:underline font-medium cursor-pointer"
+            >
+              Expand All
+            </button>
+            <span>•</span>
+            <button
+              type="button"
+              onClick={collapseAll}
+              className="hover:underline font-medium cursor-pointer"
+            >
+              Collapse All
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Category Accordion */}
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {categories.map(cat => {
           const isOpen = openIds.has(cat.id)
 
@@ -397,22 +423,24 @@ export function DynamicExpensesRenderer() {
             <div
               key={cat.id}
               className={cn(
-                'border rounded-xl transition-all duration-200 shadow-xs',
-                isOpen ? 'border-primary/40 bg-card' : 'hover:border-border/80 bg-card/60',
+                'border rounded-xl transition-all duration-200 shadow-xs bg-white dark:bg-zinc-900',
+                isOpen
+                  ? 'border-blue-500/50 dark:border-blue-500/40 ring-1 ring-blue-500/10'
+                  : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700',
               )}
             >
               <button
                 type="button"
                 onClick={() => toggle(cat.id)}
-                className="w-full flex items-center justify-between px-4 py-3.5 text-left rounded-xl transition-colors hover:bg-muted/30"
+                className="w-full flex items-center justify-between px-4 py-3.5 text-left rounded-xl transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 cursor-pointer"
               >
-                <div className="flex items-center gap-2.5 min-w-0">
+                <div className="flex items-center gap-3 min-w-0">
                   {isOpen ? (
-                    <ChevronDown className="w-4 h-4 shrink-0 text-primary" />
+                    <ChevronDown className="w-4 h-4 shrink-0 text-blue-600 dark:text-blue-400" />
                   ) : (
-                    <ChevronRight className="w-4 h-4 shrink-0 text-muted-foreground" />
+                    <ChevronRight className="w-4 h-4 shrink-0 text-zinc-400" />
                   )}
-                  <span className="font-semibold text-sm text-foreground truncate">
+                  <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">
                     {cat.label}
                   </span>
                   <StatusBadge cat={cat} />
