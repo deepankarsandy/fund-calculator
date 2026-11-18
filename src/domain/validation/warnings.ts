@@ -93,7 +93,7 @@ export function generateWarnings(ctx: WarningContext): string[] {
   )
   if (dependents.length === 0) {
     warnings.push(
-      'No dependents (spouse, children, or elderly parents) were added in Step 2. If you support family members, remember to add them to factor in their healthcare, education, and living costs.',
+      'No dependents (spouse, children, or elderly parents) were added in Step 3. If you support family members, remember to add them to factor in their healthcare, education, and living costs.',
     )
   } else {
     const familyCat = categories.find(c => c.id === 'family')

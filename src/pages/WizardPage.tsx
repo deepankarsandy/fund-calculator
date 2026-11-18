@@ -15,12 +15,17 @@ import {
   Settings2,
   Landmark,
   BarChart2,
+  Home,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
-const STEP_ICONS = [User, Users, Receipt, Settings2, Landmark, BarChart2]
+const STEP_ICONS = [User, Landmark, Users, Receipt, Settings2, BarChart2]
 
-export default function WizardPage() {
+interface WizardPageProps {
+  onBackToHome?: () => void
+}
+
+export default function WizardPage({ onBackToHome }: WizardPageProps) {
   const {
     currentStep,
     totalSteps,
@@ -67,7 +72,12 @@ export default function WizardPage() {
       <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
         <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={onBackToHome}
+              className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
+              title="Return to Home Overview"
+            >
               <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm">
                 ₹
               </div>
@@ -79,10 +89,22 @@ export default function WizardPage() {
                   Estimate the investment corpus needed for your lifetime living expenses
                 </p>
               </div>
-            </div>
+            </button>
 
             <div className="flex items-center gap-2">
               <ThemeToggle />
+
+              {onBackToHome && (
+                <button
+                  type="button"
+                  onClick={onBackToHome}
+                  className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
+                  title="Return to Home Page"
+                >
+                  <Home className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Home</span>
+                </button>
+              )}
 
               <button
                 type="button"

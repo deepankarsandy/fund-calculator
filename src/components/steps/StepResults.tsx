@@ -269,7 +269,7 @@ export function StepResults() {
         <p className="text-zinc-500 font-medium">No calculation run yet. Go back and click Calculate.</p>
         <button
           type="button"
-          onClick={() => goToStep(5)}
+          onClick={() => goToStep(2)}
           className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 cursor-pointer"
         >
           ← Go Back to Assets
@@ -398,11 +398,11 @@ export function StepResults() {
                 {w.toLowerCase().includes('no dependents') && (
                   <button
                     type="button"
-                    onClick={() => goToStep(2)}
+                    onClick={() => goToStep(3)}
                     className="ml-2 inline-flex items-center gap-1 font-bold text-amber-800 dark:text-amber-200 underline hover:opacity-80 cursor-pointer print:hidden"
                   >
                     <Users className="w-3 h-3" />
-                    <span>Add Dependents in Step 2 →</span>
+                    <span>Add Dependents in Step 3 →</span>
                   </button>
                 )}
               </li>
@@ -1132,11 +1132,11 @@ export function StepResults() {
       <div className="flex flex-wrap gap-3 pt-2 print:hidden">
         <button
           type="button"
-          onClick={() => goToStep(5)}
+          onClick={() => goToStep(2)}
           className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer shadow-xs"
         >
           <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Edit Monthly Income & Assets</span>
+          <span>Edit Income & Assets (Step 2)</span>
         </button>
         <button
           type="button"
@@ -1144,7 +1144,7 @@ export function StepResults() {
           className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer shadow-xs"
         >
           <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Edit Living Expenses</span>
+          <span>Edit Dependents (Step 3)</span>
         </button>
         <button
           type="button"
@@ -1152,7 +1152,15 @@ export function StepResults() {
           className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer shadow-xs"
         >
           <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Edit Assumptions</span>
+          <span>Edit Living Expenses (Step 4)</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => goToStep(5)}
+          className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold bg-white dark:bg-zinc-900 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors cursor-pointer shadow-xs"
+        >
+          <Edit2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+          <span>Edit Assumptions (Step 5)</span>
         </button>
       </div>
 

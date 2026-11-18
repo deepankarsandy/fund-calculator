@@ -9,7 +9,7 @@ import { cn } from '@/lib/cn'
 
 function categoryTotal(cat: ExpenseCategory): number {
   if (cat.skipped) return 0
-  if (cat.parentAmount != null && cat.parentAmount > 0 && cat.parentFrequency) {
+  if (cat.parentAmount !== undefined && cat.parentFrequency) {
     const mult = FREQUENCY_MULTIPLIERS[cat.parentFrequency] || 1
     return cat.parentAmount * mult
   }
@@ -178,12 +178,22 @@ function SubItemRow({
 
 function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
   const { updateCategory, addExpenseItem, updateExpenseItem, removeExpenseItem } = useScenarioStore()
-  const isParentMode = cat.parentAmount != null && cat.parentAmount > 0
+  const isParentMode = cat.parentAmount !== undefined
 
   function setMode(mode: 'parent' | 'subitems') {
     if (mode === 'parent') {
+      const currentSubtotal = cat.items
+        .filter(i => !i.skipped)
+        .reduce((sum, item) => sum + annualiseExpense(item), 0)
+      const monthlyEquiv = Math.round(currentSubtotal / 12)
+
       updateCategory(cat.id, {
-        parentAmount: cat.parentAmount || 0,
+        parentAmount:
+          cat.parentAmount !== undefined
+            ? cat.parentAmount
+            : monthlyEquiv > 0
+            ? monthlyEquiv
+            : 0,
         parentFrequency: cat.parentFrequency || 'monthly',
       })
     } else {
@@ -247,7 +257,7 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
             className={cn(
               'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
               isParentMode
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
             )}
           >
@@ -259,7 +269,7 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
             className={cn(
               'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
               !isParentMode
-                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs'
+                ? 'bg-blue-600 text-white shadow-xs'
                 : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
             )}
           >
@@ -278,42 +288,87 @@ function CategoryPanel({ cat }: { cat: ExpenseCategory }) {
 
       {/* Parent Total Mode */}
       {isParentMode ? (
-        <div className="space-y-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-xs">
-          <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
-            Enter a single total for this whole category. Individual sub-items are bypassed in calculations.
-          </p>
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <div className="relative flex items-center">
-              <span className="absolute left-3.5 text-sm font-bold text-zinc-400">₹</span>
-              <input
-                type="number"
-                min={0}
-                value={cat.parentAmount || ''}
-                placeholder="0"
-                onChange={e => updateCategory(cat.id, { parentAmount: Number(e.target.value) })}
-                className="w-44 h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-            </div>
-
-            <div className="relative">
-              <select
-                value={cat.parentFrequency || 'monthly'}
-                onChange={e => updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })}
-                className="h-11 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3.5 pr-9 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer"
-              >
-                <option value="monthly">Per Month</option>
-                <option value="quarterly">Per Quarter</option>
-                <option value="half_yearly">Half Yearly</option>
-                <option value="yearly">Per Year</option>
-              </select>
-              <ChevronDown className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
-            </div>
-
-            {cat.parentAmount && cat.parentAmount > 0 && (
-              <span className="text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800/60">
-                = {formatCrore(categoryTotal(cat))}/year
+        <div className="space-y-4">
+          <div className="space-y-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border-2 border-blue-500/50 shadow-xs">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                Lump-Sum Total for {cat.label}
               </span>
-            )}
+              <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/60 px-2 py-0.5 rounded">
+                Active in calculations
+              </span>
+            </div>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 font-medium">
+              Enter a single overall amount for this category. Individual sub-items below are disabled and bypassed in calculations, but displayed to help you calculate your total.
+            </p>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="relative flex items-center">
+                <span className="absolute left-3.5 text-sm font-bold text-zinc-400">₹</span>
+                <input
+                  type="number"
+                  min={0}
+                  value={cat.parentAmount ?? ''}
+                  placeholder="0"
+                  onChange={e => updateCategory(cat.id, { parentAmount: Number(e.target.value) })}
+                  className="w-44 h-11 border border-zinc-300 dark:border-zinc-700 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
+              </div>
+
+              <div className="relative">
+                <select
+                  value={cat.parentFrequency || 'monthly'}
+                  onChange={e => updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })}
+                  className="h-11 appearance-none border border-zinc-300 dark:border-zinc-700 rounded-xl pl-3.5 pr-9 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer"
+                >
+                  <option value="monthly">Per Month</option>
+                  <option value="quarterly">Per Quarter</option>
+                  <option value="half_yearly">Half Yearly</option>
+                  <option value="yearly">Per Year</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-zinc-400 pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+              </div>
+
+              {cat.parentAmount !== undefined && (
+                <span className="text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-3 py-2 rounded-xl border border-blue-200 dark:border-blue-800/60">
+                  = {formatCrore(categoryTotal(cat))}/year
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Reference Sub-categories (Disabled / Non-editable) */}
+          <div className="space-y-2 pt-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
+                Reference Sub-Categories (Disabled while Category Total is active):
+              </span>
+              <button
+                type="button"
+                onClick={() => setMode('subitems')}
+                className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
+              >
+                Switch to Edit Line Items Individually →
+              </button>
+            </div>
+
+            <div className="space-y-1.5 opacity-60 pointer-events-none select-none">
+              {cat.items.map(item => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
+                >
+                  <span className="font-medium text-zinc-800 dark:text-zinc-200">{item.name}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-zinc-700 dark:text-zinc-300">
+                      ₹{item.amount.toLocaleString('en-IN')} {FREQUENCY_LABELS[item.frequency] || item.frequency}
+                    </span>
+                    <span className="text-[10px] text-zinc-400">
+                      (≈ {formatCrore(annualiseExpense(item))}/yr)
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       ) : (
