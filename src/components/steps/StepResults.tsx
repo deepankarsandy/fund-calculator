@@ -66,23 +66,51 @@ function ScenarioTab({
   onClick: () => void
 }) {
   const color = SCENARIO_COLORS[scenario.label as keyof typeof SCENARIO_COLORS] ?? '#3b82f6'
+  const targetCorpus = scenario.targetCorpusAtRetirement > 0 ? scenario.targetCorpusAtRetirement : scenario.requiredCorpus
+
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`px-4 py-2.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
+      className={cn(
+        'w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between space-y-2',
         active
-          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
-      }`}
+          ? 'bg-blue-50/80 dark:bg-blue-950/30 border-blue-600 dark:border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
+          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/60 dark:hover:bg-zinc-850',
+      )}
     >
-      <span className="flex items-center gap-1.5">
-        <span
-          className="w-2 h-2 rounded-full"
-          style={{ backgroundColor: active ? '#ffffff' : color }}
-        />
-        {scenario.label} ({formatPercent(scenario.inflationRate)} inf / {formatPercent(scenario.returnRate)} ret)
-      </span>
+      <div className="flex items-center justify-between gap-1 w-full">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-2.5 h-2.5 rounded-full shrink-0"
+            style={{ backgroundColor: color }}
+          />
+          <span className="font-bold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100">
+            {scenario.label}
+          </span>
+        </div>
+        {active ? (
+          <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs">
+            Active
+          </span>
+        ) : (
+          <span className="text-[10px] font-semibold text-zinc-400">
+            Select
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center justify-between text-[11px] text-zinc-500 dark:text-zinc-400 pt-1 border-t border-zinc-100 dark:border-zinc-800/80 w-full">
+        <span>Inflation: <strong className="text-zinc-700 dark:text-zinc-300">{formatPercent(scenario.inflationRate)}</strong></span>
+        <span>Return: <strong className="text-zinc-700 dark:text-zinc-300">{formatPercent(scenario.returnRate)}</strong></span>
+      </div>
+
+      <div className="flex items-baseline justify-between text-xs pt-0.5 w-full">
+        <span className="text-[11px] text-zinc-500">Target Needed:</span>
+        <span className="font-extrabold text-blue-600 dark:text-blue-400">
+          {targetCorpus === 0 ? '₹0 (Self-Funded)' : formatCrore(targetCorpus)}
+        </span>
+      </div>
     </button>
   )
 }
@@ -371,17 +399,26 @@ export function StepResults() {
         </button>
       </div>
 
-      {/* Scenario Selector Pills */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 print:hidden">
-        <span className="text-xs font-bold text-zinc-500 shrink-0">Scenario:</span>
-        {results.scenarios.map((s, i) => (
-          <ScenarioTab
-            key={s.label}
-            scenario={s}
-            active={activeScenario === i}
-            onClick={() => setActiveScenario(i)}
-          />
-        ))}
+      {/* Scenario Selector Cards */}
+      <div className="space-y-2 print:hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+          <span className="text-xs font-bold uppercase tracking-wider text-zinc-500">
+            Market Scenarios
+          </span>
+          <span className="text-[11px] text-zinc-400">
+            Select a scenario to view projections under varying market conditions
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {results.scenarios.map((s, i) => (
+            <ScenarioTab
+              key={s.label}
+              scenario={s}
+              active={activeScenario === i}
+              onClick={() => setActiveScenario(i)}
+            />
+          ))}
+        </div>
       </div>
 
       {/* Warnings & Suggestions Card */}
@@ -520,7 +557,7 @@ export function StepResults() {
       </div>
 
       {/* POSITIVE & NEGATIVE FLOW SUMMARY CARDS (Consistent Color Coding) */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 print-break-inside-avoid">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 print-break-inside-avoid">
         {/* Positive Inflow Card (Emerald Green) */}
         <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20 p-4 space-y-2">
           <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wide">
@@ -602,7 +639,7 @@ export function StepResults() {
           <span className="text-xs text-zinc-500 font-medium">How every single rupee flows</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
           <div className="p-3 rounded-xl bg-red-50/50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-900/40">
             <span className="text-red-700 dark:text-red-400 font-bold block mb-1">1. Total Lifetime Outflows</span>
             <span className="text-xl font-black text-red-600 dark:text-red-400 block">{formatCrore(scenario.totalLifetimeExpenses)}</span>
@@ -1025,7 +1062,7 @@ export function StepResults() {
                       />
                     </PieChart>
                   </ResponsiveContainer>
-                  <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-xs flex-1">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 text-xs flex-1 w-full">
                     {pieData.map(d => (
                       <div key={d.name} className="flex items-center gap-2">
                         <span
