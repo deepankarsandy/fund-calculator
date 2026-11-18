@@ -142,6 +142,8 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
     expect(baseScenario!.totalAccumulatedSavings).toBeGreaterThan(0)
     expect(baseScenario!.peakCorpus).toBeGreaterThan(1000000)
     expect(baseScenario!.peakCorpusAge).toBeGreaterThanOrEqual(50)
+    expect(baseScenario!.targetCorpusAtRetirement).toBeGreaterThan(0)
+    expect(baseScenario!.projectedCorpusAtRetirement).toBeGreaterThan(0)
     expect(baseScenario!.totalLifetimeExpenses).toBeGreaterThan(0)
     expect(baseScenario!.totalLifetimeIncome).toBeGreaterThan(0)
 
@@ -153,5 +155,50 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
 
     // Warnings include dependents recommendation when no dependents are present
     expect(result.warnings.some(w => w.includes('No dependents'))).toBe(true)
+  })
+
+  it('correctly calculates shortfall and early depletion when savings are insufficient', () => {
+    const profile: Profile = {
+      ...DEFAULT_PROFILE,
+      currentAge: 45,
+      targetAge: 85,
+    }
+
+    // High expense, low income, late start
+    const underfundedCategories: ExpenseCategory[] = [
+      {
+        id: 'housing',
+        label: 'Housing Expenses',
+        description: 'Living costs',
+        defaultInflationRate: 0.05,
+        parentAmount: 80000, // 80k/mo = 9.6L/yr
+        parentFrequency: 'monthly',
+        skipped: false,
+        items: [],
+      },
+    ]
+
+    const assets: Assets = {
+      ...DEFAULT_ASSETS,
+      existingInvestableCorpus: 100000, // only 1 Lakh
+      monthlyIncome: 90000,             // only saves 10k/mo
+      incomeEndAge: 55,                 // retires in 10 years
+      incomeGrowthRate: 0.03,
+    }
+
+    const result = runScenarios({
+      profile,
+      members: [],
+      categories: underfundedCategories,
+      assets,
+      assumptions: DEFAULT_ASSUMPTIONS,
+    })
+
+    const base = result.scenarios.find(s => s.label === 'Base')!
+    expect(base.readinessScore).toBeLessThan(100)
+    expect(base.retirementFundingGap).toBeGreaterThan(0)
+    expect(base.requiredCorpus).toBeGreaterThan(0)
+    expect(base.depletionAge).toBeDefined()
+    expect(base.depletionAge).toBeLessThan(profile.targetAge)
   })
 })

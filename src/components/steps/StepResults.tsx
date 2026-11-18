@@ -16,6 +16,9 @@ import {
   Layers,
   Scale,
   Users,
+  CheckCircle2,
+  AlertCircle,
+  TrendingUp,
 } from 'lucide-react'
 import type { ScenarioResult, LifestyleComparison } from '@/domain/models/results'
 import {
@@ -53,32 +56,6 @@ const CATEGORY_COLORS = [
   '#64748b',
 ]
 
-function SummaryCard({
-  label,
-  value,
-  sub,
-  highlight,
-}: {
-  label: string
-  value: string
-  sub?: string
-  highlight?: boolean
-}) {
-  return (
-    <div
-      className={`rounded-xl border p-4 shadow-xs ${
-        highlight
-          ? 'border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20'
-          : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'
-      }`}
-    >
-      <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 mb-1">{label}</p>
-      <p className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-zinc-100">{value}</p>
-      {sub && <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{sub}</p>}
-    </div>
-  )
-}
-
 function ScenarioTab({
   scenario,
   active,
@@ -93,14 +70,19 @@ function ScenarioTab({
     <button
       type="button"
       onClick={onClick}
-      className={`px-5 py-3 text-sm font-bold rounded-t-xl border-b-2 transition-all cursor-pointer ${
+      className={`px-4 py-2.5 text-xs font-bold rounded-xl border transition-all cursor-pointer ${
         active
-          ? 'border-current text-blue-600 dark:text-blue-400 bg-blue-50/40 dark:bg-blue-950/20'
-          : 'border-transparent text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-300'
+          ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'
       }`}
-      style={{ color: active ? color : undefined }}
     >
-      {scenario.label} ({formatPercent(scenario.inflationRate)} inf / {formatPercent(scenario.returnRate)} ret)
+      <span className="flex items-center gap-1.5">
+        <span
+          className="w-2 h-2 rounded-full"
+          style={{ backgroundColor: active ? '#ffffff' : color }}
+        />
+        {scenario.label} ({formatPercent(scenario.inflationRate)} inf / {formatPercent(scenario.returnRate)} ret)
+      </span>
     </button>
   )
 }
@@ -120,7 +102,7 @@ function LifestyleComparisonSection({
         <div className="flex items-center gap-2">
           <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-            Total Cost of Living & Corpus Requirement by Lifestyle
+            Cost of Living & Corpus Requirement by Lifestyle
           </h3>
         </div>
         <button
@@ -164,25 +146,25 @@ function LifestyleComparisonSection({
 
               <div className="space-y-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800/80 text-xs">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Monthly Today</span>
+                  <span className="text-[11px] text-zinc-500">Monthly Budget (Today)</span>
                   <span className="font-bold text-zinc-800 dark:text-zinc-200">
                     {formatCrore(c.monthlyExpenseToday)}/mo
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Total Lifetime Cost</span>
+                  <span className="text-[11px] text-zinc-500">Total Lifetime Spend</span>
                   <span className="font-extrabold text-red-600 dark:text-red-400">
                     {formatCrore(c.totalLifetimeCostOfLiving)}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Corpus Needed Today</span>
+                  <span className="text-[11px] text-zinc-500">Corpus Target Needed</span>
                   <span className="font-extrabold text-blue-600 dark:text-blue-400">
                     {c.requiredCorpus === 0 ? '₹0 (Self-Funded)' : formatCrore(c.requiredCorpus)}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Projected Peak Corpus</span>
+                  <span className="text-[11px] text-zinc-500">Projected Accumulation</span>
                   <span className="font-bold text-emerald-600 dark:text-emerald-400">
                     {formatCrore(c.peakCorpus)}
                   </span>
@@ -209,9 +191,14 @@ function ProjectionTable({ scenario, full = false }: { scenario: ScenarioResult;
         <table className="w-full text-xs">
           <thead className="bg-zinc-100/80 dark:bg-zinc-800/80 border-b border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300">
             <tr>
-              {['Year', 'Age', 'Total Income ₹', 'Expenses ₹', 'Net Invested (+) ₹', 'Net Withdrawn (-) ₹', 'Growth ₹', 'Portfolio Balance ₹'].map(h => (
-                <th key={h} className="px-3 py-2.5 text-left font-bold whitespace-nowrap">{h}</th>
-              ))}
+              <th className="px-3 py-2.5 text-left font-bold whitespace-nowrap">Year</th>
+              <th className="px-3 py-2.5 text-left font-bold whitespace-nowrap">Age</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-emerald-700 dark:text-emerald-400">Total Income (+)</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-red-700 dark:text-red-400">Living Expenses (-)</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-emerald-700 dark:text-emerald-400">Net Invested (+)</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-red-700 dark:text-red-400">Net Withdrawn (-)</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-blue-700 dark:text-blue-400">Investment Growth</th>
+              <th className="px-3 py-2.5 text-right font-bold whitespace-nowrap text-zinc-900 dark:text-zinc-100">Portfolio Balance</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800 text-zinc-800 dark:text-zinc-200">
@@ -227,13 +214,13 @@ function ProjectionTable({ scenario, full = false }: { scenario: ScenarioResult;
                   {row.earnedIncome > 0 && <span className="text-[10px] text-zinc-400 block">(Salary: {formatCrore(row.earnedIncome)})</span>}
                 </td>
                 <td className="px-3 py-2 text-right font-medium text-red-600 dark:text-red-400">{formatCrore(row.expenses)}</td>
-                <td className="px-3 py-2 text-right font-bold text-blue-600 dark:text-blue-400">
+                <td className="px-3 py-2 text-right font-bold text-emerald-600 dark:text-emerald-400">
                   {row.netSavings > 0 ? `+${formatCrore(row.netSavings)}` : '—'}
                 </td>
-                <td className="px-3 py-2 text-right font-bold text-amber-600 dark:text-amber-400">
+                <td className="px-3 py-2 text-right font-bold text-red-600 dark:text-red-400">
                   {row.netWithdrawal > 0 ? `-${formatCrore(row.netWithdrawal)}` : '—'}
                 </td>
-                <td className="px-3 py-2 text-right font-medium text-emerald-600 dark:text-emerald-400">{formatCrore(row.investmentGrowth)}</td>
+                <td className="px-3 py-2 text-right font-medium text-blue-600 dark:text-blue-400">+{formatCrore(row.investmentGrowth)}</td>
                 <td className={`px-3 py-2 text-right font-bold ${row.closingCorpus < 0 ? 'text-red-600 dark:text-red-400' : 'text-zinc-900 dark:text-zinc-100'}`}>
                   {formatCrore(row.closingCorpus)}
                 </td>
@@ -270,7 +257,7 @@ function ProjectionTable({ scenario, full = false }: { scenario: ScenarioResult;
 }
 
 export function StepResults() {
-  const { results, profile, assumptions, assets, goToStep } = useScenarioStore()
+  const { results, profile, assets, goToStep } = useScenarioStore()
   const [activeScenario, setActiveScenario] = useState(1) // Base by default
   const [showExplain, setShowExplain] = useState(false)
   const [activeTab, setActiveTab] = useState<'income_vs_expense' | 'portfolio' | 'categories' | 'table'>('income_vs_expense')
@@ -292,8 +279,7 @@ export function StepResults() {
   }
 
   const scenario = results.scenarios[activeScenario]
-  const hasActiveIncome = (assets.monthlyIncome || 0) > 0
-  const finalBalance = scenario.yearProjections[scenario.yearProjections.length - 1]?.closingCorpus ?? 0
+  const hasActiveIncome = (assets.monthlyIncome || 0) > 0 && assets.incomeEndAge > profile.currentAge
 
   // Income vs Expenses Annual Crossover Data
   const incomeVsExpenseData = scenario.yearProjections.map(row => ({
@@ -358,16 +344,20 @@ export function StepResults() {
     })
     .filter(d => d.value > 0)
 
+  // Retirement Readiness Progress percentage
+  const readinessPercent = Math.min(100, Math.max(0, scenario.readinessScore))
+  const isFullyFunded = scenario.readinessScore >= 100
+
   return (
     <div className="space-y-6 max-w-4xl font-sans">
-      {/* Top Header with PDF Print Button */}
+      {/* Top Header with PDF Print Button & Scenario Selector */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-zinc-200 dark:border-zinc-800 print:hidden">
         <div>
           <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
-            Lifetime Corpus & Financial Results
+            Corpus Calculation & Lifetime Results
           </h2>
           <p className="text-xs text-zinc-500 font-medium">
-            Personalized projections, cashflow crossover, and lifestyle scenario comparison
+            Clear comparison of retirement corpus requirements, career savings, and lifetime cashflow
           </p>
         </div>
         <button
@@ -381,7 +371,20 @@ export function StepResults() {
         </button>
       </div>
 
-      {/* Warnings & Suggestions with high contrast and actionable buttons */}
+      {/* Scenario Selector Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 print:hidden">
+        <span className="text-xs font-bold text-zinc-500 shrink-0">Scenario:</span>
+        {results.scenarios.map((s, i) => (
+          <ScenarioTab
+            key={s.label}
+            scenario={s}
+            active={activeScenario === i}
+            onClick={() => setActiveScenario(i)}
+          />
+        ))}
+      </div>
+
+      {/* Warnings & Suggestions Card */}
       {results.warnings.length > 0 && (
         <div className="rounded-2xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-4 space-y-2 shadow-xs print-break-inside-avoid">
           <div className="flex items-center gap-2 text-amber-950 dark:text-amber-200 font-bold text-sm">
@@ -408,332 +411,274 @@ export function StepResults() {
         </div>
       )}
 
-      {/* Scenario tabs */}
-      <div className="border-b border-zinc-200 dark:border-zinc-800 print:hidden">
-        <div className="flex gap-1 overflow-x-auto">
-          {results.scenarios.map((s, i) => (
-            <ScenarioTab
-              key={s.label}
-              scenario={s}
-              active={activeScenario === i}
-              onClick={() => setActiveScenario(i)}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Lifetime Financial Balance: Total Expenses vs Total Savings & Wealth */}
-      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs space-y-4 print-break-inside-avoid">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 pb-3">
+      {/* HERO CARD: Retirement Readiness & Target vs Projected Corpus */}
+      <div className="rounded-2xl border-2 border-blue-600/70 dark:border-blue-500/70 bg-gradient-to-br from-blue-50/60 via-white to-indigo-50/40 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/30 p-6 space-y-5 shadow-sm print-break-inside-avoid">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-blue-100 dark:border-zinc-800 pb-3">
           <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-              Lifetime Financial Balance: Total Expenses vs Inflows & Wealth
+            <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-sm font-extrabold uppercase tracking-wider text-blue-700 dark:text-blue-300">
+              {hasActiveIncome ? `Retirement Readiness Goal (Target Age ${scenario.retirementAge})` : 'Starting Corpus Requirement'}
             </h3>
           </div>
-          <span className="text-xs font-semibold text-zinc-500">
-            Age {profile.currentAge} → {profile.targetAge} ({profile.targetAge - profile.currentAge} Years)
+          <span className="text-xs font-bold text-zinc-500">
+            {hasActiveIncome
+              ? `${scenario.workingYears} Earning Years remaining · ${scenario.retirementYears} Retirement Years`
+              : `${scenario.retirementYears} Years horizon (Age ${profile.currentAge} → ${profile.targetAge})`}
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-left">
-          <div className="p-3 bg-red-50/70 dark:bg-red-950/20 rounded-xl border border-red-200/70 dark:border-red-900/40">
-            <p className="text-[11px] font-bold text-red-700 dark:text-red-400 uppercase tracking-wide">
-              Total Lifetime Expenses
+        {/* Two Main Key Figures Side-by-Side */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Target Required */}
+          <div className="p-4 bg-white/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide">
+              {hasActiveIncome ? `Target Corpus Needed at Age ${scenario.retirementAge}` : 'Starting Corpus Needed Today'}
             </p>
-            <p className="text-lg sm:text-xl font-black text-red-600 dark:text-red-400 mt-1">
-              {formatCrore(scenario.totalLifetimeExpenses)}
+            <p className="text-3xl sm:text-4xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight mt-1">
+              {formatCrore(hasActiveIncome ? scenario.targetCorpusAtRetirement : scenario.requiredCorpus)}
             </p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">Living costs inflated across lifetime</p>
+            <p className="text-[11px] text-zinc-500 mt-1 font-medium">
+              Funds {scenario.retirementYears} years of living costs with {formatPercent(scenario.inflationRate)} inflation & {formatPercent(scenario.returnRate)} returns
+            </p>
           </div>
 
-          <div className="p-3 bg-emerald-50/70 dark:bg-emerald-950/20 rounded-xl border border-emerald-200/70 dark:border-emerald-900/40">
-            <p className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
-              Total Lifetime Income
+          {/* What User Has / Will Have */}
+          <div className="p-4 bg-white/90 dark:bg-zinc-800/80 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-2xs">
+            <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide">
+              {hasActiveIncome ? `Your Projected Savings by Age ${scenario.retirementAge}` : 'Existing Liquid Investments Today'}
             </p>
-            <p className="text-lg sm:text-xl font-black text-emerald-600 dark:text-emerald-400 mt-1">
-              {formatCrore(scenario.totalLifetimeIncome)}
+            <p className="text-3xl sm:text-4xl font-black text-blue-600 dark:text-blue-400 tracking-tight mt-1">
+              {formatCrore(hasActiveIncome ? scenario.projectedCorpusAtRetirement : scenario.existingCorpus)}
             </p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">Salary with hikes + pensions + rent</p>
-          </div>
-
-          <div className="p-3 bg-blue-50/70 dark:bg-blue-950/20 rounded-xl border border-blue-200/70 dark:border-blue-900/40">
-            <p className="text-[11px] font-bold text-blue-700 dark:text-blue-400 uppercase tracking-wide">
-              Career Surplus Invested
+            <p className="text-[11px] text-zinc-500 mt-1 font-medium">
+              {hasActiveIncome
+                ? `Accumulated from monthly income surplus + ${(assets.incomeGrowthRate * 100).toFixed(1)}%/yr hikes`
+                : 'Current mutual funds, FDs, PPF & liquid investments'}
             </p>
-            <p className="text-lg sm:text-xl font-black text-blue-600 dark:text-blue-400 mt-1">
-              {formatCrore(scenario.totalLifetimeSavingsInvested + scenario.existingCorpus)}
-            </p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">Current corpus + salary surpluses</p>
-          </div>
-
-          <div className="p-3 bg-indigo-50/70 dark:bg-indigo-950/20 rounded-xl border border-indigo-200/70 dark:border-indigo-900/40">
-            <p className="text-[11px] font-bold text-indigo-700 dark:text-indigo-400 uppercase tracking-wide">
-              Compound Returns Made
-            </p>
-            <p className="text-lg sm:text-xl font-black text-indigo-600 dark:text-indigo-400 mt-1">
-              {formatCrore(scenario.totalLifetimeInvestmentGrowth)}
-            </p>
-            <p className="text-[10px] text-zinc-500 mt-0.5">Wealth purely from portfolio returns</p>
           </div>
         </div>
 
-        {/* Visual Balance Bar */}
-        <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-between text-xs font-semibold">
-            <span className="text-red-600 dark:text-red-400">
-              Total Outflow: {formatCrore(scenario.totalLifetimeExpenses)}
+        {/* Retirement Readiness Progress Bar */}
+        <div className="space-y-2 pt-1">
+          <div className="flex items-center justify-between text-xs font-bold">
+            <span className="flex items-center gap-1.5 text-zinc-700 dark:text-zinc-300">
+              <span>Goal Funding Progress:</span>
+              <span className={isFullyFunded ? 'text-emerald-600 dark:text-emerald-400 font-extrabold' : 'text-amber-600 dark:text-amber-400 font-extrabold'}>
+                {scenario.readinessScore}% Funded
+              </span>
             </span>
-            <span className="text-emerald-600 dark:text-emerald-400">
-              Total Inflows & Compounding: {formatCrore(scenario.totalLifetimeSavingsInvested + scenario.existingCorpus + scenario.totalLifetimeInvestmentGrowth)}
+
+            {isFullyFunded ? (
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1 font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>On Track (+{formatCrore(scenario.retirementSurplus)} Surplus)</span>
+              </span>
+            ) : (
+              <span className="text-red-600 dark:text-red-400 flex items-center gap-1 font-bold">
+                <AlertCircle className="w-3.5 h-3.5 text-red-600" />
+                <span>Shortfall of {formatCrore(scenario.retirementFundingGap)}</span>
+              </span>
+            )}
+          </div>
+
+          {/* Clear Visual Progress Track */}
+          <div className="h-3.5 w-full bg-zinc-200/80 dark:bg-zinc-800 rounded-full overflow-hidden p-0.5">
+            <div
+              className={cn(
+                'h-full rounded-full transition-all duration-500 shadow-xs',
+                isFullyFunded ? 'bg-emerald-500' : readinessPercent >= 70 ? 'bg-amber-500' : 'bg-red-500',
+              )}
+              style={{ width: `${readinessPercent}%` }}
+            />
+          </div>
+
+          {/* Actionable Explanation Banner */}
+          <div
+            className={cn(
+              'p-3.5 rounded-xl border text-xs font-medium leading-relaxed',
+              isFullyFunded
+                ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
+                : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200',
+            )}
+          >
+            {isFullyFunded ? (
+              <p>
+                <strong>Plan is Fully Self-Funded:</strong> With your current monthly take-home income and career savings, your portfolio will reach <strong>{formatCrore(scenario.projectedCorpusAtRetirement)}</strong> at retirement (exceeding your requirement of {formatCrore(scenario.targetCorpusAtRetirement)}). You require <strong>₹0 extra starting capital</strong> today.
+              </p>
+            ) : (
+              <p>
+                <strong>Plan has a Shortfall:</strong> Your projected career savings of {formatCrore(scenario.projectedCorpusAtRetirement)} fall short of the {formatCrore(scenario.targetCorpusAtRetirement)} required at Age {scenario.retirementAge}. To fully close this gap, you need an extra <strong>{formatCrore(scenario.fundingGap)}</strong> invested today, or an increase in your monthly savings.
+                {scenario.depletionAge && (
+                  <span className="block mt-1 text-red-700 dark:text-red-400 font-bold">
+                    Without changes, savings are projected to run out around Age {scenario.depletionAge}.
+                  </span>
+                )}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* POSITIVE & NEGATIVE FLOW SUMMARY CARDS (Consistent Color Coding) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 print-break-inside-avoid">
+        {/* Positive Inflow Card (Emerald Green) */}
+        <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20 p-4 space-y-2">
+          <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wide">
+            <ArrowUpRight className="w-4 h-4 text-emerald-600" />
+            <span>Inflows & Savings (+)</span>
+          </div>
+          <div className="space-y-1.5 pt-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Monthly Income Today</span>
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">+{formatCrore(assets.monthlyIncome)}/mo</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Career Surplus Invested</span>
+              <span className="font-extrabold text-emerald-700 dark:text-emerald-400">+{formatCrore(scenario.totalLifetimeSavingsInvested)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Existing Liquid Assets</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100">+{formatCrore(scenario.existingCorpus)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Negative Outflow Card (Red / Rose) */}
+        <div className="rounded-xl border border-red-200 dark:border-red-900/50 bg-red-50/40 dark:bg-red-950/20 p-4 space-y-2">
+          <div className="flex items-center gap-1.5 text-red-700 dark:text-red-400 text-xs font-bold uppercase tracking-wide">
+            <ArrowDownRight className="w-4 h-4 text-red-600" />
+            <span>Living Outflows (-)</span>
+          </div>
+          <div className="space-y-1.5 pt-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Living Budget Today</span>
+              <span className="font-bold text-red-600 dark:text-red-400">-{formatCrore(scenario.currentMonthlyEquivalent)}/mo</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Annual Expense Today</span>
+              <span className="font-bold text-red-600 dark:text-red-400">-{formatCrore(scenario.currentAnnualExpense)}/yr</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Total Lifetime Living Cost</span>
+              <span className="font-extrabold text-red-600 dark:text-red-400">-{formatCrore(scenario.totalLifetimeExpenses)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Compounding & Net Balance Card (Blue / Indigo) */}
+        <div className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/40 dark:bg-blue-950/20 p-4 space-y-2">
+          <div className="flex items-center gap-1.5 text-blue-700 dark:text-blue-400 text-xs font-bold uppercase tracking-wide">
+            <TrendingUp className="w-4 h-4 text-blue-600" />
+            <span>Wealth Compounding</span>
+          </div>
+          <div className="space-y-1.5 pt-1 text-xs">
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Investment Growth Made</span>
+              <span className="font-bold text-blue-600 dark:text-blue-400">+{formatCrore(scenario.totalLifetimeInvestmentGrowth)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Projected Peak Corpus</span>
+              <span className="font-bold text-zinc-900 dark:text-zinc-100">{formatCrore(scenario.peakCorpus)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 dark:text-zinc-400">Ending Wealth (Age {profile.targetAge})</span>
+              <span className="font-extrabold text-blue-700 dark:text-blue-300">
+                {scenario.endingBalance >= 0 ? formatCrore(scenario.endingBalance) : 'Depleted'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* LIFETIME FINANCIAL RECONCILIATION: Cashflow Transparency */}
+      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs space-y-3 print-break-inside-avoid">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
+          <div className="flex items-center gap-2">
+            <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              Lifetime Cashflow Reconciliation (Age {profile.currentAge} → {profile.targetAge})
+            </h3>
+          </div>
+          <span className="text-xs text-zinc-500 font-medium">How every single rupee flows</span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+          <div className="p-3 rounded-xl bg-red-50/50 dark:bg-red-950/20 border border-red-200/60 dark:border-red-900/40">
+            <span className="text-red-700 dark:text-red-400 font-bold block mb-1">1. Total Lifetime Outflows</span>
+            <span className="text-xl font-black text-red-600 dark:text-red-400 block">{formatCrore(scenario.totalLifetimeExpenses)}</span>
+            <span className="text-[11px] text-zinc-500 mt-1 block">Inflated living costs spent across {profile.targetAge - profile.currentAge} years</span>
+          </div>
+
+          <div className="p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200/60 dark:border-emerald-900/40">
+            <span className="text-emerald-700 dark:text-emerald-400 font-bold block mb-1">2. Total Wealth Inflows & Returns</span>
+            <span className="text-xl font-black text-emerald-600 dark:text-emerald-400 block">
+              {formatCrore(scenario.totalLifetimeSavingsInvested + scenario.existingCorpus + scenario.totalLifetimeInvestmentGrowth)}
+            </span>
+            <span className="text-[11px] text-zinc-500 mt-1 block">
+              {formatCrore(scenario.totalLifetimeSavingsInvested + scenario.existingCorpus)} saved + {formatCrore(scenario.totalLifetimeInvestmentGrowth)} returns
             </span>
           </div>
-          <div className="h-3 w-full bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden flex">
-            <div
-              className="bg-red-500 transition-all"
-              style={{
-                width: `${Math.min(
-                  100,
-                  (scenario.totalLifetimeExpenses /
-                    Math.max(
-                      1,
-                      scenario.totalLifetimeExpenses +
-                        scenario.totalLifetimeSavingsInvested +
-                        scenario.totalLifetimeInvestmentGrowth,
-                    )) *
-                    100,
-                )}%`,
-              }}
-              title={`Expenses: ${formatCrore(scenario.totalLifetimeExpenses)}`}
-            />
-            <div
-              className="bg-emerald-500 transition-all flex-1"
-              title="Inflows & Compound Growth"
-            />
+
+          <div className="p-3 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/40">
+            <span className="text-blue-700 dark:text-blue-400 font-bold block mb-1">3. Net Ending Wealth at Age {profile.targetAge}</span>
+            <span className="text-xl font-black text-blue-600 dark:text-blue-400 block">
+              {scenario.endingBalance >= 0 ? formatCrore(scenario.endingBalance) : '₹0 (Depleted)'}
+            </span>
+            <span className="text-[11px] text-zinc-500 mt-1 block">Inflows & Returns minus Lifetime Living Costs</span>
           </div>
         </div>
 
         {/* Self-Sustaining Perpetual Portfolio Explanation */}
-        {finalBalance >= scenario.peakCorpus * 0.99 && (
-          <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/60 text-xs text-emerald-950 dark:text-emerald-200">
+        {scenario.endingBalance >= scenario.projectedCorpusAtRetirement * 0.95 && (
+          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs text-emerald-950 dark:text-emerald-200">
             <Sparkles className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <p className="font-bold">Perpetual Self-Sustaining Portfolio (FIRE / Generational Legacy):</p>
+              <p className="font-bold">Why is ending balance so high?</p>
               <p className="text-emerald-900 dark:text-emerald-300 mt-0.5 leading-relaxed">
-                Your projected Peak Corpus ({formatCrore(scenario.peakCorpus)}) and Ending Balance ({formatCrore(finalBalance)}) are both the same because your annual investment growth ({formatPercent(scenario.returnRate)}) is larger than your annual living expenses. Your invested corpus continues expanding faster than you withdraw, leaving generational wealth at Age {profile.targetAge}!
+                Because your projected accumulated savings ({formatCrore(scenario.projectedCorpusAtRetirement)}) are substantially higher than the bare minimum retirement requirement ({formatCrore(scenario.targetCorpusAtRetirement)}), the annual investment return earned on your portfolio is larger than your living expenses. Your capital never needs to be touched; living costs are funded entirely out of returns, preserving generational wealth!
               </p>
             </div>
           </div>
         )}
       </div>
 
-      {/* Summary cards with accumulation and decumulation data */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 print-break-inside-avoid">
-        {hasActiveIncome ? (
-          <>
-            <SummaryCard
-              label="Current Monthly Income"
-              value={formatCrore(assets.monthlyIncome)}
-              sub={`Earned until Age ${assets.incomeEndAge} (+${(assets.incomeGrowthRate * 100).toFixed(1)}%/yr)`}
-              highlight
-            />
-            <SummaryCard
-              label="Retirement Target"
-              value={`Age ${assets.incomeEndAge}`}
-              sub={`${Math.max(0, assets.incomeEndAge - profile.currentAge)} earning years remaining`}
-              highlight
-            />
-            <SummaryCard
-              label="Projected Peak Corpus"
-              value={formatCrore(scenario.peakCorpus)}
-              sub={`Accumulated by Age ${scenario.peakCorpusAge}`}
-              highlight
-            />
-            <SummaryCard
-              label="Total Career Savings"
-              value={formatCrore(scenario.totalAccumulatedSavings)}
-              sub="Surplus invested across working years"
-            />
-            <SummaryCard
-              label="Annual Expenses (Today)"
-              value={formatCrore(scenario.currentAnnualExpense)}
-              sub={`≈ ${formatCrore(scenario.currentMonthlyEquivalent)}/mo`}
-            />
-            <SummaryCard
-              label={`Ending Balance (Age ${profile.targetAge})`}
-              value={finalBalance >= 0 ? formatCrore(finalBalance) : 'Depletes Early'}
-              sub={finalBalance >= 0 ? 'Surplus wealth remaining' : `Runs out around Age ${scenario.depletionAge}`}
-            />
-          </>
-        ) : (
-          <>
-            <SummaryCard
-              label="Monthly budget (today)"
-              value={formatCrore(scenario.currentMonthlyEquivalent)}
-              sub="Annual costs averaged per month"
-            />
-            <SummaryCard
-              label="Annual budget (today)"
-              value={formatCrore(scenario.currentAnnualExpense)}
-            />
-            <SummaryCard
-              label="Essential expenses / yr"
-              value={formatCrore(scenario.essentialAnnualExpense)}
-            />
-            <SummaryCard
-              label="Discretionary / yr"
-              value={formatCrore(scenario.discretionaryAnnualExpense)}
-            />
-            <SummaryCard
-              label="Planning Horizon"
-              value={`${profile.targetAge - profile.currentAge} years`}
-              sub={`Age ${profile.currentAge} → ${profile.targetAge}`}
-            />
-            <SummaryCard
-              label="Inflation / Return Rate"
-              value={`${formatPercent(scenario.inflationRate)} / ${formatPercent(scenario.returnRate)}`}
-              sub={
-                assumptions.withdrawalTiming === 'end_of_year'
-                  ? 'End-of-year withdrawals'
-                  : 'Beginning-of-year withdrawals'
-              }
-            />
-          </>
-        )}
-      </div>
-
-      {/* Main corpus highlight card */}
-      <div className="rounded-2xl border-2 border-blue-600/60 dark:border-blue-500/60 bg-gradient-to-br from-blue-50/70 via-white to-indigo-50/50 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/20 p-6 space-y-4 shadow-sm print-break-inside-avoid">
-        <div className="flex flex-col sm:flex-row sm:items-start gap-4 justify-between">
-          <div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              <p className="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-300">
-                {hasActiveIncome ? 'Retirement Readiness & Corpus Goal' : 'Estimated Starting Corpus Required'}
-              </p>
-            </div>
-
-            {hasActiveIncome ? (
-              <div className="mt-2">
-                <p className="text-3xl sm:text-4xl font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
-                  {scenario.fundingGap === 0 ? 'Fully Self-Funded Plan' : `Need ${formatCrore(scenario.fundingGap)} Extra`}
-                </p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 font-medium leading-relaxed max-w-xl">
-                  {scenario.fundingGap === 0
-                    ? `Your active monthly income (investing the surplus) is projected to accumulate a Peak Corpus of ${formatCrore(scenario.peakCorpus)} by Age ${assets.incomeEndAge}, comfortably financing your expenses through Age ${profile.targetAge}.`
-                    : `Based on your current monthly income and expenses, your portfolio may be depleted by Age ${scenario.depletionAge}. An additional starting corpus of ${formatCrore(scenario.fundingGap)} today or increased monthly savings is recommended.`}
-                </p>
-              </div>
-            ) : (
-              <div className="mt-2">
-                <p className="text-4xl sm:text-5xl font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
-                  {formatCrore(scenario.requiredCorpus)}
-                </p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 font-medium">
-                  Convention A · {assumptions.withdrawalTiming === 'end_of_year' ? 'End' : 'Beginning'}-of-year withdrawals · {formatPercent(scenario.inflationRate)} inflation · {formatPercent(scenario.returnRate)} net return · {profile.targetAge - profile.currentAge} years
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="sm:text-right space-y-1 bg-white/80 dark:bg-zinc-800/80 p-3.5 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Existing investable assets</p>
-            <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100">
-              {formatCrore(scenario.existingCorpus)}
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-blue-200/60 dark:border-zinc-800">
-          <div className="p-3 bg-white/70 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/70 dark:border-zinc-800">
-            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">Net Funding Gap</p>
-            <p
-              className={`text-lg font-extrabold ${
-                scenario.fundingGap > 0
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-emerald-600 dark:text-emerald-400'
-              }`}
-            >
-              {scenario.fundingGap > 0
-                ? formatCrore(scenario.fundingGap)
-                : 'Fully Funded (No Gap)'}
-            </p>
-          </div>
-          <div className="p-3 bg-white/70 dark:bg-zinc-800/50 rounded-xl border border-zinc-200/70 dark:border-zinc-800">
-            <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
-              Safety Margin ({formatPercent(assumptions.safetyMarginPercent)})
-            </p>
-            <p className="text-lg font-bold text-zinc-800 dark:text-zinc-200">
-              {formatCrore(scenario.safetyMarginAmount)}
-            </p>
-          </div>
-          <div className="p-3 bg-blue-50 dark:bg-blue-950/50 rounded-xl border border-blue-200 dark:border-blue-800/60">
-            <p className="text-xs font-bold text-blue-700 dark:text-blue-300">
-              {hasActiveIncome ? 'Target Peak Wealth' : 'Corpus with Safety Margin'}
-            </p>
-            <p className="text-lg font-extrabold text-blue-700 dark:text-blue-300">
-              {formatCrore(hasActiveIncome ? scenario.peakCorpus : scenario.corpusWithSafetyMargin)}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {/* Lifestyle Type Breakdown Section */}
+      {/* LIFESTYLE BREAKDOWN */}
       <LifestyleComparisonSection
         comparisons={results.lifestyleComparisons}
         currentLifestyle={profile.lifestyleScenario}
         onEditProfile={() => goToStep(1)}
       />
 
-      {/* How was this calculated dropdown */}
+      {/* HOW WAS THIS CALCULATED DROPDOWN */}
       <div className="print:hidden">
         <button
           type="button"
           onClick={() => setShowExplain(x => !x)}
           className="flex items-center gap-2 text-xs font-bold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 cursor-pointer"
         >
-          {showExplain ? (
-            <ChevronDown className="w-4 h-4" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
+          {showExplain ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           How was this mathematically calculated?
         </button>
         {showExplain && (
           <div className="mt-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 p-4 text-xs text-zinc-700 dark:text-zinc-300 space-y-2 leading-relaxed">
-            {hasActiveIncome ? (
-              <>
-                <p>
-                  <strong>Accumulation Phase (Age {profile.currentAge} to {assets.incomeEndAge}):</strong> Your monthly income grows at {(assets.incomeGrowthRate * 100).toFixed(1)}% annually. Living expenses (inflating at {(scenario.inflationRate * 100).toFixed(1)}%) are subtracted each year, and the surplus is invested into your portfolio earning {(scenario.returnRate * 100).toFixed(1)}% annual return.
-                </p>
-                <p>
-                  <strong>Peak Corpus at Retirement (Age {scenario.peakCorpusAge}):</strong> Portfolio reaches its maximum value of {formatCrore(scenario.peakCorpus)} when earned income stops.
-                </p>
-                <p>
-                  <strong>Decumulation Phase (Age {assets.incomeEndAge} to {profile.targetAge}):</strong> Net living expenses (minus any pension/rent) are withdrawn from the invested corpus.
-                </p>
-              </>
-            ) : (
-              <>
-                <p>
-                  <strong>Formula:</strong> Growing annuity present value (Convention A). First year-end withdrawal equals today's annual living expenses E₀.
-                </p>
-                <p>
-                  <strong>When return ≠ inflation (r ≠ g):</strong> C = E₀ × [1 − ((1+g)/(1+r))^n] / (r − g)
-                </p>
-                <p>
-                  <strong>When return = inflation (r = g):</strong> C = E₀ × n / (1 + r) (special case avoiding division by zero).
-                </p>
-              </>
-            )}
+            <p>
+              <strong>Retirement Target Formula (Convention A):</strong> Required retirement corpus at Age {scenario.retirementAge} is computed using the present value of growing annuities over {scenario.retirementYears} retirement years:
+              <br />
+              <code className="text-[11px] bg-zinc-200 dark:bg-zinc-800 px-1.5 py-0.5 rounded font-mono">
+                C = E_ret × [1 − ((1 + g) / (1 + r))^n] / (r − g)
+              </code>
+            </p>
+            <p>
+              <strong>Career Accumulation:</strong> Monthly take-home salary grows at {(assets.incomeGrowthRate * 100).toFixed(1)}%/yr. Net living expenses are subtracted each year, and the entire surplus is invested into the portfolio compounding at {formatPercent(scenario.returnRate)} net annual return.
+            </p>
             <p className="pt-2 border-t border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400">
-              This is an estimation and planning tool, not an investment guarantee. Sequence-of-returns and market volatility can alter actual outcomes.
+              This calculator provides planning estimates based on mathematical compounding. Market returns and inflation fluctuate in practice.
             </p>
           </div>
         )}
       </div>
 
-      {/* Screen Interactive Tabs Selector (Hidden in Print) */}
+      {/* SCREEN TABS SELECTOR (Hidden in Print) */}
       <div className="print:hidden">
         <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
           <button
@@ -793,8 +738,8 @@ export function StepResults() {
                   </h4>
                   <p className="text-xs text-zinc-500">
                     {cashflowView === 'annual'
-                      ? 'Green = Annual Income · Red = Living Expenses · Blue = Surplus Invested · Amber = Savings Withdrawn'
-                      : 'Lifetime Cumulative Trajectory: Total Cumulative Income vs Cumulative Expenses vs Portfolio'}
+                      ? 'Green = Annual Income · Red = Living Expenses · Blue Area = Surplus Invested · Rose Area = Deficit Withdrawn'
+                      : 'Cumulative Lifetime Trajectory: Total Cumulative Income vs Total Cumulative Living Costs'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2 self-start sm:self-center">
@@ -824,7 +769,7 @@ export function StepResults() {
                   </div>
                   {hasActiveIncome && (
                     <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[11px] font-bold text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60">
-                      <span>Crossover: Age {assets.incomeEndAge}</span>
+                      <span>Crossover: Age {scenario.retirementAge}</span>
                     </div>
                   )}
                 </div>
@@ -885,8 +830,8 @@ export function StepResults() {
                     <Area
                       type="monotone"
                       dataKey="netWithdrawal"
-                      stroke="#f59e0b"
-                      fill="#f59e0b15"
+                      stroke="#f43f5e"
+                      fill="#f43f5e15"
                       name="Deficit Withdrawn (-)"
                       strokeWidth={1.5}
                     />
@@ -952,7 +897,7 @@ export function StepResults() {
                   <ArrowUpRight className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold text-emerald-900 dark:text-emerald-300">
-                      Accumulation Phase (Age {profile.currentAge} → {assets.incomeEndAge}):
+                      Accumulation Phase (Age {profile.currentAge} → {scenario.retirementAge}):
                     </span>
                     <p className="text-zinc-600 dark:text-zinc-400 mt-0.5">
                       Earned income exceeds living costs. The surplus is continuously invested into your portfolio, fueling compounding growth.
@@ -960,14 +905,14 @@ export function StepResults() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-2 bg-amber-50/50 dark:bg-amber-950/20 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-900/40">
-                  <ArrowDownRight className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="flex items-start gap-2 bg-red-50/50 dark:bg-red-950/20 p-2.5 rounded-xl border border-red-200/60 dark:border-red-900/40">
+                  <ArrowDownRight className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
                   <div>
-                    <span className="font-bold text-amber-900 dark:text-amber-300">
-                      Decumulation Phase (Age {assets.incomeEndAge} → {profile.targetAge}):
+                    <span className="font-bold text-red-900 dark:text-red-300">
+                      Retirement Phase (Age {scenario.retirementAge} → {profile.targetAge}):
                     </span>
                     <p className="text-zinc-600 dark:text-zinc-400 mt-0.5">
-                      Active income ends. Living costs exceed non-earned income, and the difference is drawn from your accumulated savings.
+                      Active salary stops. Living expenses are paid from portfolio investment returns and accumulated corpus.
                     </p>
                   </div>
                 </div>
@@ -985,7 +930,7 @@ export function StepResults() {
                   Wealth Timeline (Portfolio Balance) — All 3 Scenarios
                 </h4>
                 <p className="text-xs text-zinc-500">
-                  Shows accumulation to Peak Corpus at Age {scenario.peakCorpusAge}, followed by drawdown through retirement
+                  Portfolio balance trajectory across Optimistic, Base, and Conservative market return scenarios
                 </p>
               </div>
 
@@ -1021,7 +966,7 @@ export function StepResults() {
                     dataKey="optimistic"
                     stroke="#10b981"
                     fill="#10b98125"
-                    name="Optimistic"
+                    name="Optimistic (4% inf / 7% ret)"
                     strokeWidth={2}
                   />
                   <Area
@@ -1029,7 +974,7 @@ export function StepResults() {
                     dataKey="base"
                     stroke="#3b82f6"
                     fill="#3b82f625"
-                    name="Base"
+                    name="Base (Current Settings)"
                     strokeWidth={2.5}
                   />
                   <Area
@@ -1037,7 +982,7 @@ export function StepResults() {
                     dataKey="conservative"
                     stroke="#f59e0b"
                     fill="#f59e0b25"
-                    name="Conservative"
+                    name="Conservative (6% inf / 7% ret)"
                     strokeWidth={2}
                   />
                 </AreaChart>
@@ -1122,7 +1067,7 @@ export function StepResults() {
               <Area type="monotone" dataKey="income" stroke="#10b981" fill="#10b98125" name="Total Income" strokeWidth={2} />
               <Area type="monotone" dataKey="expenses" stroke="#ef4444" fill="#ef444420" name="Living Expenses" strokeWidth={2} />
               <Area type="monotone" dataKey="netSavings" stroke="#3b82f6" fill="#3b82f615" name="Surplus Invested (+)" strokeWidth={1.5} />
-              <Area type="monotone" dataKey="netWithdrawal" stroke="#f59e0b" fill="#f59e0b15" name="Deficit Withdrawn (-)" strokeWidth={1.5} />
+              <Area type="monotone" dataKey="netWithdrawal" stroke="#f43f5e" fill="#f43f5e15" name="Deficit Withdrawn (-)" strokeWidth={1.5} />
             </AreaChart>
           </ResponsiveContainer>
         </div>

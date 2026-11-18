@@ -79,39 +79,29 @@ function runOneScenario(
     planningYears,
   })
 
-  const hasActiveIncome = (assets.monthlyIncome || 0) > 0
+  const hasActiveIncome =
+    (assets.monthlyIncome || 0) > 0 && assets.incomeEndAge > profile.currentAge
+  const isRetired = !hasActiveIncome
+  const retirementAge = hasActiveIncome
+    ? Math.min(profile.targetAge, assets.incomeEndAge)
+    : profile.currentAge
+  const workingYears = hasActiveIncome ? retirementAge - profile.currentAge : 0
+  const retirementYears = Math.max(1, profile.targetAge - retirementAge)
 
-  let requiredCorpus: number
-  let startingSimulationCorpus: number
-
-  if (hasActiveIncome) {
-    // With active income: calculate Net Present Value of all net withdrawals minus net savings
-    // C0 = sum( (withdrawal - savings) / (1 + r)^t )
-    const rDec = new Decimal(effectiveReturn)
-    const npv = rawProjections.reduce((sum, p) => {
-      const netCashDemand = new Decimal(p.netWithdrawal).minus(p.netSavings)
-      const discount = rDec.plus(1).pow(p.year)
-      return sum.plus(netCashDemand.div(discount))
-    }, new Decimal(0))
-
-    requiredCorpus = Math.max(0, npv.toNumber())
-    // The simulation runs starting from the user's actual existing corpus
-    startingSimulationCorpus = assets.existingInvestableCorpus
-  } else {
-    // Pure retirement model from today:
-    requiredCorpus = calculateCorpus(
-      total,
-      effectiveReturn,
-      inflationRate,
-      planningYears,
-      assumptions.withdrawalTiming,
-    )
-    startingSimulationCorpus = requiredCorpus
-  }
-
-  const fundingGap = Math.max(0, requiredCorpus - assets.existingInvestableCorpus)
-  const safetyMarginAmount = requiredCorpus * assumptions.safetyMarginPercent
-  const corpusWithSafetyMargin = requiredCorpus + safetyMarginAmount
+  // Determine starting simulation corpus:
+  // For active earners, simulation starts from existing liquid assets today.
+  // For already retired users without active income, simulate from the required corpus or existing corpus.
+  const startingSimulationCorpus = hasActiveIncome
+    ? assets.existingInvestableCorpus
+    : assets.existingInvestableCorpus > 0
+    ? assets.existingInvestableCorpus
+    : calculateCorpus(
+        total,
+        effectiveReturn,
+        inflationRate,
+        planningYears,
+        assumptions.withdrawalTiming,
+      )
 
   // Simulate lifetime portfolio balance
   const yearProjections = simulatePortfolio(
@@ -120,6 +110,79 @@ function runOneScenario(
     effectiveReturn,
     assumptions.withdrawalTiming,
   )
+
+  // Calculate Target Corpus Required at Retirement Age
+  let targetCorpusAtRetirement: number
+  if (isRetired) {
+    targetCorpusAtRetirement = calculateCorpus(
+      total,
+      effectiveReturn,
+      inflationRate,
+      retirementYears,
+      assumptions.withdrawalTiming,
+    )
+  } else {
+    // First year of retirement expense (year index = workingYears)
+    const firstRetirementExpense =
+      rawProjections[workingYears]?.expenses ??
+      total * Math.pow(1 + inflationRate, workingYears)
+    const firstRetirementOtherIncome =
+      rawProjections[workingYears]?.otherIncome ?? 0
+    const netRetirementAnnualBaseline = Math.max(
+      0,
+      firstRetirementExpense - firstRetirementOtherIncome,
+    )
+
+    targetCorpusAtRetirement = calculateCorpus(
+      netRetirementAnnualBaseline,
+      effectiveReturn,
+      inflationRate,
+      retirementYears,
+      assumptions.withdrawalTiming,
+    )
+  }
+
+  // Projected portfolio accumulated by Retirement Age
+  const projectedCorpusAtRetirement =
+    workingYears > 0
+      ? yearProjections[workingYears - 1]?.closingCorpus ?? assets.existingInvestableCorpus
+      : assets.existingInvestableCorpus
+
+  const retirementFundingGap = Math.max(
+    0,
+    targetCorpusAtRetirement - projectedCorpusAtRetirement,
+  )
+  const retirementSurplus = Math.max(
+    0,
+    projectedCorpusAtRetirement - targetCorpusAtRetirement,
+  )
+  const readinessScore =
+    targetCorpusAtRetirement > 0
+      ? Math.min(250, Math.round((projectedCorpusAtRetirement / targetCorpusAtRetirement) * 100))
+      : 100
+
+  // Starting Corpus Required Today & Starting Gap Today
+  let requiredCorpus: number
+  let fundingGap: number
+
+  if (isRetired) {
+    requiredCorpus = targetCorpusAtRetirement
+    fundingGap = Math.max(0, requiredCorpus - assets.existingInvestableCorpus)
+  } else {
+    if (projectedCorpusAtRetirement >= targetCorpusAtRetirement) {
+      // Career savings fully cover retirement!
+      requiredCorpus = 0
+      fundingGap = 0
+    } else {
+      // Shortfall at retirement discounted to today
+      const discountFactor = new Decimal(1).plus(effectiveReturn).pow(workingYears)
+      requiredCorpus = new Decimal(retirementFundingGap).div(discountFactor).toNumber()
+      fundingGap = requiredCorpus
+    }
+  }
+
+  const safetyMarginAmount = (targetCorpusAtRetirement || requiredCorpus) * assumptions.safetyMarginPercent
+  const corpusWithSafetyMargin = (targetCorpusAtRetirement || requiredCorpus) + safetyMarginAmount
 
   // Find peak corpus and when it occurs
   let peakCorpus = startingSimulationCorpus
@@ -138,6 +201,8 @@ function runOneScenario(
     }
   })
 
+  const endingBalance = yearProjections[yearProjections.length - 1]?.closingCorpus ?? 0
+
   // Lifetime cumulative totals
   const totalLifetimeExpenses = rawProjections.reduce((sum, p) => sum + p.expenses, 0)
   const totalLifetimeIncome = rawProjections.reduce((sum, p) => sum + p.totalIncome, 0)
@@ -149,10 +214,19 @@ function runOneScenario(
     label,
     inflationRate,
     returnRate: effectiveReturn,
+    isRetired,
+    retirementAge,
+    workingYears,
+    retirementYears,
     currentAnnualExpense: total,
     currentMonthlyEquivalent: total / 12,
     essentialAnnualExpense: essential,
     discretionaryAnnualExpense: discretionary,
+    targetCorpusAtRetirement,
+    projectedCorpusAtRetirement,
+    retirementFundingGap,
+    retirementSurplus,
+    readinessScore,
     totalLifetimeExpenses,
     totalLifetimeIncome,
     totalLifetimeSavingsInvested,
@@ -161,6 +235,7 @@ function runOneScenario(
     requiredCorpus,
     peakCorpus,
     peakCorpusAge,
+    endingBalance,
     totalAccumulatedSavings,
     depletionAge,
     existingCorpus: assets.existingInvestableCorpus,
@@ -227,9 +302,9 @@ function computeLifestyleComparisons(
       description: 'Covers only core survival essentials (basic food, shelter, healthcare). No luxuries.',
       monthlyExpenseToday: bareScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: bareScenario.totalLifetimeExpenses,
-      requiredCorpus: bareScenario.requiredCorpus,
-      peakCorpus: bareScenario.peakCorpus,
-      peakAge: bareScenario.peakCorpusAge,
+      requiredCorpus: bareScenario.isRetired ? bareScenario.requiredCorpus : bareScenario.targetCorpusAtRetirement,
+      peakCorpus: bareScenario.isRetired ? bareScenario.peakCorpus : bareScenario.projectedCorpusAtRetirement,
+      peakAge: bareScenario.isRetired ? bareScenario.peakCorpusAge : bareScenario.retirementAge,
     },
     {
       lifestyle: 'comfortable',
@@ -237,9 +312,9 @@ function computeLifestyleComparisons(
       description: 'Your configured balanced lifestyle with moderate leisure, gadgets, and vacations.',
       monthlyExpenseToday: baseScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: baseScenario.totalLifetimeExpenses,
-      requiredCorpus: baseScenario.requiredCorpus,
-      peakCorpus: baseScenario.peakCorpus,
-      peakAge: baseScenario.peakCorpusAge,
+      requiredCorpus: baseScenario.isRetired ? baseScenario.requiredCorpus : baseScenario.targetCorpusAtRetirement,
+      peakCorpus: baseScenario.isRetired ? baseScenario.peakCorpus : baseScenario.projectedCorpusAtRetirement,
+      peakAge: baseScenario.isRetired ? baseScenario.peakCorpusAge : baseScenario.retirementAge,
     },
     {
       lifestyle: 'luxury',
@@ -247,9 +322,9 @@ function computeLifestyleComparisons(
       description: 'Elevated lifestyle with premium housing, luxury travel, dining, and higher discretionary spending.',
       monthlyExpenseToday: luxuryScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: luxuryScenario.totalLifetimeExpenses,
-      requiredCorpus: luxuryScenario.requiredCorpus,
-      peakCorpus: luxuryScenario.peakCorpus,
-      peakAge: luxuryScenario.peakCorpusAge,
+      requiredCorpus: luxuryScenario.isRetired ? luxuryScenario.requiredCorpus : luxuryScenario.targetCorpusAtRetirement,
+      peakCorpus: luxuryScenario.isRetired ? luxuryScenario.peakCorpus : luxuryScenario.projectedCorpusAtRetirement,
+      peakAge: luxuryScenario.isRetired ? luxuryScenario.peakCorpusAge : luxuryScenario.retirementAge,
     },
   ]
 }
