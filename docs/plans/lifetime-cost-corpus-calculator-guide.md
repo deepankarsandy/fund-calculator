@@ -850,7 +850,7 @@ Use this sample as a seeded example, not as a default for every user.
   Mobile recharge                                       ₹500
   Fuel                                                ₹1,000
   Cooking gas                                         ₹1,000
-  Groceries, vegetables, fish, meat, rice             ₹5,000
+  Groceries, vegetables, fish, meat, rice             ₹2,000
   **Total**                                       **₹9,000**
 
 **Additional annual expenses**

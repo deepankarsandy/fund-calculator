@@ -1,9 +1,11 @@
+import { useEffect } from 'react'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { WIZARD_STEPS_CONFIG } from '@/config/formFields'
 import { DynamicStepRenderer } from '@/components/wizard/DynamicStepRenderer'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { runScenarios } from '@/domain/calculations/runScenarios'
+import { getStoredSettings } from '@/lib/settingsStorage'
 import {
   ChevronLeft,
   ChevronRight,
@@ -44,6 +46,19 @@ export default function WizardPage({ onBackToHome }: WizardPageProps) {
   const currentStepConfig = WIZARD_STEPS_CONFIG[currentStep - 1]
   const isLastInputStep = currentStep === totalSteps - 1
   const isResultsStep = currentStep === totalSteps
+
+  useEffect(() => {
+    const settings = getStoredSettings()
+    if (settings.lastFilledId) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(settings.lastFilledId!)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [currentStep])
 
   function handleCalculate() {
     const results = runScenarios({ profile, members, categories, assumptions, assets })

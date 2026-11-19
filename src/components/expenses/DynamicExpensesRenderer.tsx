@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, Info, Plus, Trash2, RotateCcw } from 'lucide-react'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { formatCrore } from '@/lib/currency'
@@ -7,6 +7,48 @@ import type { ExpenseCategory, ExpenseItem, Frequency } from '@/domain/models/ex
 import { FREQUENCY_LABELS, FREQUENCY_MULTIPLIERS } from '@/domain/models/expense'
 import type { HouseholdMember } from '@/domain/models/household'
 import { cn } from '@/lib/cn'
+import { getStoredSettings, updateStoredSettings, setLastFilled } from '@/lib/settingsStorage'
+
+// ─── localStorage-backed expanded categories ──────────────────────────────────
+
+function useExpandedCategories(categories: ExpenseCategory[]) {
+  const [openIds, setOpenIds] = useState<Set<string>>(() => {
+    const settings = getStoredSettings()
+    const initial = new Set(settings.expandedCategories)
+    // If there is a last filled item, ensure its category is expanded
+    if (settings.lastFilledId) {
+      for (const cat of categories) {
+        if (cat.items.some(i => `expense-item-${i.id}` === settings.lastFilledId || i.id === settings.lastFilledId) || `category-${cat.id}` === settings.lastFilledId) {
+          initial.add(cat.id)
+        }
+      }
+    }
+    return initial
+  })
+
+  function toggle(id: string) {
+    setOpenIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      updateStoredSettings({ expandedCategories: [...next] })
+      return next
+    })
+  }
+
+  function expandAll(allIds: string[]) {
+    const next = new Set(allIds)
+    updateStoredSettings({ expandedCategories: [...next] })
+    setOpenIds(next)
+  }
+
+  function collapseAll() {
+    const next = new Set<string>()
+    updateStoredSettings({ expandedCategories: [] })
+    setOpenIds(next)
+  }
+
+  return { openIds, setOpenIds, toggle, expandAll, collapseAll }
+}
 
 function categoryTotal(cat: ExpenseCategory): number {
   if (cat.skipped) return 0
@@ -206,7 +248,10 @@ function ExpenseWindowPanel({
             <button
               key={i}
               type="button"
-              onClick={() => onUpdate({ startYear: s.startYear, endYear: s.endYear })}
+              onClick={() => {
+                setLastFilled(`expense-item-${item.id}`, 4)
+                onUpdate({ startYear: s.startYear, endYear: s.endYear })
+              }}
               className="text-[10px] font-semibold bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-300 dark:border-blue-700 px-2 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800/60 transition-colors cursor-pointer"
             >
               {s.label}
@@ -225,7 +270,11 @@ function ExpenseWindowPanel({
             type="number"
             min={1}
             value={item.startYear}
-            onChange={e => onUpdate({ startYear: Math.max(1, Number(e.target.value)) })}
+            onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+            onChange={e => {
+              setLastFilled(`expense-item-${item.id}`, 4)
+              onUpdate({ startYear: Math.max(1, Number(e.target.value)) })
+            }}
             className="w-14 h-7 border border-zinc-300 dark:border-zinc-700 rounded-lg px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -239,9 +288,11 @@ function ExpenseWindowPanel({
             min={item.startYear}
             value={item.endYear ?? ''}
             placeholder="Lifelong"
-            onChange={e =>
+            onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+            onChange={e => {
+              setLastFilled(`expense-item-${item.id}`, 4)
               onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
-            }
+            }}
             className="w-20 h-7 border border-zinc-300 dark:border-zinc-700 rounded-lg px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
@@ -306,11 +357,11 @@ function SubItemRow({
   const [showDetails, setShowDetails] = useState(false)
 
   // For family category items, show the ExpenseWindowPanel always (not in "More").
-  // For other items, start/end stay in the "More" panel as before.
   const showWindowPanel = isFamilyCategory
 
   return (
     <div
+      id={`expense-item-${item.id}`}
       className={cn(
         'border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2 text-sm bg-white dark:bg-zinc-900 shadow-xs transition-colors',
         item.skipped && 'opacity-40',
@@ -320,7 +371,11 @@ function SubItemRow({
         <input
           type="text"
           value={item.name}
-          onChange={e => onUpdate({ name: e.target.value })}
+          onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+          onChange={e => {
+            setLastFilled(`expense-item-${item.id}`, 4)
+            onUpdate({ name: e.target.value })
+          }}
           className="flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
 
@@ -332,7 +387,11 @@ function SubItemRow({
               min={0}
               value={item.amount || ''}
               placeholder="0"
-              onChange={e => onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })}
+              onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+              onChange={e => {
+                setLastFilled(`expense-item-${item.id}`, 4)
+                onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })
+              }}
               className="w-24 sm:w-28 h-9 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
             />
           </div>
@@ -340,7 +399,11 @@ function SubItemRow({
           <div className="relative">
             <select
               value={item.frequency}
-              onChange={e => onUpdate({ frequency: e.target.value as Frequency })}
+              onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+              onChange={e => {
+                setLastFilled(`expense-item-${item.id}`, 4)
+                onUpdate({ frequency: e.target.value as Frequency })
+              }}
               className="h-9 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-lg pl-2.5 pr-6 text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
             >
               {Object.entries(FREQUENCY_LABELS).map(([k, label]) => (
@@ -360,7 +423,11 @@ function SubItemRow({
                 min={1}
                 max={30}
                 value={item.everyNYears ?? 5}
-                onChange={e => onUpdate({ everyNYears: Number(e.target.value) })}
+                onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+                onChange={e => {
+                  setLastFilled(`expense-item-${item.id}`, 4)
+                  onUpdate({ everyNYears: Number(e.target.value) })
+                }}
                 className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
               <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">yrs</span>
@@ -381,7 +448,7 @@ function SubItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
             title="Delete item"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -433,7 +500,11 @@ function SubItemRow({
               type="number"
               min={1}
               value={item.startYear}
-              onChange={e => onUpdate({ startYear: Number(e.target.value) })}
+              onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+              onChange={e => {
+                setLastFilled(`expense-item-${item.id}`, 4)
+                onUpdate({ startYear: Number(e.target.value) })
+              }}
               className="w-16 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
           </div>
@@ -445,7 +516,11 @@ function SubItemRow({
               min={1}
               value={item.endYear ?? ''}
               placeholder="Lifelong"
-              onChange={e => onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })}
+              onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+              onChange={e => {
+                setLastFilled(`expense-item-${item.id}`, 4)
+                onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
+              }}
               className="w-20 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
           </div>
@@ -461,14 +536,17 @@ function CategoryPanel({
   cat,
   members,
   userCurrentAge,
+  totalCovered,
+  dependentsCount,
 }: {
   cat: ExpenseCategory
   members: HouseholdMember[]
   userCurrentAge: number
+  totalCovered: number
+  dependentsCount: number
 }) {
   const { updateCategory, addExpenseItem, updateExpenseItem, removeExpenseItem } = useScenarioStore()
   const isFamilyCategory = cat.id === 'family'
-  // For family category, default to sub-items mode (parentAmount undefined by default is already sub-items)
   const isParentMode = cat.parentAmount !== undefined
 
   function setMode(mode: 'parent' | 'subitems') {
@@ -503,6 +581,7 @@ function CategoryPanel({
       skipped: false,
     }
     addExpenseItem(cat.id, newItem)
+    setLastFilled(`expense-item-${newItem.id}`, 4)
   }
 
   if (cat.skipped) {
@@ -524,7 +603,7 @@ function CategoryPanel({
   }
 
   return (
-    <div className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl">
+    <div className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl" id={`category-${cat.id}`}>
       <div className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
         <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
@@ -534,6 +613,32 @@ function CategoryPanel({
           </p>
         </div>
       </div>
+
+      {/* Dependent Warning / Context Tag */}
+      {isFamilyCategory ? (
+        dependentsCount > 0 ? (
+          <div className="flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
+            <span>👶</span>
+            <span>
+              Time-windowed dependent support for <strong>{dependentsCount} dependent{dependentsCount > 1 ? 's' : ''}</strong>: School, college, and parental support run only for specific phases. All values entered in today's rates are inflated automatically.
+            </span>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
+            <span>ℹ️</span>
+            <span>
+              No dependents added in Step 3. Child education and parental care expenses activate when you add dependents in Step 3 (Household Members).
+            </span>
+          </div>
+        )
+      ) : totalCovered > 1 && (
+        <div className="flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
+          <span>👥</span>
+          <span>
+            Covers all <strong>{totalCovered} household members</strong> (Self + {dependentsCount} dependent{dependentsCount > 1 ? 's' : ''}): Please enter the combined total expense for all {totalCovered} members, not per-person.
+          </span>
+        </div>
+      )}
 
       {/* Mode Switcher */}
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-b border-zinc-200 dark:border-zinc-800 pb-3">
@@ -597,7 +702,11 @@ function CategoryPanel({
                   min={0}
                   value={cat.parentAmount ?? ''}
                   placeholder="0"
-                  onChange={e => updateCategory(cat.id, { parentAmount: Number(e.target.value) })}
+                  onFocus={() => setLastFilled(`category-${cat.id}`, 4)}
+                  onChange={e => {
+                    setLastFilled(`category-${cat.id}`, 4)
+                    updateCategory(cat.id, { parentAmount: Number(e.target.value) })
+                  }}
                   className="w-44 h-11 border border-zinc-300 dark:border-zinc-700 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
@@ -605,9 +714,11 @@ function CategoryPanel({
               <div className="relative">
                 <select
                   value={cat.parentFrequency || 'monthly'}
-                  onChange={e =>
+                  onFocus={() => setLastFilled(`category-${cat.id}`, 4)}
+                  onChange={e => {
+                    setLastFilled(`category-${cat.id}`, 4)
                     updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })
-                  }
+                  }}
                   className="h-11 appearance-none border border-zinc-300 dark:border-zinc-700 rounded-xl pl-3.5 pr-9 text-sm font-semibold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 cursor-pointer"
                 >
                   <option value="monthly">Per Month</option>
@@ -695,25 +806,25 @@ function CategoryPanel({
 
 export function DynamicExpensesRenderer() {
   const { categories, profile, members, recalibrateCategories } = useScenarioStore()
-  const [openIds, setOpenIds] = useState<Set<string>>(new Set(['housing', 'food', 'healthcare']))
+  const { openIds, toggle, expandAll, collapseAll } = useExpandedCategories(categories)
 
   const userCurrentAge = profile.currentAge
+  const totalCovered = members.filter(m => m.financiallyDependent).length || 1
+  const dependentsCount = members.filter(m => m.id !== 'self' && m.financiallyDependent).length
 
-  function toggle(id: string) {
-    setOpenIds(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
-  }
-
-  function expandAll() {
-    setOpenIds(new Set(categories.map(c => c.id)))
-  }
-
-  function collapseAll() {
-    setOpenIds(new Set())
-  }
+  // Scroll to last filled expense item or category if present
+  useEffect(() => {
+    const settings = getStoredSettings()
+    if (settings.lastFilledId) {
+      const timer = setTimeout(() => {
+        const el = document.getElementById(settings.lastFilledId!)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }, 150)
+      return () => clearTimeout(timer)
+    }
+  }, [])
 
   const grandTotal = categories.reduce((sum, c) => sum + categoryTotal(c), 0)
 
@@ -744,14 +855,14 @@ export function DynamicExpensesRenderer() {
             type="button"
             onClick={recalibrateCategories}
             className="text-xs font-semibold bg-white/15 hover:bg-white/25 text-white px-3 py-1.5 rounded-lg transition-colors border border-white/20 cursor-pointer"
-            title="Reset default expense amounts based on your profile location"
+            title="Reset default expense amounts based on your profile location and household members"
           >
             Reset to Area Defaults
           </button>
           <div className="flex items-center gap-2 text-xs text-white/90">
             <button
               type="button"
-              onClick={expandAll}
+              onClick={() => expandAll(categories.map(c => c.id))}
               className="hover:underline font-medium cursor-pointer"
             >
               Expand All
@@ -800,12 +911,28 @@ export function DynamicExpensesRenderer() {
                   <span className="font-bold text-sm text-zinc-900 dark:text-zinc-100 truncate">
                     {cat.label}
                   </span>
+                  {totalCovered > 1 && cat.id !== 'family' && (
+                    <span className="hidden sm:inline text-[10px] font-semibold text-orange-700 dark:text-orange-300 bg-orange-100 dark:bg-orange-950/60 border border-orange-200 dark:border-orange-800/60 px-2 py-0.5 rounded-full">
+                      {totalCovered} people
+                    </span>
+                  )}
+                  {dependentsCount > 0 && cat.id === 'family' && (
+                    <span className="hidden sm:inline text-[10px] font-semibold text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800/60 px-2 py-0.5 rounded-full">
+                      {dependentsCount} dep.
+                    </span>
+                  )}
                   <StatusBadge cat={cat} />
                 </div>
               </button>
 
               {isOpen && (
-                <CategoryPanel cat={cat} members={members} userCurrentAge={userCurrentAge} />
+                <CategoryPanel
+                  cat={cat}
+                  members={members}
+                  userCurrentAge={userCurrentAge}
+                  totalCovered={totalCovered}
+                  dependentsCount={dependentsCount}
+                />
               )}
             </div>
           )

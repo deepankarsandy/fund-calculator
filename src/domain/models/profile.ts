@@ -11,7 +11,6 @@ export interface Profile {
   currency: string
   currentAge: number
   targetAge: number
-  householdSize: number
   areaType: AreaType
   lifestyleScenario: LifestyleScenario
 }
@@ -23,7 +22,6 @@ export const DEFAULT_PROFILE: Profile = {
   currency: 'INR',
   currentAge: 30,
   targetAge: 85,
-  householdSize: 1,
   areaType: 'small_town',
   lifestyleScenario: 'comfortable',
 }

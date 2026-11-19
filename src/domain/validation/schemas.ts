@@ -16,7 +16,7 @@ export const profileSchema = z
       .int()
       .min(2, 'Target age must be at least 2')
       .max(120, 'Target age must be under 120'),
-    householdSize: z.number().int().min(1).max(50),
+    householdSize: z.number().int().min(1).max(50).optional(),
     lifestyleScenario: z.enum(['bare_minimum', 'comfortable', 'custom']),
   })
   .refine(d => d.targetAge > d.currentAge, {

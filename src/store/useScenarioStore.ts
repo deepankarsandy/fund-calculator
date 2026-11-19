@@ -10,6 +10,7 @@ import { DEFAULT_PROFILE } from '@/domain/models/profile'
 import { DEFAULT_ASSUMPTIONS } from '@/domain/models/assumptions'
 import { DEFAULT_ASSETS } from '@/domain/models/assets'
 import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
+import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
 
 interface ScenarioState {
   // Data
@@ -69,7 +70,7 @@ const initialSelf: HouseholdMember = {
   label: 'Self',
   relationship: 'self',
   age: DEFAULT_PROFILE.currentAge,
-  financiallyDependent: false,
+  financiallyDependent: true,
   hasHealthInsurance: false,
 }
 
@@ -78,11 +79,11 @@ export const useScenarioStore = create<ScenarioState>()(
     (set, get) => ({
       profile: DEFAULT_PROFILE,
       members: [initialSelf],
-      categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario),
+      categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario, [initialSelf]),
       assumptions: DEFAULT_ASSUMPTIONS,
       assets: DEFAULT_ASSETS,
       results: null,
-      currentStep: 1,
+      currentStep: getStoredSettings().currentStep || 1,
       totalSteps: 6,
 
       setStepFieldValue: (stepKey, fieldId, value) => {
@@ -103,6 +104,7 @@ export const useScenarioStore = create<ScenarioState>()(
               updatedCategories = buildCategoriesForProfile(
                 updatedProfile.areaType,
                 updatedProfile.lifestyleScenario,
+                updatedMembers,
               )
             }
 
@@ -114,7 +116,12 @@ export const useScenarioStore = create<ScenarioState>()(
           })
         } else if (stepKey === 'household') {
           if (fieldId === 'members') {
-            set({ members: value })
+            const newMembers = value as HouseholdMember[]
+            const { profile } = get()
+            set({
+              members: newMembers,
+              categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario, newMembers),
+            })
           }
         } else if (stepKey === 'assumptions') {
           set(s => ({ assumptions: { ...s.assumptions, [fieldId]: value } }))
@@ -131,26 +138,45 @@ export const useScenarioStore = create<ScenarioState>()(
             updatedCategories = buildCategoriesForProfile(
               updatedProfile.areaType,
               updatedProfile.lifestyleScenario,
+              s.members,
             )
           }
           return { profile: updatedProfile, categories: updatedCategories }
         }),
 
       recalibrateCategories: () => {
-        const { profile } = get()
+        const { profile, members } = get()
         set({
-          categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario),
+          categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario, members),
         })
       },
 
       addMember: m =>
-        set(s => ({ members: [...s.members, m] })),
+        set(s => {
+          const nextMembers = [...s.members, m]
+          return {
+            members: nextMembers,
+            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+          }
+        }),
+
       updateMember: (id, patch) =>
-        set(s => ({
-          members: s.members.map(m => (m.id === id ? { ...m, ...patch } : m)),
-        })),
+        set(s => {
+          const nextMembers = s.members.map(m => (m.id === id ? { ...m, ...patch } : m))
+          return {
+            members: nextMembers,
+            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+          }
+        }),
+
       removeMember: id =>
-        set(s => ({ members: s.members.filter(m => m.id !== id) })),
+        set(s => {
+          const nextMembers = s.members.filter(m => m.id !== id)
+          return {
+            members: nextMembers,
+            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+          }
+        }),
 
       updateCategory: (id, patch) =>
         set(s => ({
@@ -224,25 +250,37 @@ export const useScenarioStore = create<ScenarioState>()(
 
       goToStep: step => {
         const { totalSteps } = get()
-        if (step >= 1 && step <= totalSteps) set({ currentStep: step })
+        if (step >= 1 && step <= totalSteps) {
+          updateStoredSettings({ currentStep: step })
+          set({ currentStep: step })
+        }
       },
       nextStep: () => {
         const { currentStep, totalSteps } = get()
-        if (currentStep < totalSteps) set({ currentStep: currentStep + 1 })
+        if (currentStep < totalSteps) {
+          const next = currentStep + 1
+          updateStoredSettings({ currentStep: next })
+          set({ currentStep: next })
+        }
       },
       prevStep: () => {
         const { currentStep } = get()
-        if (currentStep > 1) set({ currentStep: currentStep - 1 })
+        if (currentStep > 1) {
+          const prev = currentStep - 1
+          updateStoredSettings({ currentStep: prev })
+          set({ currentStep: prev })
+        }
       },
 
       reset: () => {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('corpus-calc-v1')
         }
+        clearStoredSettings()
         set({
           profile: DEFAULT_PROFILE,
           members: [{ ...initialSelf, age: DEFAULT_PROFILE.currentAge }],
-          categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario),
+          categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario, [initialSelf]),
           assumptions: DEFAULT_ASSUMPTIONS,
           assets: DEFAULT_ASSETS,
           results: null,

@@ -78,7 +78,6 @@ export function DynamicStepRenderer({ step }: DynamicStepRendererProps) {
           const isWide =
             field.type === 'array' ||
             field.type === 'radio' ||
-            field.id === 'householdSize' ||
             field.id === 'lifestyleScenario' ||
             field.id === 'otherIncome' ||
             field.id === 'futureContributions'

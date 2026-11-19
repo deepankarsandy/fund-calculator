@@ -1,5 +1,6 @@
 import type { AreaType, LifestyleScenario } from '@/domain/models/profile'
 import type { ExpenseCategory, CategoryId, Frequency, ExpenseType } from '@/domain/models/expense'
+import type { HouseholdMember } from '@/domain/models/household'
 import { EXPENSE_CATEGORIES_CONFIG } from '@/config/formFields'
 
 // Multipliers for different living costs across India
@@ -45,10 +46,37 @@ function generateId(prefix: string, idx: number): string {
   return `${prefix}_${idx}_${Math.random().toString(36).slice(2, 6)}`
 }
 
+// Member scaling: not linear. Each additional person adds diminishing cost.
+// Formula: 1 + (memberCount - 1) * scalingFactor
+function getMemberScalingFactor(categoryId: string): number {
+  if (['financial', 'emergency', 'technology'].includes(categoryId)) return 0.1
+  if (categoryId === 'housing') return 0.25
+  if (['food', 'personal'].includes(categoryId)) return 0.65
+  if (categoryId === 'healthcare') return 0.5
+  if (['transport', 'utilities'].includes(categoryId)) return 0.35
+  if (categoryId === 'family') return 0.8
+  return 0.4
+}
+
 export function buildCategoriesForProfile(
   areaType: AreaType = 'small_town',
   lifestyle: LifestyleScenario = 'comfortable',
+  membersOrCount: number | HouseholdMember[] = 1,
 ): ExpenseCategory[] {
+  let memberCount = 1
+  let membersList: HouseholdMember[] = []
+
+  if (typeof membersOrCount === 'number') {
+    memberCount = Math.max(1, membersOrCount)
+  } else if (Array.isArray(membersOrCount)) {
+    membersList = membersOrCount
+    const dependentCount = membersList.filter(m => m.financiallyDependent).length
+    memberCount = Math.max(1, dependentCount)
+  }
+
+  const childMembers = membersList.filter(m => m.relationship === 'child' && m.financiallyDependent)
+  const parentMembers = membersList.filter(m => m.relationship === 'parent' && m.financiallyDependent)
+
   return EXPENSE_CATEGORIES_CONFIG.map(cat => {
     const factor = CATEGORY_AREA_FACTORS[cat.id]?.[areaType] ?? AREA_MULTIPLIERS[areaType].baseMultiplier
 
@@ -70,10 +98,55 @@ export function buildCategoriesForProfile(
 
         // Scale default amount
         let scaledAmount = Math.round((sub.defaultAmount * factor) / 50) * 50
+        let itemStartYear = 1
+        let itemEndYear: number | undefined = undefined
 
-        // If bare minimum lifestyle, reduce discretionary to 0 or 50%
+        // Category H: Family & Dependents smart defaults based on added members
+        if (cat.id === 'family') {
+          if (sub.id === 'school_fees') {
+            if (childMembers.length > 0) {
+              const child = childMembers[0]
+              // Baseline ~₹35k/year in small town per child
+              scaledAmount = Math.round((35000 * factor * childMembers.length) / 500) * 500
+              itemStartYear = Math.max(1, 5 - child.age)
+              itemEndYear = itemStartYear + 11 // ~12 years of schooling
+            } else {
+              scaledAmount = 0
+            }
+          } else if (sub.id === 'higher_education') {
+            if (childMembers.length > 0) {
+              const child = childMembers[0]
+              // Baseline ~₹80k/year in small town per child
+              scaledAmount = Math.round((80000 * factor * childMembers.length) / 500) * 500
+              itemStartYear = Math.max(1, 17 - child.age)
+              itemEndYear = itemStartYear + 3 // ~4 years of college
+            } else {
+              scaledAmount = 0
+            }
+          } else if (sub.id === 'parental_support') {
+            if (parentMembers.length > 0) {
+              const parent = parentMembers[0]
+              // Baseline ~₹8k/month in small town per parent
+              scaledAmount = Math.round((8000 * factor * parentMembers.length) / 500) * 500
+              itemStartYear = 1
+              itemEndYear = parent.supportUntilAge
+                ? Math.max(1, parent.supportUntilAge - parent.age)
+                : Math.max(1, 80 - parent.age)
+            } else {
+              scaledAmount = 0
+            }
+          }
+        }
+
+        // If bare minimum lifestyle, reduce discretionary to 0
         if (lifestyle === 'bare_minimum' && !sub.essential) {
           scaledAmount = 0
+        }
+
+        // Apply member scaling (non-linear) only to non-zero amounts for general household items
+        if (scaledAmount > 0 && memberCount > 1 && cat.id !== 'family') {
+          const memberMultiplier = 1 + (memberCount - 1) * getMemberScalingFactor(cat.id)
+          scaledAmount = Math.round((scaledAmount * memberMultiplier) / 50) * 50
         }
 
         return {
@@ -85,7 +158,8 @@ export function buildCategoriesForProfile(
           everyNYears: sub.everyNYears,
           essential: sub.essential,
           appliesTo: 'household',
-          startYear: 1,
+          startYear: itemStartYear,
+          endYear: itemEndYear,
           type,
           notes: sub.help || '',
           skipped: false,

@@ -2,6 +2,7 @@ import { Info, Plus, Trash2, ChevronDown } from 'lucide-react'
 import { FieldConfig } from '@/config/formFields'
 import { formatCrore } from '@/lib/currency'
 import { cn } from '@/lib/cn'
+import { setLastFilled } from '@/lib/settingsStorage'
 
 interface DynamicFieldProps {
   field: FieldConfig
@@ -11,6 +12,12 @@ interface DynamicFieldProps {
 
 export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
   const currentValue = value !== undefined ? value : field.defaultValue
+
+  const handleFocus = () => {
+    if (field.id) {
+      setLastFilled(field.id)
+    }
+  }
 
   return (
     <div className="space-y-2 py-1.5">
@@ -44,7 +51,11 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
           type="text"
           value={currentValue ?? ''}
           placeholder={field.placeholder}
-          onChange={e => onChange(e.target.value)}
+          onFocus={handleFocus}
+          onChange={e => {
+            setLastFilled(field.id)
+            onChange(e.target.value)
+          }}
           className="w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl px-3.5 text-sm bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150"
         />
       )}
@@ -65,7 +76,11 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               step={field.step}
               value={currentValue ?? ''}
               placeholder={field.placeholder}
-              onChange={e => onChange(e.target.value === '' ? '' : Number(e.target.value))}
+              onFocus={handleFocus}
+              onChange={e => {
+                setLastFilled(field.id)
+                onChange(e.target.value === '' ? '' : Number(e.target.value))
+              }}
               className={cn(
                 'w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 field.prefix ? 'pl-8' : 'pl-3.5',
@@ -91,7 +106,11 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
           <select
             id={field.id}
             value={currentValue ?? ''}
-            onChange={e => onChange(e.target.value)}
+            onFocus={handleFocus}
+            onChange={e => {
+              setLastFilled(field.id)
+              onChange(e.target.value)
+            }}
             className="w-full h-11 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3.5 pr-10 text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 cursor-pointer"
           >
             {field.options?.map(opt => (
@@ -114,7 +133,11 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               max={field.max ?? 1}
               step={field.step ?? 0.01}
               value={currentValue ?? field.defaultValue}
-              onChange={e => onChange(Number(e.target.value))}
+              onFocus={handleFocus}
+              onChange={e => {
+                setLastFilled(field.id)
+                onChange(Number(e.target.value))
+              }}
               className="flex-1 accent-blue-600 dark:accent-blue-500 cursor-pointer h-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg"
             />
             <div className="w-24 text-right">
@@ -129,14 +152,17 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
       )}
 
       {field.type === 'radio' && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1" id={field.id}>
           {field.options?.map(opt => {
             const isSelected = currentValue === opt.value
             return (
               <button
                 key={String(opt.value)}
                 type="button"
-                onClick={() => onChange(opt.value)}
+                onClick={() => {
+                  setLastFilled(field.id)
+                  onChange(opt.value)
+                }}
                 className={cn(
                   'text-left p-3.5 rounded-xl border-2 transition-all duration-150 cursor-pointer shadow-xs',
                   isSelected
@@ -162,7 +188,11 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
             id={field.id}
             type="checkbox"
             checked={Boolean(currentValue)}
-            onChange={e => onChange(e.target.checked)}
+            onFocus={handleFocus}
+            onChange={e => {
+              setLastFilled(field.id)
+              onChange(e.target.checked)
+            }}
             className="w-4 h-4 rounded text-blue-600 dark:text-blue-500 border-zinc-300 dark:border-zinc-700 focus:ring-blue-500"
           />
           <span className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
@@ -198,13 +228,16 @@ function ArrayField({
     field.subFields?.forEach(sub => {
       newItem[sub.id] = sub.defaultValue
     })
-    onChange([...items, newItem])
+    const updated = [...items, newItem]
+    onChange(updated)
+    setLastFilled(`${field.id}_${updated.length - 1}`)
   }
 
   function updateItem(index: number, subId: string, val: any) {
     const copy = [...items]
     copy[index] = { ...copy[index], [subId]: val }
     onChange(copy)
+    setLastFilled(`${field.id}_${index}_${subId}`)
   }
 
   function removeItem(index: number) {
@@ -212,10 +245,11 @@ function ArrayField({
   }
 
   return (
-    <div className="space-y-3 pt-1">
+    <div className="space-y-3 pt-1" id={field.id}>
       {items.map((item, idx) => (
         <div
           key={item.id || idx}
+          id={`${field.id}_${idx}`}
           className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-900/90 shadow-xs space-y-3 relative"
         >
           <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
@@ -226,10 +260,10 @@ function ArrayField({
               <button
                 type="button"
                 onClick={() => removeItem(idx)}
-                className="text-zinc-400 hover:text-red-600 dark:hover:text-red-400 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
                 title="Remove item"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
               </button>
             )}
           </div>
@@ -238,7 +272,7 @@ function ArrayField({
             {field.subFields?.map(sub => (
               <DynamicField
                 key={sub.id}
-                field={sub}
+                field={{ ...sub, id: `${field.id}_${idx}_${sub.id}` }}
                 value={item[sub.id]}
                 onChange={val => updateItem(idx, sub.id, val)}
               />
