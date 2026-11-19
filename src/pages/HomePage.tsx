@@ -20,9 +20,10 @@ import { SocialLinks } from '@/components/ui/SocialLinks'
 interface HomePageProps {
   onStart: () => void
   onViewLogic?: () => void
+  onHome?: () => void
 }
 
-export default function HomePage({ onStart, onViewLogic }: HomePageProps) {
+export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       {/* Top Navbar */}
@@ -30,7 +31,10 @@ export default function HomePage({ onStart, onViewLogic }: HomePageProps) {
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <button
             type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            onClick={() => {
+              if (onHome) onHome()
+              window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
             className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
             title="Lifetime Corpus Calculator"
           >

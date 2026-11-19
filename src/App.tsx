@@ -1,87 +1,48 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
+import { useRouter } from '@/lib/router'
+import { useScenarioStore } from '@/store/useScenarioStore'
 import HomePage from '@/pages/HomePage'
 import WizardPage from '@/pages/WizardPage'
 import FeaturesAndLogicPage from '@/pages/FeaturesAndLogicPage'
 
 export default function App() {
-  const [view, setView] = useState<'home' | 'wizard' | 'logic'>('home')
-  const [previousView, setPreviousView] = useState<'home' | 'wizard'>('home')
+  const { route, navigateToHome, navigateToLogic, navigateToCalculator, navigateBack } = useRouter()
+  const { currentStep, goToStep } = useScenarioStore()
 
-  // Support URL hash synchronization for deep linking and back button support
+  // Sync route step with store when navigating via URL/history
   useEffect(() => {
-    const handleHash = () => {
-      const hash = window.location.hash.toLowerCase()
-      if (
-        hash === '#logic' ||
-        hash === '#features' ||
-        hash === '#features-and-logic' ||
-        hash === '#methodology'
-      ) {
-        setView('logic')
-      } else if (hash === '#wizard' || hash === '#calculator') {
-        setView('wizard')
-      } else if (hash === '#home' || hash === '') {
-        setView('home')
+    if (route.page === 'calculator') {
+      const step = route.step ?? currentStep ?? 1
+      if (step !== currentStep) {
+        goToStep(step)
       }
     }
+  }, [route.page, route.step, currentStep, goToStep])
 
-    handleHash()
-    window.addEventListener('hashchange', handleHash)
-    return () => window.removeEventListener('hashchange', handleHash)
-  }, [])
-
-  const handleStartWizard = () => {
-    window.location.hash = 'wizard'
-    setView('wizard')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleBackToHome = () => {
-    window.location.hash = ''
-    setView('home')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleViewLogic = (from: 'home' | 'wizard') => {
-    setPreviousView(from)
-    window.location.hash = 'features-and-logic'
-    setView('logic')
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const handleBackFromLogic = () => {
-    if (previousView === 'wizard') {
-      window.location.hash = 'wizard'
-      setView('wizard')
-    } else {
-      window.location.hash = ''
-      setView('home')
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  if (view === 'logic') {
+  if (route.page === 'logic') {
     return (
       <FeaturesAndLogicPage
-        onBack={handleBackFromLogic}
-        onStartWizard={handleStartWizard}
+        onBack={navigateBack}
+        onStartWizard={() => navigateToCalculator(currentStep || 1)}
+        onHome={navigateToHome}
       />
     )
   }
 
-  if (view === 'home') {
+  if (route.page === 'calculator') {
     return (
-      <HomePage
-        onStart={handleStartWizard}
-        onViewLogic={() => handleViewLogic('home')}
+      <WizardPage
+        onBackToHome={navigateToHome}
+        onViewLogic={navigateToLogic}
       />
     )
   }
 
   return (
-    <WizardPage
-      onBackToHome={handleBackToHome}
-      onViewLogic={() => handleViewLogic('wizard')}
+    <HomePage
+      onStart={() => navigateToCalculator(currentStep || 1)}
+      onViewLogic={navigateToLogic}
+      onHome={navigateToHome}
     />
   )
 }

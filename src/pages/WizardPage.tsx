@@ -41,6 +41,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
     categories,
     assumptions,
     assets,
+    results,
     setResults,
     reset,
   } = useScenarioStore()
@@ -48,6 +49,18 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
   const currentStepConfig = WIZARD_STEPS_CONFIG[currentStep - 1]
   const isLastInputStep = currentStep === totalSteps - 1
   const isResultsStep = currentStep === totalSteps
+
+  // Auto-calculate if deep-linking directly to results step
+  useEffect(() => {
+    if (currentStep === totalSteps && !results) {
+      const computed = runScenarios({ profile, members, categories, assumptions, assets })
+      setResults(computed)
+    }
+  }, [currentStep, totalSteps, results, profile, members, categories, assumptions, assets, setResults])
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentStep])
 
   useEffect(() => {
     const settings = getStoredSettings()
@@ -247,12 +260,12 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <button
               type="button"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border text-xs font-bold disabled:opacity-40 disabled:cursor-not-allowed hover:bg-muted transition-colors cursor-pointer shadow-xs"
+              onClick={currentStep === 1 ? onBackToHome : prevStep}
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border text-xs font-bold hover:bg-muted transition-colors cursor-pointer shadow-xs"
+              title={currentStep === 1 ? 'Return to Home Overview' : 'Go to previous step'}
             >
               <ChevronLeft className="w-4 h-4" />
-              <span>Back</span>
+              <span>{currentStep === 1 ? 'Home' : 'Back'}</span>
             </button>
 
             <span className="text-xs text-muted-foreground font-semibold">

@@ -340,7 +340,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
         <p className="text-zinc-500 font-medium">No calculation run yet. Go back and click Calculate.</p>
         <button
           type="button"
-          onClick={() => goToStep(2)}
+          onClick={() => goToStep(5)}
           className="px-5 py-2.5 bg-blue-600 text-white rounded-xl text-sm font-bold shadow-sm hover:bg-blue-700 cursor-pointer"
         >
           ← Go Back to Assets

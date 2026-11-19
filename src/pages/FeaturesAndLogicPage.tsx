@@ -22,8 +22,9 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 
 interface FeaturesAndLogicPageProps {
-  onBack: () => void
+  onBack?: () => void
   onStartWizard: () => void
+  onHome?: () => void
 }
 
 type ActiveSection = 'math' | 'area' | 'lifestyles' | 'features' | 'architecture'
@@ -31,6 +32,7 @@ type ActiveSection = 'math' | 'area' | 'lifestyles' | 'features' | 'architecture
 export default function FeaturesAndLogicPage({
   onBack,
   onStartWizard,
+  onHome,
 }: FeaturesAndLogicPageProps) {
   const [activeSection, setActiveSection] = useState<ActiveSection>('math')
 
@@ -39,36 +41,27 @@ export default function FeaturesAndLogicPage({
       {/* Sticky Top Header */}
       <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              type="button"
-              onClick={onBack}
-              className="p-2 rounded-xl border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all cursor-pointer shadow-xs flex items-center gap-1.5 text-xs font-semibold"
-              title="Return to previous screen"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span className="hidden sm:inline">Back</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
-              title="Features & Calculation Logic"
-            >
-              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
-                ₹
-              </div>
-              <div>
-                <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                  Features & Calculation Logic
-                </h1>
-                <p className="text-[11px] text-muted-foreground font-medium hidden sm:block">
-                  Mathematical formulations, calibrations & architecture
-                </p>
-              </div>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              if (onHome) onHome()
+              else window.scrollTo({ top: 0, behavior: 'smooth' })
+            }}
+            className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
+            title="Features & Calculation Logic"
+          >
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
+              ₹
+            </div>
+            <div>
+              <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
+                Features & Calculation Logic
+              </h1>
+              <p className="text-[11px] text-muted-foreground font-medium hidden sm:block">
+                Mathematical formulations, calibrations & architecture
+              </p>
+            </div>
+          </button>
 
           <div className="flex items-center gap-2">
             <SocialLinks />

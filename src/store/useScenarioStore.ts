@@ -12,6 +12,7 @@ import { DEFAULT_ASSETS } from '@/domain/models/assets'
 import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
+import { syncStepToUrl } from '@/lib/router'
 
 interface ScenarioState {
   // Data
@@ -369,6 +370,7 @@ export const useScenarioStore = create<ScenarioState>()(
         if (step >= 1 && step <= totalSteps) {
           updateStoredSettings({ currentStep: step })
           set({ currentStep: step })
+          syncStepToUrl(step)
         }
       },
       nextStep: () => {
@@ -377,6 +379,7 @@ export const useScenarioStore = create<ScenarioState>()(
           const next = currentStep + 1
           updateStoredSettings({ currentStep: next })
           set({ currentStep: next })
+          syncStepToUrl(next)
         }
       },
       prevStep: () => {
@@ -385,6 +388,7 @@ export const useScenarioStore = create<ScenarioState>()(
           const prev = currentStep - 1
           updateStoredSettings({ currentStep: prev })
           set({ currentStep: prev })
+          syncStepToUrl(prev)
         }
       },
 
@@ -402,6 +406,7 @@ export const useScenarioStore = create<ScenarioState>()(
           results: null,
           currentStep: 1,
         })
+        syncStepToUrl(1, { replace: true })
       },
     }),
     { name: 'corpus-calc-v1' },

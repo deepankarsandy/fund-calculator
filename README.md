@@ -104,7 +104,17 @@ npm run preview
 This project strictly follows a **logic-only testing policy**:
 - **What is tested**: Pure financial algorithms, annualisation routines, growing annuity edge cases ($r \ne g$ and $r = g$), inflation compounding, income accumulation, and portfolio depletion.
 - **What is NOT tested**: UI components and DOM rendering (no Jest DOM / React Testing Library bloat) to keep development fast, lightweight, and maintainable.
-- All 30 unit tests run via **Vitest** in `< 1s`.
+- All 47 unit tests run via **Vitest** in `< 1.5s`.
+
+---
+
+## 🧭 Client-Side URL Routing
+
+The application runs 100% in the browser as a zero-backend Single Page Application (SPA) with full URL-based deep linking and browser history (Back / Forward) support:
+- **Home Overview**: `/`
+- **Calculation Logic & Methodology**: `/calc-logic`
+- **Step-by-Step Calculator**: `/calculator?step=1` through `/calculator?step=6` (with bidirectional query param synchronization across all wizard controls)
+- **Hash Fallback & Static Host Compatibility**: Seamlessly supports `#/calculator?step=X` and includes static SPA redirect handling for GitHub Pages / static file hosting.
 
 ---
 
