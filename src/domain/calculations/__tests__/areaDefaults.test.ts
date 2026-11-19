@@ -23,6 +23,35 @@ describe('Area & Lifestyle Defaults', () => {
     // Discretionary items like clothing or travel should be 0
     const travel = personalCat?.items.find(i => i.name.includes('Travel'))
     expect(travel?.amount).toBe(0)
+    // Essential items like groceries or electricity should remain positive
+    const foodCat = bareCategories.find(c => c.id === 'food')
+    const groceries = foodCat?.items.find(i => i.name.includes('Groceries'))
+    expect(groceries?.amount).toBeGreaterThan(0)
+  })
+
+  it('scales expenses higher under luxury lifestyle than comfortable', () => {
+    const comfortableCategories = buildCategoriesForProfile('small_town', 'comfortable')
+    const luxuryCategories = buildCategoriesForProfile('small_town', 'luxury')
+
+    const comfPersonal = comfortableCategories.find(c => c.id === 'personal')?.items.find(i => i.name.includes('Travel'))?.amount ?? 0
+    const luxPersonal = luxuryCategories.find(c => c.id === 'personal')?.items.find(i => i.name.includes('Travel'))?.amount ?? 0
+
+    expect(luxPersonal).toBeGreaterThan(comfPersonal)
+  })
+
+  it('preserves all category and item fields regardless of lifestyle scenario', () => {
+    const bareCategories = buildCategoriesForProfile('small_town', 'bare_minimum')
+    const comfortableCategories = buildCategoriesForProfile('small_town', 'comfortable')
+    const luxuryCategories = buildCategoriesForProfile('small_town', 'luxury')
+
+    expect(bareCategories.length).toBe(comfortableCategories.length)
+    expect(luxuryCategories.length).toBe(comfortableCategories.length)
+
+    // Verify item counts match across all categories
+    for (let i = 0; i < comfortableCategories.length; i++) {
+      expect(bareCategories[i].items.length).toBe(comfortableCategories[i].items.length)
+      expect(luxuryCategories[i].items.length).toBe(comfortableCategories[i].items.length)
+    }
   })
 
   it('provides sensible multipliers across area types', () => {

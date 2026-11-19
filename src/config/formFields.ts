@@ -187,6 +187,11 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
             description: 'Includes leisure, hobbies, outings, travel, and buffer.',
           },
           {
+            label: 'Luxury / Aspirational',
+            value: 'luxury',
+            description: 'Elevated lifestyle: premium housing, dining, travel, and higher buffer.',
+          },
+          {
             label: 'Custom',
             value: 'custom',
             description: 'Manually specify essential vs discretionary items.',

@@ -8,6 +8,7 @@ import { annualiseExpense } from './annualise'
 import { calculateCorpus, netReturn } from './corpusFormula'
 import { projectCashflows } from './projectCashflows'
 import { simulatePortfolio } from './simulatePortfolio'
+import { buildCategoriesForProfile } from './areaDefaults'
 import { generateWarnings } from '../validation/warnings'
 import type { HouseholdMember } from '../models/household'
 import Decimal from 'decimal.js'
@@ -250,50 +251,141 @@ function computeLifestyleComparisons(
   baseInput: RunScenariosInput,
   baseScenario: ScenarioResult,
 ): LifestyleComparison[] {
-  const { categories, assumptions } = baseInput
+  const { categories, assumptions, profile, members } = baseInput
   const r = assumptions.annualInvestmentReturn
   const g = assumptions.globalInflationRate
+  const currentLifestyle = profile.lifestyleScenario
 
-  // 1. Bare Minimum Categories (essentials only, or 65% of parent amount)
-  const bareMinCategories: ExpenseCategory[] = categories.map(cat => {
-    if (cat.parentAmount != null && cat.parentFrequency) {
+  let bareScenario: ScenarioResult
+  let comfortableScenario: ScenarioResult
+  let luxuryScenario: ScenarioResult
+
+  if (currentLifestyle === 'bare_minimum') {
+    bareScenario = baseScenario
+
+    // Derive comfortable baseline
+    const comfortableDefaults = buildCategoriesForProfile(profile.areaType, 'comfortable', members)
+    const comfortableCategories: ExpenseCategory[] = comfortableDefaults.map(cat => {
+      const userCat = categories.find(c => c.id === cat.id)
+      if (!userCat) return cat
+      if (userCat.parentAmount != null && userCat.parentFrequency) {
+        return { ...cat, parentAmount: Math.round(userCat.parentAmount / 0.65) }
+      }
       return {
         ...cat,
-        parentAmount: Math.round(cat.parentAmount * 0.65),
+        items: cat.items.map(defItem => {
+          const userItem = userCat.items.find(ui => ui.name === defItem.name)
+          if (userItem && userItem.essential && userItem.amount > 0) {
+            return { ...defItem, amount: userItem.amount }
+          }
+          return defItem
+        }),
       }
-    }
-    return {
-      ...cat,
-      items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
-    }
-  })
+    })
 
-  const bareScenario = runOneScenario('Bare Minimum', g, r, {
-    ...baseInput,
-    categories: bareMinCategories,
-  })
+    comfortableScenario = runOneScenario('Comfortable', g, r, {
+      ...baseInput,
+      categories: comfortableCategories,
+    })
 
-  // 2. Luxury / Aspirational Categories (+40% to parent, or 1.5x discretionary)
-  const luxuryCategories: ExpenseCategory[] = categories.map(cat => {
-    if (cat.parentAmount != null && cat.parentFrequency) {
+    const luxuryCategories: ExpenseCategory[] = comfortableCategories.map(cat => {
+      if (cat.parentAmount != null && cat.parentFrequency) {
+        return { ...cat, parentAmount: Math.round(cat.parentAmount * 1.4) }
+      }
       return {
         ...cat,
-        parentAmount: Math.round(cat.parentAmount * 1.4),
+        items: cat.items.map(it => ({
+          ...it,
+          amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
+        })),
       }
-    }
-    return {
-      ...cat,
-      items: cat.items.map(it => ({
-        ...it,
-        amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
-      })),
-    }
-  })
+    })
 
-  const luxuryScenario = runOneScenario('Luxury', g, r, {
-    ...baseInput,
-    categories: luxuryCategories,
-  })
+    luxuryScenario = runOneScenario('Luxury', g, r, {
+      ...baseInput,
+      categories: luxuryCategories,
+    })
+  } else if (currentLifestyle === 'luxury') {
+    luxuryScenario = baseScenario
+
+    // Reverse scale to comfortable baseline
+    const comfortableCategories: ExpenseCategory[] = categories.map(cat => {
+      if (cat.parentAmount != null && cat.parentFrequency) {
+        return { ...cat, parentAmount: Math.round(cat.parentAmount / 1.4) }
+      }
+      return {
+        ...cat,
+        items: cat.items.map(it => ({
+          ...it,
+          amount: it.essential ? Math.round(it.amount / 1.15) : Math.round(it.amount / 1.5),
+        })),
+      }
+    })
+
+    comfortableScenario = runOneScenario('Comfortable', g, r, {
+      ...baseInput,
+      categories: comfortableCategories,
+    })
+
+    const bareMinCategories: ExpenseCategory[] = comfortableCategories.map(cat => {
+      if (cat.parentAmount != null && cat.parentFrequency) {
+        return { ...cat, parentAmount: Math.round(cat.parentAmount * 0.65) }
+      }
+      return {
+        ...cat,
+        items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+      }
+    })
+
+    bareScenario = runOneScenario('Bare Minimum', g, r, {
+      ...baseInput,
+      categories: bareMinCategories,
+    })
+  } else {
+    // Current is comfortable (or custom)
+    comfortableScenario = baseScenario
+
+    // 1. Bare Minimum Categories (essentials only, or 65% of parent amount)
+    const bareMinCategories: ExpenseCategory[] = categories.map(cat => {
+      if (cat.parentAmount != null && cat.parentFrequency) {
+        return {
+          ...cat,
+          parentAmount: Math.round(cat.parentAmount * 0.65),
+        }
+      }
+      return {
+        ...cat,
+        items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+      }
+    })
+
+    bareScenario = runOneScenario('Bare Minimum', g, r, {
+      ...baseInput,
+      categories: bareMinCategories,
+    })
+
+    // 2. Luxury / Aspirational Categories (+40% to parent, or 1.5x discretionary)
+    const luxuryCategories: ExpenseCategory[] = categories.map(cat => {
+      if (cat.parentAmount != null && cat.parentFrequency) {
+        return {
+          ...cat,
+          parentAmount: Math.round(cat.parentAmount * 1.4),
+        }
+      }
+      return {
+        ...cat,
+        items: cat.items.map(it => ({
+          ...it,
+          amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
+        })),
+      }
+    })
+
+    luxuryScenario = runOneScenario('Luxury', g, r, {
+      ...baseInput,
+      categories: luxuryCategories,
+    })
+  }
 
   return [
     {
@@ -308,13 +400,13 @@ function computeLifestyleComparisons(
     },
     {
       lifestyle: 'comfortable',
-      label: 'Comfortable (Current Plan)',
+      label: 'Comfortable',
       description: 'Your configured balanced lifestyle with moderate leisure, gadgets, and vacations.',
-      monthlyExpenseToday: baseScenario.currentMonthlyEquivalent,
-      totalLifetimeCostOfLiving: baseScenario.totalLifetimeExpenses,
-      requiredCorpus: baseScenario.isRetired ? baseScenario.requiredCorpus : baseScenario.targetCorpusAtRetirement,
-      peakCorpus: baseScenario.isRetired ? baseScenario.peakCorpus : baseScenario.projectedCorpusAtRetirement,
-      peakAge: baseScenario.isRetired ? baseScenario.peakCorpusAge : baseScenario.retirementAge,
+      monthlyExpenseToday: comfortableScenario.currentMonthlyEquivalent,
+      totalLifetimeCostOfLiving: comfortableScenario.totalLifetimeExpenses,
+      requiredCorpus: comfortableScenario.isRetired ? comfortableScenario.requiredCorpus : comfortableScenario.targetCorpusAtRetirement,
+      peakCorpus: comfortableScenario.isRetired ? comfortableScenario.peakCorpus : comfortableScenario.projectedCorpusAtRetirement,
+      peakAge: comfortableScenario.isRetired ? comfortableScenario.peakCorpusAge : comfortableScenario.retirementAge,
     },
     {
       lifestyle: 'luxury',

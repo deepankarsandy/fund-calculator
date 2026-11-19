@@ -138,9 +138,13 @@ export function buildCategoriesForProfile(
           }
         }
 
-        // If bare minimum lifestyle, reduce discretionary to 0
+        // Lifestyle adjustment
         if (lifestyle === 'bare_minimum' && !sub.essential) {
           scaledAmount = 0
+        } else if (lifestyle === 'luxury') {
+          scaledAmount = sub.essential
+            ? Math.round((scaledAmount * 1.15) / 50) * 50
+            : Math.round((scaledAmount * 1.5) / 50) * 50
         }
 
         // Apply member scaling (non-linear) only to non-zero amounts for general household items

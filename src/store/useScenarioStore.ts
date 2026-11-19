@@ -10,6 +10,7 @@ import { DEFAULT_PROFILE } from '@/domain/models/profile'
 import { DEFAULT_ASSUMPTIONS } from '@/domain/models/assumptions'
 import { DEFAULT_ASSETS } from '@/domain/models/assets'
 import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
+import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
 
 interface ScenarioState {
@@ -55,6 +56,7 @@ interface ScenarioState {
 
   // Results
   setResults: (r: CalculationResults) => void
+  selectLifestylePlan: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
 
   // Navigation
   goToStep: (step: number) => void
@@ -247,6 +249,120 @@ export const useScenarioStore = create<ScenarioState>()(
         })),
 
       setResults: r => set({ results: r }),
+
+      selectLifestylePlan: (lifestyle) => {
+        const { profile, members, categories, assumptions, assets } = get()
+        const updatedProfile: Profile = { ...profile, lifestyleScenario: lifestyle }
+
+        // Derive updated categories for this lifestyle
+        let updatedCategories: ExpenseCategory[]
+        const comfortableDefaults = buildCategoriesForProfile(profile.areaType, 'comfortable', members)
+
+        if (lifestyle === 'bare_minimum') {
+          // Keep essentials, reduce discretionary to 0 (skipped)
+          updatedCategories = categories.map(cat => {
+            if (cat.parentAmount != null && cat.parentFrequency) {
+              return {
+                ...cat,
+                parentAmount: Math.round(cat.parentAmount * 0.65),
+              }
+            }
+            return {
+              ...cat,
+              items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+            }
+          })
+        } else if (lifestyle === 'luxury') {
+          // Derive from comfortable baseline
+          let baseCategories = categories
+          if (profile.lifestyleScenario === 'bare_minimum') {
+            baseCategories = comfortableDefaults.map(cat => {
+              const currentCat = categories.find(c => c.id === cat.id)
+              if (!currentCat) return cat
+              return {
+                ...cat,
+                items: cat.items.map(defItem => {
+                  const currentItem = currentCat.items.find(ci => ci.name === defItem.name)
+                  if (currentItem && currentItem.essential && currentItem.amount > 0) {
+                    return { ...defItem, amount: currentItem.amount }
+                  }
+                  return defItem
+                }),
+              }
+            })
+          }
+
+          updatedCategories = baseCategories.map(cat => {
+            if (cat.parentAmount != null && cat.parentFrequency) {
+              return {
+                ...cat,
+                parentAmount: Math.round(cat.parentAmount * 1.4),
+              }
+            }
+            return {
+              ...cat,
+              items: cat.items.map(it => ({
+                ...it,
+                skipped: false,
+                amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
+              })),
+            }
+          })
+        } else {
+          // 'comfortable'
+          if (profile.lifestyleScenario === 'bare_minimum') {
+            // Restore comfortable defaults for non-essential items while preserving any user-entered essentials
+            updatedCategories = comfortableDefaults.map(cat => {
+              const currentCat = categories.find(c => c.id === cat.id)
+              if (!currentCat) return cat
+              if (currentCat.parentAmount != null && currentCat.parentFrequency) {
+                return { ...cat, parentAmount: Math.round(currentCat.parentAmount / 0.65) }
+              }
+              return {
+                ...cat,
+                items: cat.items.map(defItem => {
+                  const currentItem = currentCat.items.find(ci => ci.name === defItem.name)
+                  if (currentItem && currentItem.essential && currentItem.amount > 0) {
+                    return { ...defItem, amount: currentItem.amount }
+                  }
+                  return { ...defItem, skipped: false }
+                }),
+              }
+            })
+          } else if (profile.lifestyleScenario === 'luxury') {
+            // Unscale back to comfortable
+            updatedCategories = categories.map(cat => {
+              if (cat.parentAmount != null && cat.parentFrequency) {
+                return { ...cat, parentAmount: Math.round(cat.parentAmount / 1.4) }
+              }
+              return {
+                ...cat,
+                items: cat.items.map(it => ({
+                  ...it,
+                  amount: it.essential ? Math.round(it.amount / 1.15) : Math.round(it.amount / 1.5),
+                })),
+              }
+            })
+          } else {
+            updatedCategories = categories
+          }
+        }
+
+        // Recalculate full scenario results immediately
+        const newResults = runScenarios({
+          profile: updatedProfile,
+          members,
+          categories: updatedCategories,
+          assumptions,
+          assets,
+        })
+
+        set({
+          profile: updatedProfile,
+          categories: updatedCategories,
+          results: newResults,
+        })
+      },
 
       goToStep: step => {
         const { totalSteps } = get()

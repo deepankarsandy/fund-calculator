@@ -1,4 +1,4 @@
-export type LifestyleScenario = 'bare_minimum' | 'comfortable' | 'custom'
+export type LifestyleScenario = 'bare_minimum' | 'comfortable' | 'luxury' | 'custom'
 export type WithdrawalTiming = 'beginning_of_year' | 'end_of_year'
 export type InflationMode = 'simple' | 'category' | 'item'
 export type ReturnBasis = 'gross' | 'net'

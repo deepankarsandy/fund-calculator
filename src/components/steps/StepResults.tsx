@@ -119,19 +119,26 @@ function LifestyleComparisonSection({
   comparisons,
   currentLifestyle,
   onEditProfile,
+  onSelectLifestyle,
 }: {
   comparisons: LifestyleComparison[]
   currentLifestyle: string
   onEditProfile: () => void
+  onSelectLifestyle: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
 }) {
   return (
     <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs space-y-4 print-break-inside-avoid">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
-            Cost of Living & Corpus Requirement by Lifestyle
-          </h3>
+        <div>
+          <div className="flex items-center gap-2">
+            <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+              Cost of Living & Corpus Requirement by Lifestyle
+            </h3>
+          </div>
+          <p className="text-[11px] text-zinc-500 mt-0.5">
+            Click any plan card below to immediately apply it and recalculate your required corpus
+          </p>
         </div>
         <button
           type="button"
@@ -148,31 +155,45 @@ function LifestyleComparisonSection({
           const isSelected =
             (c.lifestyle === 'bare_minimum' && currentLifestyle === 'bare_minimum') ||
             (c.lifestyle === 'comfortable' && currentLifestyle === 'comfortable') ||
-            (c.lifestyle === 'luxury' && currentLifestyle === 'custom')
+            (c.lifestyle === 'luxury' && (currentLifestyle === 'luxury' || currentLifestyle === 'custom'))
+
+          const lifestyleName =
+            c.lifestyle === 'bare_minimum'
+              ? 'Bare Minimum'
+              : c.lifestyle === 'luxury'
+              ? 'Luxury'
+              : 'Comfortable'
 
           return (
-            <div
+            <button
               key={c.lifestyle}
+              type="button"
+              onClick={() => onSelectLifestyle(c.lifestyle)}
               className={cn(
-                'rounded-xl p-4 border transition-all flex flex-col justify-between space-y-3 relative',
+                'rounded-xl p-4 border transition-all flex flex-col justify-between space-y-3 relative text-left cursor-pointer group',
                 isSelected
-                  ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-950/25 ring-1 ring-blue-500/30'
-                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-800/30',
+                  ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500/25 shadow-xs'
+                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-850/40 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xs',
               )}
             >
-              <div>
+              <div className="w-full">
                 <div className="flex items-center justify-between gap-1 mb-1">
                   <h4 className="font-bold text-xs text-zinc-900 dark:text-zinc-100">{c.label}</h4>
-                  {isSelected && (
-                    <span className="text-[10px] font-extrabold uppercase px-1.5 py-0.5 rounded-full bg-blue-600 text-white shadow-xs">
-                      Active
+                  {isSelected ? (
+                    <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-600 text-white shadow-2xs flex items-center gap-1">
+                      <CheckCircle2 className="w-2.5 h-2.5" />
+                      Active Plan
+                    </span>
+                  ) : (
+                    <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 group-hover:underline flex items-center gap-0.5">
+                      Click to apply →
                     </span>
                   )}
                 </div>
                 <p className="text-[11px] text-zinc-500 leading-snug">{c.description}</p>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800/80 text-xs">
+              <div className="space-y-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800/80 text-xs w-full">
                 <div className="flex justify-between items-baseline">
                   <span className="text-[11px] text-zinc-500">Monthly Budget (Today)</span>
                   <span className="font-bold text-zinc-800 dark:text-zinc-200">
@@ -198,7 +219,22 @@ function LifestyleComparisonSection({
                   </span>
                 </div>
               </div>
-            </div>
+
+              {/* Action Button at Bottom */}
+              <div className="pt-1 w-full print:hidden">
+                {isSelected ? (
+                  <div className="w-full py-1.5 px-3 rounded-lg bg-blue-600/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-center font-bold text-[11px] flex items-center justify-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Current Active Plan</span>
+                  </div>
+                ) : (
+                  <div className="w-full py-1.5 px-3 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 group-hover:bg-blue-600 group-hover:text-white transition-all text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-2xs">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Apply {lifestyleName} Plan</span>
+                  </div>
+                )}
+              </div>
+            </button>
           )
         })}
       </div>
@@ -285,7 +321,7 @@ function ProjectionTable({ scenario, full = false }: { scenario: ScenarioResult;
 }
 
 export function StepResults() {
-  const { results, profile, assets, goToStep } = useScenarioStore()
+  const { results, profile, assets, goToStep, selectLifestylePlan } = useScenarioStore()
   const [activeScenario, setActiveScenario] = useState(1) // Base by default
   const [showExplain, setShowExplain] = useState(false)
   const [activeTab, setActiveTab] = useState<'income_vs_expense' | 'portfolio' | 'categories' | 'table'>('income_vs_expense')
@@ -683,6 +719,7 @@ export function StepResults() {
       <LifestyleComparisonSection
         comparisons={results.lifestyleComparisons}
         currentLifestyle={profile.lifestyleScenario}
+        onSelectLifestyle={selectLifestylePlan}
         onEditProfile={() => goToStep(1)}
       />
 
