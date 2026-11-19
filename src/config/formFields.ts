@@ -42,6 +42,7 @@ export interface ExpenseSubItemConfig {
   essential: boolean
   everyNYears?: number
   help?: string
+  linkedMemberRelationship?: 'child' | 'parent' | 'sibling'
 }
 
 export interface ExpenseCategoryConfig {
@@ -681,9 +682,9 @@ export const EXPENSE_CATEGORIES_CONFIG: ExpenseCategoryConfig[] = [
       help: 'Total monthly allowance sent to dependents.',
     },
     subItems: [
-      { id: 'parental_support', name: 'Support for Elderly Parents', defaultAmount: 0, frequency: 'monthly', essential: true, help: 'Monthly financial assistance to parents.' },
-      { id: 'school_fees', name: 'School Fees & Tuitions', defaultAmount: 0, frequency: 'yearly', essential: true, help: 'Annual school fees, uniform, books.' },
-      { id: 'higher_education', name: 'College / Higher Education Provision', defaultAmount: 0, frequency: 'yearly', essential: false, help: 'Degree or university funding support.' },
+      { id: 'parental_support', name: 'Support for Elderly Parents', defaultAmount: 0, frequency: 'monthly', essential: true, help: 'Monthly financial assistance to parents.', linkedMemberRelationship: 'parent' },
+      { id: 'school_fees', name: 'School Fees & Tuitions', defaultAmount: 0, frequency: 'yearly', essential: true, help: 'Annual school fees, uniform, books.', linkedMemberRelationship: 'child' },
+      { id: 'higher_education', name: 'College / Higher Education Provision', defaultAmount: 0, frequency: 'yearly', essential: false, help: 'Degree or university funding support.', linkedMemberRelationship: 'child' },
     ],
   },
   {

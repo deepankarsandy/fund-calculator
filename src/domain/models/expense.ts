@@ -38,6 +38,7 @@ export interface ExpenseItem {
   type: ExpenseType
   notes: string
   skipped: boolean
+  linkedMemberRelationship?: string
 }
 
 export interface ExpenseCategory {

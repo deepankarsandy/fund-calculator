@@ -89,6 +89,7 @@ export function buildCategoriesForProfile(
           type,
           notes: sub.help || '',
           skipped: false,
+          linkedMemberRelationship: sub.linkedMemberRelationship,
         }
       }),
     }
