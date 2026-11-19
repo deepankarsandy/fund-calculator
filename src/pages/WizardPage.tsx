@@ -100,7 +100,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       {/* Header */}
       <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+        <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
@@ -112,7 +112,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
                 ₹
               </div>
               <div className="hidden sm:block">
-                <h1 className="text-base font-extrabold text-foreground leading-tight tracking-tight">
+                <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
                   Lifetime Corpus Calculator
                 </h1>
                 <p className="text-[11px] text-muted-foreground font-medium">
@@ -121,12 +121,12 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
               </div>
             </button>
 
-            <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="flex items-center gap-2">
               {onViewLogic && (
                 <button
                   type="button"
                   onClick={onViewLogic}
-                  className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
+                  className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                   title="View Calculation Logic & Formulas"
                 >
                   <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -139,7 +139,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
               <button
                 type="button"
                 onClick={handleReset}
-                className="text-xs font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1.5 px-2.5 sm:px-3 py-2 rounded-lg border border-border hover:bg-muted transition-all cursor-pointer shadow-xs"
+                className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                 title="Reset all fields to defaults and clear storage"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
@@ -245,7 +245,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
       </header>
 
       {/* Main Step Body */}
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-6">
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-6">
         {currentStepConfig && (
           <DynamicStepRenderer
             step={currentStepConfig}
@@ -257,7 +257,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
       {/* Footer Navigation */}
       {!isResultsStep && (
         <footer className="border-t border-border bg-card/90 backdrop-blur-md sticky bottom-0 z-20 shadow-md">
-          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={currentStep === 1 ? onBackToHome : prevStep}

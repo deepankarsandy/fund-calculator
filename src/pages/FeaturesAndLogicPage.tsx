@@ -40,7 +40,7 @@ export default function FeaturesAndLogicPage({
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       {/* Sticky Top Header */}
       <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => {
