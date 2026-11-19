@@ -19,6 +19,9 @@ import {
   CheckCircle2,
   AlertCircle,
   TrendingUp,
+  BookOpen,
+  Calculator,
+  ArrowRight,
 } from 'lucide-react'
 import type { ScenarioResult, LifestyleComparison } from '@/domain/models/results'
 import {
@@ -320,7 +323,11 @@ function ProjectionTable({ scenario, full = false }: { scenario: ScenarioResult;
   )
 }
 
-export function StepResults() {
+interface StepResultsProps {
+  onViewLogic?: () => void
+}
+
+export function StepResults({ onViewLogic }: StepResultsProps = {}) {
   const { results, profile, assets, goToStep, selectLifestylePlan } = useScenarioStore()
   const [activeScenario, setActiveScenario] = useState(1) // Base by default
   const [showExplain, setShowExplain] = useState(false)
@@ -748,6 +755,19 @@ export function StepResults() {
             <p className="pt-2 border-t border-zinc-200 dark:border-zinc-800 text-zinc-500 dark:text-zinc-400">
               This calculator provides planning estimates based on mathematical compounding. Market returns and inflation fluctuate in practice.
             </p>
+            {onViewLogic && (
+              <div className="pt-2 border-t border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-2">
+                <span className="text-zinc-500 dark:text-zinc-400">Want to explore all mathematical derivations & calibrations?</span>
+                <button
+                  type="button"
+                  onClick={onViewLogic}
+                  className="font-bold text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Explore Calculation Logic & Features</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -1202,8 +1222,44 @@ export function StepResults() {
         </div>
       </div>
 
+      {/* CTA: See How The Calculation Is Done */}
+      {onViewLogic && (
+        <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-r from-blue-50/90 via-card to-indigo-50/60 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/40 p-5 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs print:hidden">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-[11px] font-bold">
+              <Calculator className="w-3.5 h-3.5" />
+              <span>Complete Math & Feature Transparency</span>
+            </div>
+            <h4 className="text-base sm:text-lg font-black text-foreground">
+              See How This Calculation Is Done
+            </h4>
+            <p className="text-xs text-muted-foreground max-w-xl leading-relaxed">
+              Wondering how your target corpus and projections were computed? Explore our mathematical engine, Convention A growing annuity formula (<code className="font-mono text-[11px]">r ≠ g</code> and <code className="font-mono text-[11px]">r = g</code>), geographic cost calibration factors, and career accumulation models.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onViewLogic}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs sm:text-sm font-extrabold shadow-sm transition-all cursor-pointer shrink-0 flex items-center gap-2 group"
+          >
+            <span>Explore Calc Logic & Features</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
+          </button>
+        </div>
+      )}
+
       {/* Edit buttons */}
       <div className="flex flex-wrap gap-3 pt-2 print:hidden">
+        {onViewLogic && (
+          <button
+            type="button"
+            onClick={onViewLogic}
+            className="flex items-center gap-2 px-4 py-2.5 border border-blue-200 dark:border-blue-800 rounded-xl text-xs font-bold bg-blue-50/60 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-colors cursor-pointer shadow-xs"
+          >
+            <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+            <span>How Calculation Is Done</span>
+          </button>
+        )}
         <button
           type="button"
           onClick={() => goToStep(2)}

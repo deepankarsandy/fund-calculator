@@ -11,15 +11,18 @@ import {
   HelpCircle,
   Coins,
   ChevronRight,
+  Calculator,
+  BookOpen,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 
 interface HomePageProps {
   onStart: () => void
+  onViewLogic?: () => void
 }
 
-export default function HomePage({ onStart }: HomePageProps) {
+export default function HomePage({ onStart, onViewLogic }: HomePageProps) {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       {/* Top Navbar */}
@@ -45,6 +48,17 @@ export default function HomePage({ onStart }: HomePageProps) {
           </button>
 
           <div className="flex items-center gap-2">
+            {onViewLogic && (
+              <button
+                type="button"
+                onClick={onViewLogic}
+                className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                title="View Calculation Formulas & Logic"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="hidden sm:inline">Calc Logic</span>
+              </button>
+            )}
             <SocialLinks />
             <ThemeToggle />
           </div>
@@ -77,6 +91,16 @@ export default function HomePage({ onStart }: HomePageProps) {
               <span>Start Lifetime Calculation</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
+            {onViewLogic && (
+              <button
+                type="button"
+                onClick={onViewLogic}
+                className="w-full sm:w-auto px-6 py-3.5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-sm font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2"
+              >
+                <Calculator className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>See How It's Calculated</span>
+              </button>
+            )}
           </div>
 
           <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 pt-3 text-xs text-muted-foreground font-semibold">
@@ -253,14 +277,26 @@ export default function HomePage({ onStart }: HomePageProps) {
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto font-medium">
             Takes only 2–3 minutes. Pre-filled with realistic Indian cost baselines and skippable steps.
           </p>
-          <button
-            type="button"
-            onClick={onStart}
-            className="px-8 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-extrabold hover:bg-blue-700 transition-all cursor-pointer shadow-md inline-flex items-center gap-2"
-          >
-            <span>Launch Calculator Now</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onStart}
+              className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-extrabold hover:bg-blue-700 transition-all cursor-pointer shadow-md inline-flex items-center justify-center gap-2"
+            >
+              <span>Launch Calculator Now</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+            {onViewLogic && (
+              <button
+                type="button"
+                onClick={onViewLogic}
+                className="w-full sm:w-auto px-6 py-3.5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-sm font-bold transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
+              >
+                <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>How Calculation Is Done</span>
+              </button>
+            )}
+          </div>
         </section>
       </main>
 

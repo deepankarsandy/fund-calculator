@@ -6,9 +6,10 @@ import { useScenarioStore } from '@/store/useScenarioStore'
 
 interface DynamicStepRendererProps {
   step: WizardStepConfig
+  onViewLogic?: () => void
 }
 
-export function DynamicStepRenderer({ step }: DynamicStepRendererProps) {
+export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererProps) {
   const store = useScenarioStore()
   const { setStepFieldValue, nextStep } = store
 
@@ -40,7 +41,7 @@ export function DynamicStepRenderer({ step }: DynamicStepRendererProps) {
 
   // Specialized view for step 6 (Results)
   if (step.key === 'results') {
-    return <StepResults />
+    return <StepResults onViewLogic={onViewLogic} />
   }
 
   // For Profile, Household, Assumptions, Assets:
