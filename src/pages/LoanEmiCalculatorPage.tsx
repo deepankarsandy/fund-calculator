@@ -320,7 +320,7 @@ export default function LoanEmiCalculatorPage({
                   onChange={(e) => handleRateChange(Number(e.target.value))}
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                 />
-                <div className="relative w-24 shrink-0">
+                <div className="relative w-28 shrink-0">
                   <input
                     type="number"
                     min={1}
@@ -328,7 +328,7 @@ export default function LoanEmiCalculatorPage({
                     step={0.1}
                     value={inputs.annualInterestRate}
                     onChange={(e) => handleRateChange(Number(e.target.value))}
-                    className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">%</span>
                 </div>
@@ -353,6 +353,55 @@ export default function LoanEmiCalculatorPage({
               </div>
             </div>
 
+            {/* Interest Method Switch: Reducing vs Flat */}
+            <div className="space-y-2 pt-2 border-t border-border/60">
+              <div className="flex items-center justify-between gap-2">
+                <label className="text-xs font-bold text-foreground">
+                  Interest Method
+                </label>
+                {inputs.interestMethod === 'flat' ? (
+                  <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
+                    Equiv. Reducing APR: ~{results.equivalentReducingApr}%
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800">
+                    Reducing Balance (Standard)
+                  </span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 p-1 bg-muted/60 rounded-xl border border-border">
+                <button
+                  type="button"
+                  onClick={() => setInputs((prev) => ({ ...prev, interestMethod: 'reducing' }))}
+                  className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
+                    (inputs.interestMethod || 'reducing') === 'reducing'
+                      ? 'bg-card text-foreground shadow-xs border border-border'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Reducing Balance
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputs((prev) => ({ ...prev, interestMethod: 'flat' }))}
+                  className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
+                    inputs.interestMethod === 'flat'
+                      ? 'bg-card text-foreground shadow-xs border border-border'
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  Flat Rate
+                </button>
+              </div>
+
+              {inputs.interestMethod === 'flat' && (
+                <div className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50/60 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/80 dark:border-amber-800/80 leading-relaxed">
+                  <strong>Notice on Flat Rate:</strong> Interest is charged on the initial principal throughout the tenure. A {inputs.annualInterestRate}% flat rate corresponds to an effective ~{results.equivalentReducingApr}% reducing APR.
+                </div>
+              )}
+            </div>
+
             {/* Loan Tenure */}
             <div className="space-y-2 pt-2 border-t border-border/60">
               <div className="flex items-center justify-between gap-2">
@@ -375,7 +424,7 @@ export default function LoanEmiCalculatorPage({
                   onChange={(e) => handleYearsChange(Number(e.target.value))}
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
-                <div className="relative w-24 shrink-0">
+                <div className="relative w-28 shrink-0">
                   <input
                     type="number"
                     min={1}
@@ -383,7 +432,7 @@ export default function LoanEmiCalculatorPage({
                     step={1}
                     value={inputs.tenureYears}
                     onChange={(e) => handleYearsChange(Number(e.target.value))}
-                    className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-2.5 pr-8 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">Yr</span>
                 </div>

@@ -89,4 +89,23 @@ describe('calculateLoanEmi', () => {
     expect(res.actualTotalPayment).toBe(0)
     expect(res.actualTotalInterest).toBe(0)
   })
+
+  it('supports flat rate loan calculation with equivalent reducing APR', () => {
+    // 5 Lakhs at 10% flat rate for 5 years
+    const flatRes = calculateLoanEmi({
+      loanAmount: 500000,
+      annualInterestRate: 10.0,
+      tenureYears: 5,
+      interestMethod: 'flat',
+    })
+
+    // Total flat interest = 500,000 * 10% * 5 = 250,000
+    expect(flatRes.totalOriginalInterest).toBe(250000)
+    expect(flatRes.totalOriginalPayment).toBe(750000)
+    // Monthly EMI = 750,000 / 60 = 12,500
+    expect(flatRes.monthlyEmi).toBe(12500)
+    // Equivalent reducing APR is nearly 18%+
+    expect(flatRes.equivalentReducingApr).toBeGreaterThan(17)
+    expect(flatRes.interestMethod).toBe('flat')
+  })
 })

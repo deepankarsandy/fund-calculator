@@ -1,4 +1,5 @@
 export type LoanTypePreset = 'home' | 'car' | 'personal' | 'custom'
+export type LoanInterestMethod = 'reducing' | 'flat'
 
 export interface LoanEmiCalculationInputs {
   loanAmount: number
@@ -6,6 +7,7 @@ export interface LoanEmiCalculationInputs {
   tenureYears: number
   tenureMonths: number
   loanType: LoanTypePreset
+  interestMethod: LoanInterestMethod
   monthlyExtraPrepayment: number
   annualLumpSumPrepayment: number
   enableTaxDeduction: boolean
@@ -29,6 +31,8 @@ export interface LoanYearlyAmortization {
 export interface LoanEmiCalculationResult {
   monthlyEmi: number
   totalTenureMonths: number
+  interestMethod: LoanInterestMethod
+  equivalentReducingApr: number
   totalOriginalPayment: number
   totalOriginalInterest: number
   actualPayoffMonths: number
@@ -48,6 +52,7 @@ export const DEFAULT_LOAN_EMI_INPUTS: LoanEmiCalculationInputs = {
   tenureYears: 20,
   tenureMonths: 0,
   loanType: 'home',
+  interestMethod: 'reducing',
   monthlyExtraPrepayment: 0,
   annualLumpSumPrepayment: 0,
   enableTaxDeduction: true,
@@ -70,6 +75,9 @@ export function calculateLoanEmi(
   const months = Math.max(0, merged.tenureMonths || 0)
   const totalMonths = Math.max(1, years * 12 + months)
 
+  const interestMethod = merged.interestMethod || 'reducing'
+  const isFlatRate = interestMethod === 'flat'
+
   const monthlyRate = annualRate > 0 ? (annualRate / 100) / 12 : 0
   const monthlyExtra = Math.max(0, merged.monthlyExtraPrepayment || 0)
   const annualLumpSum = Math.max(0, merged.annualLumpSumPrepayment || 0)
@@ -84,6 +92,8 @@ export function calculateLoanEmi(
     return {
       monthlyEmi: 0,
       totalTenureMonths: totalMonths,
+      interestMethod,
+      equivalentReducingApr: 0,
       totalOriginalPayment: 0,
       totalOriginalInterest: 0,
       actualPayoffMonths: 0,
@@ -98,17 +108,34 @@ export function calculateLoanEmi(
     }
   }
 
-  // Standard monthly EMI calculation
   let monthlyEmi = 0
-  if (monthlyRate === 0) {
-    monthlyEmi = Math.round(P / totalMonths)
-  } else {
-    const factor = Math.pow(1 + monthlyRate, totalMonths)
-    monthlyEmi = Math.round((P * monthlyRate * factor) / (factor - 1))
-  }
+  let totalOriginalPayment = 0
+  let totalOriginalInterest = 0
+  let equivalentReducingApr = annualRate
 
-  const totalOriginalPayment = monthlyEmi * totalMonths
-  const totalOriginalInterest = Math.max(0, totalOriginalPayment - P)
+  if (isFlatRate) {
+    // Flat Rate Loan Formula: Total Interest = P * R * T
+    const tenureInYears = totalMonths / 12
+    totalOriginalInterest = Math.round(P * (annualRate / 100) * tenureInYears)
+    totalOriginalPayment = P + totalOriginalInterest
+    monthlyEmi = Math.round(totalOriginalPayment / totalMonths)
+
+    // Equivalent Reducing APR calculation
+    // Rule of thumb: approx 1.85 to 1.95x of flat rate
+    const approxAprFactor = (2 * totalMonths) / (totalMonths + 1)
+    equivalentReducingApr = Number((annualRate * approxAprFactor).toFixed(2))
+  } else {
+    // Reducing Balance Loan Formula
+    if (monthlyRate === 0) {
+      monthlyEmi = Math.round(P / totalMonths)
+    } else {
+      const factor = Math.pow(1 + monthlyRate, totalMonths)
+      monthlyEmi = Math.round((P * monthlyRate * factor) / (factor - 1))
+    }
+    totalOriginalPayment = monthlyEmi * totalMonths
+    totalOriginalInterest = Math.max(0, totalOriginalPayment - P)
+    equivalentReducingApr = annualRate
+  }
 
   // Month-by-month amortization simulation
   let balance = P
@@ -127,11 +154,22 @@ export function calculateLoanEmi(
   let yearExtra = 0
   let yearTotalPay = 0
 
+  const flatMonthlyPrincipal = Math.round(P / totalMonths)
+  const flatMonthlyInterest = Math.round(totalOriginalInterest / totalMonths)
+
   for (let m = 1; m <= totalMonths; m++) {
     if (balance <= 0) break
 
-    const interestMonth = balance * monthlyRate
-    const regularPrincipal = Math.min(balance, Math.max(0, monthlyEmi - interestMonth))
+    let interestMonth = 0
+    let regularPrincipal = 0
+
+    if (isFlatRate) {
+      interestMonth = Math.min(balance > 0 ? flatMonthlyInterest : 0)
+      regularPrincipal = Math.min(balance, flatMonthlyPrincipal)
+    } else {
+      interestMonth = balance * monthlyRate
+      regularPrincipal = Math.min(balance, Math.max(0, monthlyEmi - interestMonth))
+    }
 
     let extraThisMonth = monthlyExtra
     if (m % 12 === 0) {
@@ -199,6 +237,8 @@ export function calculateLoanEmi(
   return {
     monthlyEmi,
     totalTenureMonths: totalMonths,
+    interestMethod,
+    equivalentReducingApr,
     totalOriginalPayment,
     totalOriginalInterest,
     actualPayoffMonths,

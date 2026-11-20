@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateSip } from '../sip'
+import { calculateSip, calculateSwp } from '../sip'
 
 describe('calculateSip', () => {
   it('calculates standard 10-year monthly SIP with 12% returns', () => {
@@ -91,5 +91,51 @@ describe('calculateSip', () => {
     expect(noReturnRes.totalInvested).toBe(120000)
     expect(noReturnRes.grossCorpus).toBe(120000)
     expect(noReturnRes.estimatedReturns).toBe(0)
+  })
+})
+
+describe('calculateSwp', () => {
+  it('calculates regular monthly SWP withdrawals and remaining balance', () => {
+    const res = calculateSwp({
+      initialInvestment: 5000000, // 50 Lakhs
+      monthlyWithdrawal: 30000, // 30k / mo = 3.6L / yr
+      annualReturnRate: 8.0, // 8% returns
+      timeHorizonYears: 10,
+      enableStepUpWithdrawal: false,
+    })
+
+    expect(res.initialInvestment).toBe(5000000)
+    expect(res.totalWithdrawn).toBe(3600000) // 30k * 120
+    expect(res.finalBalance).toBeGreaterThan(4500000)
+    expect(res.isDepleted).toBe(false)
+    expect(res.depletionYear).toBeNull()
+    expect(res.yearlySchedule).toHaveLength(10)
+  })
+
+  it('detects when corpus depletes under high withdrawals', () => {
+    const res = calculateSwp({
+      initialInvestment: 1000000, // 10 Lakhs
+      monthlyWithdrawal: 50000, // 50k / mo = 6L / yr
+      annualReturnRate: 5.0,
+      timeHorizonYears: 10,
+    })
+
+    expect(res.isDepleted).toBe(true)
+    expect(res.depletionYear).toBeLessThanOrEqual(3)
+    expect(res.finalBalance).toBe(0)
+  })
+
+  it('supports annual step-up withdrawal increases', () => {
+    const res = calculateSwp({
+      initialInvestment: 5000000,
+      monthlyWithdrawal: 25000,
+      annualReturnRate: 8.0,
+      timeHorizonYears: 5,
+      enableStepUpWithdrawal: true,
+      stepUpWithdrawalPercent: 10,
+    })
+
+    expect(res.yearlySchedule[1].monthlyWithdrawal).toBe(27500)
+    expect(res.yearlySchedule[2].monthlyWithdrawal).toBe(30250)
   })
 })

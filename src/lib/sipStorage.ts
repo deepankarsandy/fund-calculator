@@ -1,44 +1,76 @@
 import {
   SipCalculationInputs,
   SipCalculationResult,
+  SwpCalculationInputs,
+  SwpCalculationResult,
   DEFAULT_SIP_INPUTS,
+  DEFAULT_SWP_INPUTS,
 } from '@/domain/calculations/sip'
+
+export type SipMode = 'sip' | 'swp'
+
+export interface StoredSipData {
+  mode: SipMode
+  sip: SipCalculationInputs
+  swp: SwpCalculationInputs
+}
+
+export interface StoredSipResultsData {
+  mode: SipMode
+  sip: SipCalculationResult | null
+  swp: SwpCalculationResult | null
+}
 
 export const SIP_INPUTS_STORAGE_KEY = 'fundcalc_sip_inputs_v1'
 export const SIP_RESULTS_STORAGE_KEY = 'fundcalc_sip_results_v1'
 
-export function getStoredSipInputs(): SipCalculationInputs {
-  if (typeof window === 'undefined') return DEFAULT_SIP_INPUTS
+export const DEFAULT_STORED_SIP_DATA: StoredSipData = {
+  mode: 'sip',
+  sip: DEFAULT_SIP_INPUTS,
+  swp: DEFAULT_SWP_INPUTS,
+}
+
+export function getStoredSipInputs(): StoredSipData {
+  if (typeof window === 'undefined') return DEFAULT_STORED_SIP_DATA
   try {
     const raw = localStorage.getItem(SIP_INPUTS_STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
+      // Backward compatibility if previous stored data was plain SipCalculationInputs
+      if ('monthlyInvestment' in parsed) {
+        return {
+          mode: 'sip',
+          sip: { ...DEFAULT_SIP_INPUTS, ...parsed },
+          swp: DEFAULT_SWP_INPUTS,
+        }
+      }
       return {
-        ...DEFAULT_SIP_INPUTS,
-        ...parsed,
+        mode: parsed.mode === 'swp' ? 'swp' : 'sip',
+        sip: { ...DEFAULT_SIP_INPUTS, ...(parsed.sip || {}) },
+        swp: { ...DEFAULT_SWP_INPUTS, ...(parsed.swp || {}) },
       }
     }
   } catch {
     // Ignore storage parse error
   }
-  return DEFAULT_SIP_INPUTS
+  return DEFAULT_STORED_SIP_DATA
 }
 
-export function saveStoredSipInputs(inputs: SipCalculationInputs): void {
+export function saveStoredSipInputs(data: StoredSipData): void {
   if (typeof window === 'undefined') return
   try {
-    localStorage.setItem(SIP_INPUTS_STORAGE_KEY, JSON.stringify(inputs))
+    localStorage.setItem(SIP_INPUTS_STORAGE_KEY, JSON.stringify(data))
   } catch {
     // Ignore storage errors
   }
 }
 
-export function getStoredSipResults(): SipCalculationResult | null {
+export function getStoredSipResults(): StoredSipResultsData | null {
   if (typeof window === 'undefined') return null
   try {
     const raw = localStorage.getItem(SIP_RESULTS_STORAGE_KEY)
     if (raw) {
-      return JSON.parse(raw) as SipCalculationResult
+      return JSON.parse(raw) as StoredSipResultsData
     }
   } catch {
     // Ignore
@@ -46,7 +78,7 @@ export function getStoredSipResults(): SipCalculationResult | null {
   return null
 }
 
-export function saveStoredSipResults(results: SipCalculationResult): void {
+export function saveStoredSipResults(results: StoredSipResultsData): void {
   if (typeof window === 'undefined') return
   try {
     localStorage.setItem(SIP_RESULTS_STORAGE_KEY, JSON.stringify(results))

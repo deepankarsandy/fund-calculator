@@ -292,7 +292,7 @@ export default function InvestmentCalculatorPage({
                   onChange={(e) => handleYearsChange(Number(e.target.value))}
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
-                <div className="relative w-24 shrink-0">
+                <div className="relative w-28 shrink-0">
                   <input
                     type="number"
                     min={1}
@@ -300,7 +300,7 @@ export default function InvestmentCalculatorPage({
                     step={1}
                     value={inputs.timeHorizonYears}
                     onChange={(e) => handleYearsChange(Number(e.target.value))}
-                    className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-2.5 pr-8 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">Yr</span>
                 </div>
@@ -422,7 +422,7 @@ export default function InvestmentCalculatorPage({
                     onChange={(e) => handleSimpleRateChange(Number(e.target.value))}
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
-                  <div className="relative w-24 shrink-0">
+                  <div className="relative w-28 shrink-0">
                     <input
                       type="number"
                       min={1}
@@ -430,7 +430,7 @@ export default function InvestmentCalculatorPage({
                       step={0.5}
                       value={inputs.simpleReturnRate}
                       onChange={(e) => handleSimpleRateChange(Number(e.target.value))}
-                      className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">%</span>
                   </div>
