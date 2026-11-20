@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
-export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment'
+export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd'
 
 export interface AppRoute {
   page: PageRoute
@@ -38,6 +38,8 @@ export function buildUrl(page: PageRoute, step?: number): string {
       return `${base}sip`
     case 'investment':
       return `${base}investment`
+    case 'fd':
+      return `${base}fd`
     case 'calculator': {
       const s = typeof step === 'number' && !isNaN(step) ? Math.min(Math.max(1, step), 6) : 1
       return `${base}calculator?step=${s}`
@@ -104,6 +106,9 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
       if (lower === 'investment' || lower === 'investment-calculator') {
         return { page: 'investment' }
       }
+      if (lower === 'fd' || lower === 'fd-calculator' || lower === 'fixed-deposit') {
+        return { page: 'fd' }
+      }
       if (lower === 'calculator' || lower === 'wizard') {
         const step = getStoredSettings().currentStep || 1
         return { page: 'calculator', step }
@@ -137,6 +142,10 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
 
   if (normalizedPath === 'investment' || normalizedPath === 'investment-calculator') {
     return { page: 'investment' }
+  }
+
+  if (normalizedPath === 'fd' || normalizedPath === 'fd-calculator' || normalizedPath === 'fixed-deposit') {
+    return { page: 'fd' }
   }
 
   if (normalizedPath === 'calculator' || normalizedPath === 'wizard') {
@@ -206,6 +215,10 @@ export function navigateToSIP(options?: { replace?: boolean }): void {
 
 export function navigateToInvestment(options?: { replace?: boolean }): void {
   navigateTo(buildUrl('investment'), options)
+}
+
+export function navigateToFD(options?: { replace?: boolean }): void {
+  navigateTo(buildUrl('fd'), options)
 }
 
 export function navigateToCalculator(step: number = 1, options?: { replace?: boolean }): void {
@@ -321,6 +334,7 @@ export function useRouter() {
     navigateToLogic,
     navigateToSIP,
     navigateToInvestment,
+    navigateToFD,
     navigateToCalculator,
     navigateBack,
     syncStepToUrl,

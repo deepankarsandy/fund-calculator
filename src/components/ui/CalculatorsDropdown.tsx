@@ -60,9 +60,9 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     shortDesc: 'Bank FD quarterly compounding, interest payouts & maturity',
     longDesc: 'Compute maturity amounts and effective yields across standard, cumulative, and monthly payout fixed deposits.',
     category: 'helper',
-    status: 'coming_soon',
+    status: 'active',
     icon: Landmark,
-    badge: 'Coming Soon',
+    badge: 'Active',
   },
   {
     id: 'interest',
