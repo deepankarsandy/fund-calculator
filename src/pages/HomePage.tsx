@@ -15,10 +15,7 @@ import {
   BookOpen,
   Clock,
 } from 'lucide-react'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { SocialLinks } from '@/components/ui/SocialLinks'
-import { CalculatorsDropdown, FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
-import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
+import { FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
 import { HomePageProfileBanner } from '@/components/profile/HomePageProfileBanner'
 import { navigateToProfile } from '@/lib/router'
 import { cn } from '@/lib/cn'
@@ -30,61 +27,12 @@ interface HomePageProps {
   onHome?: () => void
 }
 
-export default function HomePage({ onStart, onSelectCalculator, onViewLogic, onHome }: HomePageProps) {
+export default function HomePage({ onStart, onSelectCalculator, onViewLogic }: HomePageProps) {
   const primaryCalc = FINANCIAL_CALCULATORS.find((c) => c.category === 'primary')
   const helperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper')
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
-      {/* Top Navbar */}
-      <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (onHome) onHome();
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
-            title="Fund Calculator"
-          >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
-              ₹
-            </div>
-            <div className="hidden sm:block">
-              <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                Fund Calculator
-              </h1>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                Retirement & Financial Planning
-              </p>
-            </div>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>100% Local & Private</span>
-            </div>
-
-            {/* Calculators & Logic Dropdown */}
-            <CalculatorsDropdown
-              onSelectCalculator={(id) => {
-                if (onSelectCalculator) onSelectCalculator(id);
-                else if (id === "fund") onStart();
-              }}
-              onViewLogic={onViewLogic}
-            />
-
-            <SocialLinks />
-            <ThemeToggle />
-
-            {/* Profile CTA Header Button - Right Most Side */}
-            <ProfileHeaderButton onClick={() => navigateToProfile()} />
-          </div>
-        </div>
-      </header>
-
+    <div className="flex-1 flex flex-col">
       {/* Hero Section */}
       <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-10">
         {/* Profile CTA Banner on Home Page Top */}

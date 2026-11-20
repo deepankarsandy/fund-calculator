@@ -17,10 +17,6 @@ import {
   Download,
   Settings,
 } from 'lucide-react'
-import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { SocialLinks } from '@/components/ui/SocialLinks'
-import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
-import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
 
 interface FeaturesAndLogicPageProps {
   onBack?: () => void
@@ -38,50 +34,7 @@ export default function FeaturesAndLogicPage({
   const [activeSection, setActiveSection] = useState<ActiveSection>('math')
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
-      {/* Sticky Top Header */}
-      <header className="border-b border-border bg-card/90 backdrop-blur-md sticky top-0 z-20 shadow-xs">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (onHome) onHome()
-              else window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
-            className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
-            title="Fund Calculator"
-          >
-            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
-              ₹
-            </div>
-            <div>
-              <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                Fund Calculator
-              </h1>
-              <p className="text-[11px] text-muted-foreground font-medium hidden sm:block">
-                Features & Calculation Logic · Mathematical Formulations
-              </p>
-            </div>
-          </button>
-
-          <div className="flex items-center gap-2">
-            <CalculatorsDropdown
-              onSelectCalculator={(id) => {
-                if (id === 'fund') onStartWizard()
-              }}
-              onViewLogic={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' })
-              }}
-              currentActive="logic"
-            />
-            <SocialLinks />
-            <ThemeToggle />
-            {/* Profile Button - Right Most Side */}
-            <ProfileHeaderButton />
-          </div>
-        </div>
-      </header>
-
+    <div className="flex-1 flex flex-col">
       {/* Main Content */}
       <main className="flex-1 max-w-6xl mx-auto w-full px-4 py-8 sm:py-12 space-y-10">
         {/* Hero Header */}
@@ -1013,6 +966,14 @@ export default function FeaturesAndLogicPage({
             Use the top navigation dropdown to switch to the Fund Calculator or explore upcoming financial calculators.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onStartWizard}
+              className="px-6 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-extrabold transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
+            >
+              <Calculator className="w-4 h-4" />
+              <span>Launch Fund Calculator</span>
+            </button>
             <button
               type="button"
               onClick={onBack || onHome}
