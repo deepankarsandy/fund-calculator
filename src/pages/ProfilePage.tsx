@@ -12,6 +12,8 @@ import {
   Landmark,
   BadgePercent,
   ChevronDown,
+  Download,
+  Upload,
 } from 'lucide-react'
 import {
   UserProfile,
@@ -23,6 +25,7 @@ import {
 import { AreaType, LifestyleScenario } from '@/domain/models/profile'
 import { useUserProfile, syncProfileToCalculators } from '@/lib/userProfileStorage'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
 
 interface ProfilePageProps {
@@ -215,7 +218,48 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                 time, while still letting you tweak values individually.
               </p>
             </div>
+
+            <button
+              type="button"
+              onClick={() => navigateToExportImport()}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/80 dark:hover:bg-blue-900 border border-blue-200 dark:border-blue-800 rounded-xl transition-all cursor-pointer shadow-2xs shrink-0 self-start sm:self-auto"
+            >
+              <Download className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+              <span>Export & Import Data</span>
+            </button>
           </div>
+        </div>
+
+        {/* Data Portability CTA Card */}
+        <div className="p-3.5 sm:p-4 rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-gradient-to-r from-blue-50/70 via-card to-card dark:from-blue-950/30 dark:via-card dark:to-card flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <Download className="w-4 h-4" />
+            </div>
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2">
+                <h4 className="text-xs font-black text-foreground">
+                  Backup or Transfer Your Profile & Calculators
+                </h4>
+                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                  JSON Data
+                </span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-snug">
+                Export your personal baseline and all 5 calculators as a single JSON file, or
+                restore from automatic backups.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigateToExportImport()}
+            className="w-full sm:w-auto px-4 py-2 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+          >
+            <Upload className="w-3.5 h-3.5" />
+            <span>Export & Import JSON</span>
+          </button>
         </div>
 
         {/* Tabbed Card Container */}

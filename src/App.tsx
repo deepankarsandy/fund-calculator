@@ -13,6 +13,7 @@ const InvestmentCalculatorPage = lazy(() => import('@/pages/InvestmentCalculator
 const FdCalculatorPage = lazy(() => import('@/pages/FdCalculatorPage'))
 const LoanEmiCalculatorPage = lazy(() => import('@/pages/LoanEmiCalculatorPage'))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage'))
+const ExportImportPage = lazy(() => import('@/pages/ExportImportPage'))
 
 function PageFallback() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
     navigateToFD,
     navigateToLoanEMI,
     navigateToProfile,
+    navigateToExportImport,
     navigateBack,
   } = useRouter()
 
@@ -70,11 +72,15 @@ export default function App() {
       navigateToLoanEMI()
     } else if (id === 'profile') {
       navigateToProfile()
+    } else if (id === 'export-import') {
+      navigateToExportImport()
     }
   }
 
   const renderPage = () => {
     switch (route.page) {
+      case 'export-import':
+        return <ExportImportPage onBackToHome={navigateToHome} />
       case 'profile':
         return <ProfilePage onBackToHome={navigateToHome} />
       case 'interest':

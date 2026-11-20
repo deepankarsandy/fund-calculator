@@ -58,6 +58,13 @@ export const DEFAULT_PAGE_HEADERS: Record<string, HeaderConfig> = {
     showPrivateBadge: true,
     showStepper: false,
   },
+  'export-import': {
+    title: 'Fund Calculator',
+    subtitle: 'Data Management · Export, Import & Restore Calculator Data',
+    currentActive: 'export-import',
+    showPrivateBadge: true,
+    showStepper: false,
+  },
   logic: {
     title: 'Fund Calculator',
     subtitle: 'Features & Calculation Logic · Mathematical Formulations',

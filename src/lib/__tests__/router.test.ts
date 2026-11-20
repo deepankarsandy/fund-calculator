@@ -22,6 +22,7 @@ describe('Router & URL Navigation', () => {
       expect(buildUrl('fd')).toBe('/fd')
       expect(buildUrl('interest')).toBe('/loan-emi')
       expect(buildUrl('profile')).toBe('/profile')
+      expect(buildUrl('export-import')).toBe('/export-import')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -84,6 +85,19 @@ describe('Router & URL Navigation', () => {
       expect(parseRoute({ pathname: '/profile', search: '', hash: '' }).page).toBe('profile')
       expect(parseRoute({ pathname: '/user-profile', search: '', hash: '' }).page).toBe('profile')
       expect(parseRoute({ pathname: '/', search: '', hash: '#profile' }).page).toBe('profile')
+    })
+
+    it('parses /export-import and data management aliases', () => {
+      expect(parseRoute({ pathname: '/export-import', search: '', hash: '' }).page).toBe(
+        'export-import'
+      )
+      expect(parseRoute({ pathname: '/export', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/import', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/backup', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#export-import' }).page).toBe(
+        'export-import'
+      )
+      expect(parseRoute({ pathname: '/', search: '', hash: '#backup' }).page).toBe('export-import')
     })
 
     it('parses /logic and other logic aliases', () => {

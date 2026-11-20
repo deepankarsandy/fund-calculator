@@ -14,10 +14,12 @@ import {
   Calculator,
   BookOpen,
   Clock,
+  Download,
+  Upload,
 } from 'lucide-react'
 import { FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
 import { HomePageProfileBanner } from '@/components/profile/HomePageProfileBanner'
-import { navigateToProfile } from '@/lib/router'
+import { navigateToProfile, navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
 
 interface HomePageProps {
@@ -115,6 +117,42 @@ export default function HomePage({ onStart, onSelectCalculator, onViewLogic }: H
                 trackers are used. Your privacy is absolute.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Export & Import Data CTA Banner */}
+        <section className="max-w-3xl mx-auto -mt-4">
+          <div className="rounded-2xl border border-blue-200/80 dark:border-blue-900/60 bg-gradient-to-r from-blue-50/70 via-card to-card dark:from-blue-950/30 dark:via-card dark:to-card p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <Download className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-sm font-extrabold text-foreground">
+                    Export, Import & Restore All Data
+                  </h3>
+                  <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                    JSON Backup
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed font-medium">
+                  Download your complete retirement model, profile defaults, and 5 financial
+                  calculators in a single JSON file. Restore or transfer anytime with safety
+                  backups.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigateToExportImport()}
+              className="w-full sm:w-auto px-4 py-2.5 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer shrink-0 group"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Export & Import JSON</span>
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            </button>
           </div>
         </section>
 

@@ -9,6 +9,7 @@ import {
   Percent,
   Sparkles,
   Clock,
+  Download,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 
@@ -308,6 +309,36 @@ export function CalculatorsDropdown({
                 </div>
               </button>
             )}
+
+            {/* Export & Import JSON CTA */}
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false)
+                onSelectCalculator?.('export-import')
+              }}
+              className={cn(
+                'w-full p-2.5 rounded-xl border flex items-start gap-3 text-left transition-all cursor-pointer group',
+                currentActive === 'export-import'
+                  ? 'border-blue-600 bg-blue-50/50 dark:bg-blue-950/40 text-blue-900 dark:text-blue-100'
+                  : 'border-border/80 bg-background hover:bg-muted/60 text-foreground hover:border-border'
+              )}
+            >
+              <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5 group-hover:scale-105 transition-transform">
+                <Download className="w-4 h-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center justify-between gap-1">
+                  <span className="text-xs font-bold text-foreground">Export & Import JSON</span>
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 shrink-0">
+                    Data
+                  </span>
+                </div>
+                <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5 leading-snug">
+                  Backup, transfer or restore all 5 calculators and profile data
+                </p>
+              </div>
+            </button>
           </div>
 
           {/* Upcoming Helper Calculators */}

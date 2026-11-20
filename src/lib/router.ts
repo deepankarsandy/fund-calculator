@@ -2,7 +2,15 @@ import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
 export type PageRoute =
-  'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd' | 'interest' | 'profile'
+  | 'home'
+  | 'logic'
+  | 'calculator'
+  | 'sip'
+  | 'investment'
+  | 'fd'
+  | 'interest'
+  | 'profile'
+  | 'export-import'
 
 export interface AppRoute {
   page: PageRoute
@@ -45,6 +53,8 @@ export function buildUrl(page: PageRoute, step?: number): string {
       return `${base}loan-emi`
     case 'profile':
       return `${base}profile`
+    case 'export-import':
+      return `${base}export-import`
     case 'calculator': {
       const s = typeof step === 'number' && !isNaN(step) ? Math.min(Math.max(1, step), 6) : 1
       return `${base}calculator?step=${s}`
@@ -129,6 +139,15 @@ export function parseRoute(locationObj?: {
       if (lower === 'profile' || lower === 'user-profile' || lower === 'my-profile') {
         return { page: 'profile' }
       }
+      if (
+        lower === 'export-import' ||
+        lower === 'export' ||
+        lower === 'import' ||
+        lower === 'backup' ||
+        lower === 'data-management'
+      ) {
+        return { page: 'export-import' }
+      }
       if (lower === 'calculator' || lower === 'wizard') {
         const step = getStoredSettings().currentStep || 1
         return { page: 'calculator', step }
@@ -187,6 +206,16 @@ export function parseRoute(locationObj?: {
     normalizedPath === 'my-profile'
   ) {
     return { page: 'profile' }
+  }
+
+  if (
+    normalizedPath === 'export-import' ||
+    normalizedPath === 'export' ||
+    normalizedPath === 'import' ||
+    normalizedPath === 'backup' ||
+    normalizedPath === 'data-management'
+  ) {
+    return { page: 'export-import' }
   }
 
   if (normalizedPath === 'calculator' || normalizedPath === 'wizard') {
@@ -268,6 +297,10 @@ export function navigateToLoanEMI(options?: { replace?: boolean }): void {
 
 export function navigateToProfile(options?: { replace?: boolean }): void {
   navigateTo(buildUrl('profile'), options)
+}
+
+export function navigateToExportImport(options?: { replace?: boolean }): void {
+  navigateTo(buildUrl('export-import'), options)
 }
 
 export function navigateToCalculator(step: number = 1, options?: { replace?: boolean }): void {
@@ -386,6 +419,7 @@ export function useRouter() {
     navigateToFD,
     navigateToLoanEMI,
     navigateToProfile,
+    navigateToExportImport,
     navigateToCalculator,
     navigateBack,
     syncStepToUrl,

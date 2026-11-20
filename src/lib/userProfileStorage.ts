@@ -82,6 +82,24 @@ export function saveUserProfile(profile: UserProfile, syncToCalculators: boolean
 }
 
 /**
+ * Notifies all active in-memory profile subscribers and dispatches the window event.
+ * Useful after restoring or importing profile data directly from storage.
+ */
+export function notifyProfileUpdated(customProfile?: UserProfile): void {
+  const profile = customProfile || getUserProfile()
+  profileListeners.forEach((fn) => {
+    try {
+      fn(profile)
+    } catch (err) {
+      console.error('Error notifying profile listener:', err)
+    }
+  })
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('fundcalc_user_profile_updated', { detail: profile }))
+  }
+}
+
+/**
  * Partially updates the stored user profile.
  */
 export function updateUserProfile(
