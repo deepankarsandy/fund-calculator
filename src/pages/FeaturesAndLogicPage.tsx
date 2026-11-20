@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import {
   ArrowLeft,
-  ArrowRight,
   Calculator,
   Compass,
   MapPin,
@@ -20,6 +19,7 @@ import {
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
+import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
 
 interface FeaturesAndLogicPageProps {
   onBack?: () => void
@@ -48,32 +48,33 @@ export default function FeaturesAndLogicPage({
               else window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
             className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
-            title="Features & Calculation Logic"
+            title="Fund Calculator"
           >
             <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
               ₹
             </div>
             <div>
               <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                Features & Calculation Logic
+                Fund Calculator
               </h1>
               <p className="text-[11px] text-muted-foreground font-medium hidden sm:block">
-                Mathematical formulations, calibrations & architecture
+                Features & Calculation Logic · Mathematical Formulations
               </p>
             </div>
           </button>
 
           <div className="flex items-center gap-2">
+            <CalculatorsDropdown
+              onSelectCalculator={(id) => {
+                if (id === 'fund') onStartWizard()
+              }}
+              onViewLogic={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+              }}
+              currentActive="logic"
+            />
             <SocialLinks />
             <ThemeToggle />
-            <button
-              type="button"
-              onClick={onStartWizard}
-              className="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl shadow-xs transition-all cursor-pointer"
-            >
-              <span>Launch Calculator</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
           </div>
         </div>
       </header>
@@ -1000,26 +1001,18 @@ export default function FeaturesAndLogicPage({
           </div>
         )}
 
-        {/* Bottom CTA Banner */}
-        <section className="rounded-3xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-br from-blue-50 via-white to-blue-50/50 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/40 p-8 text-center space-y-4 shadow-sm">
+        {/* Bottom Navigation Banner */}
+        <section className="rounded-3xl border border-border bg-card p-8 text-center space-y-4 shadow-sm">
           <h3 className="text-xl sm:text-2xl font-black text-foreground">
-            Ready to compute your lifetime financial number?
+            Explore Features & Methodologies
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto font-medium">
-            Test your assumptions with India-calibrated cost baselines, skippable steps, and instant PDF reporting.
+            Use the top navigation dropdown to switch to the Fund Calculator or explore upcoming financial calculators.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
             <button
               type="button"
-              onClick={onStartWizard}
-              className="px-8 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-extrabold hover:bg-blue-700 transition-all cursor-pointer shadow-md inline-flex items-center gap-2"
-            >
-              <span>Launch Corpus Calculator</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={onBack}
+              onClick={onBack || onHome}
               className="px-6 py-3.5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-sm font-bold transition-all cursor-pointer shadow-xs inline-flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -1032,7 +1025,7 @@ export default function FeaturesAndLogicPage({
       {/* Footer */}
       <footer className="border-t border-border py-6 bg-card/50 text-center text-xs text-muted-foreground space-y-1.5 px-4">
         <p className="font-medium">
-          Lifetime Cost of Living & Corpus Calculator · Open Source Financial Planning Tool
+          Fund Calculator · Calculation Logic & Open Source Financial Planning Suite
         </p>
         <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
           <strong>Disclaimer:</strong> This application is an estimation and scenario planning tool. It is not regulated financial advice, investment advisory, or a guarantee of safe withdrawal rates.

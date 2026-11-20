@@ -18,9 +18,9 @@ import {
   Settings2,
   Landmark,
   BarChart2,
-  BookOpen,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
+import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
 
 const STEP_ICONS = [User, Landmark, Users, Receipt, Settings2, BarChart2]
 
@@ -113,26 +113,25 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
               </div>
               <div className="hidden sm:block">
                 <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                  Lifetime Corpus Calculator
+                  Fund Calculator
                 </h1>
                 <p className="text-[11px] text-muted-foreground font-medium">
-                  Estimate the investment corpus needed for your lifetime living expenses
+                  Retirement Fund Calculator · Lifetime Corpus Modeling
                 </p>
               </div>
             </button>
 
             <div className="flex items-center gap-2">
-              {onViewLogic && (
-                <button
-                  type="button"
-                  onClick={onViewLogic}
-                  className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                  title="View Calculation Logic & Formulas"
-                >
-                  <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                  <span className="hidden sm:inline">Calc Logic</span>
-                </button>
-              )}
+              <CalculatorsDropdown
+                onSelectCalculator={(id) => {
+                  if (id === 'fund') {
+                    // Already on fund calculator
+                    window.scrollTo({ top: 0, behavior: 'smooth' })
+                  }
+                }}
+                onViewLogic={onViewLogic}
+                currentActive="fund"
+              />
               <SocialLinks />
               <ThemeToggle />
 

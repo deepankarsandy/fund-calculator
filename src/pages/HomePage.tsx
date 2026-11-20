@@ -13,9 +13,11 @@ import {
   ChevronRight,
   Calculator,
   BookOpen,
+  Clock,
 } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
+import { CalculatorsDropdown, FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
 
 interface HomePageProps {
   onStart: () => void
@@ -24,6 +26,9 @@ interface HomePageProps {
 }
 
 export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps) {
+  const primaryCalc = FINANCIAL_CALCULATORS.find((c) => c.category === 'primary')
+  const helperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper')
+
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col font-sans transition-colors duration-200">
       {/* Top Navbar */}
@@ -36,17 +41,17 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
               window.scrollTo({ top: 0, behavior: 'smooth' })
             }}
             className="flex items-center gap-2.5 text-left cursor-pointer hover:opacity-85 transition-opacity"
-            title="Lifetime Corpus Calculator"
+            title="Fund Calculator"
           >
             <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-sm shrink-0">
               ₹
             </div>
             <div className="hidden sm:block">
               <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
-                Lifetime Corpus Calculator
+                Fund Calculator
               </h1>
               <p className="text-[11px] text-muted-foreground font-medium">
-                India-Calibrated Living Cost & Retirement Modeling
+                Retirement & Lifetime Corpus Modeling · Financial Planning
               </p>
             </div>
           </button>
@@ -56,17 +61,15 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
               <ShieldCheck className="w-3.5 h-3.5" />
               <span>100% Local & Private</span>
             </div>
-            {onViewLogic && (
-              <button
-                type="button"
-                onClick={onViewLogic}
-                className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                title="View Calculation Formulas & Logic"
-              >
-                <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                <span className="hidden sm:inline">Calc Logic</span>
-              </button>
-            )}
+
+            {/* Calculators & Logic Dropdown */}
+            <CalculatorsDropdown
+              onSelectCalculator={(id) => {
+                if (id === 'fund') onStart()
+              }}
+              onViewLogic={onViewLogic}
+            />
+
             <SocialLinks />
             <ThemeToggle />
           </div>
@@ -78,7 +81,7 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
         <section className="text-center space-y-5 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Built for Indian Households · Inflation Adjusted · Frugal to Luxury</span>
+            <span>Fund Calculator Suite · Built for Indian Households · Inflation Adjusted</span>
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-black text-foreground tracking-tight leading-tight">
@@ -90,13 +93,14 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
             Estimate the exact investment corpus required to fund your lifestyle for life. Calculates career salary increments, living costs calibrated from village to metro, inflation compounding, and healthcare reserves.
           </p>
 
+          {/* Primary Action CTAs */}
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
               onClick={onStart}
               className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-extrabold hover:bg-blue-700 transition-all cursor-pointer shadow-md hover:shadow-lg flex items-center justify-center gap-2 group"
             >
-              <span>Start Lifetime Calculation</span>
+              <span>Launch Fund Calculator</span>
               <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </button>
             {onViewLogic && (
@@ -105,8 +109,8 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
                 onClick={onViewLogic}
                 className="w-full sm:w-auto px-6 py-3.5 bg-card hover:bg-muted text-foreground border border-border rounded-xl text-sm font-bold transition-all cursor-pointer shadow-xs flex items-center justify-center gap-2"
               >
-                <Calculator className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                <span>See How It's Calculated</span>
+                <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                <span>See Calculation Logic</span>
               </button>
             )}
           </div>
@@ -146,6 +150,111 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
                 All calculations and financial data remain <strong>completely local to your browser on your computer</strong>. Nothing is ever sent to any remote server, cloud database, or third-party API, and zero analytics or trackers are used. Your privacy is absolute.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Financial Calculator Suite & CTA Directory */}
+        <section className="space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Financial Tools Hub</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl font-black text-foreground tracking-tight mt-0.5">
+                Financial Calculators Suite
+              </h3>
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+                Our primary retirement corpus calculator alongside upcoming side financial planning tools
+              </p>
+            </div>
+            {onViewLogic && (
+              <button
+                type="button"
+                onClick={onViewLogic}
+                className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>View Formulas & Logic</span>
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* Primary Calculator Card (Retirement Fund) */}
+            {primaryCalc && (
+              <div className="p-5 rounded-2xl border-2 border-blue-500/50 bg-gradient-to-b from-blue-50/50 via-card to-card dark:from-blue-950/30 dark:via-card dark:to-card shadow-sm flex flex-col justify-between space-y-4 relative group">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-xs">
+                      <Calculator className="w-5 h-5" />
+                    </div>
+                    <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                      Flagship Feature
+                    </span>
+                  </div>
+                  <div>
+                    <h4 className="font-extrabold text-base text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                      {primaryCalc.name}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                      {primaryCalc.longDesc || primaryCalc.shortDesc}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-border/60">
+                  <button
+                    type="button"
+                    onClick={onStart}
+                    className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 group/btn"
+                  >
+                    <span>Launch Calculator</span>
+                    <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Helper Calculators */}
+            {helperCalcs.map((calc) => {
+              const IconComponent = calc.icon
+              return (
+                <div
+                  key={calc.id}
+                  className="p-5 rounded-2xl border border-border bg-card/60 shadow-xs flex flex-col justify-between space-y-4 transition-all hover:border-border/90"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="w-10 h-10 rounded-xl bg-muted border border-border text-muted-foreground flex items-center justify-center">
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5" />
+                        <span>Coming Soon</span>
+                      </span>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-sm text-foreground">{calc.name}</h4>
+                      <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                        {calc.longDesc || calc.shortDesc}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-border/60">
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-2.5 px-4 bg-muted/60 text-muted-foreground text-xs font-semibold rounded-xl border border-border/60 cursor-not-allowed flex items-center justify-center gap-1.5"
+                    >
+                      <Clock className="w-3 h-3" />
+                      <span>In Development</span>
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
 
@@ -212,10 +321,10 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
           </div>
         </section>
 
-        {/* How It Works (4 Simple Steps) */}
+        {/* How It Works (5 Simple Steps) */}
         <section className="rounded-3xl border border-border bg-card p-6 sm:p-8 space-y-6 shadow-xs">
           <div className="space-y-1">
-            <h3 className="text-lg sm:text-xl font-bold text-foreground">How the Calculator Works</h3>
+            <h3 className="text-lg sm:text-xl font-bold text-foreground">How the Retirement Fund Calculator Works</h3>
             <p className="text-xs text-muted-foreground font-medium">
               A guided 5-step wizard designed for quick estimation or deep customization
             </p>
@@ -302,7 +411,7 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
         {/* Bottom CTA Banner */}
         <section className="rounded-3xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-br from-blue-50 via-white to-blue-50/50 dark:from-zinc-900 dark:via-zinc-900 dark:to-blue-950/40 p-8 text-center space-y-4 shadow-sm">
           <h3 className="text-xl sm:text-2xl font-black text-foreground">
-            Ready to calculate your lifetime corpus?
+            Ready to calculate your fund requirements?
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto font-medium">
             Takes only 2–3 minutes. Pre-filled with realistic Indian cost baselines and skippable steps.
@@ -313,7 +422,7 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
               onClick={onStart}
               className="w-full sm:w-auto px-8 py-3.5 bg-blue-600 text-white rounded-xl text-sm font-extrabold hover:bg-blue-700 transition-all cursor-pointer shadow-md inline-flex items-center justify-center gap-2"
             >
-              <span>Launch Calculator Now</span>
+              <span>Launch Fund Calculator</span>
               <ChevronRight className="w-4 h-4" />
             </button>
             {onViewLogic && (
@@ -333,7 +442,7 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
       {/* Footer */}
       <footer className="border-t border-border py-6 bg-card/50 text-center text-xs text-muted-foreground space-y-1.5 px-4">
         <p className="font-medium">
-          Lifetime Cost of Living & Corpus Calculator · Open Source Financial Planning Tool
+          Fund Calculator · Open Source Personal Financial Planning Suite
         </p>
         <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
           <strong>Disclaimer:</strong> This application is an estimation and scenario planning tool. It is not regulated financial advice, investment advisory, or a guarantee of safe withdrawal rates.
