@@ -26,6 +26,7 @@ describe('Router & URL Navigation', () => {
       expect(buildUrl('sip')).toBe('/sip')
       expect(buildUrl('investment')).toBe('/investment')
       expect(buildUrl('fd')).toBe('/fd')
+      expect(buildUrl('interest')).toBe('/loan-emi')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -71,6 +72,13 @@ describe('Router & URL Navigation', () => {
       expect(parseRoute({ pathname: '/fd', search: '', hash: '' }).page).toBe('fd')
       expect(parseRoute({ pathname: '/fd-calculator', search: '', hash: '' }).page).toBe('fd')
       expect(parseRoute({ pathname: '/', search: '', hash: '#fd' }).page).toBe('fd')
+    })
+
+    it('parses /loan-emi as loan EMI calculator page', () => {
+      expect(parseRoute({ pathname: '/loan-emi', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/emi-calculator', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/interest', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#loan-emi' }).page).toBe('interest')
     })
 
     it('parses /logic and other logic aliases', () => {

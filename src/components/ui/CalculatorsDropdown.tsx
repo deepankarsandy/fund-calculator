@@ -70,9 +70,9 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     shortDesc: 'Home/car loan EMI, interest amortization & pre-payment benefits',
     longDesc: 'Visualize principal vs interest breakdown, EMI schedules, and loan tenure reduction through extra payments.',
     category: 'helper',
-    status: 'coming_soon',
+    status: 'active',
     icon: Percent,
-    badge: 'Coming Soon',
+    badge: 'Active',
   },
 ]
 

@@ -18,25 +18,12 @@ describe('FINANCIAL_CALCULATORS configuration', () => {
     expect(helperIds).toContain('interest')
   })
 
-  it('marks active helper calculators and remaining coming_soon', () => {
-    const sip = FINANCIAL_CALCULATORS.find((c) => c.id === 'sip')
-    expect(sip?.status).toBe('active')
-    expect(sip?.badge).toBe('Active')
-
-    const investment = FINANCIAL_CALCULATORS.find((c) => c.id === 'investment')
-    expect(investment?.status).toBe('active')
-    expect(investment?.badge).toBe('Active')
-
-    const fd = FINANCIAL_CALCULATORS.find((c) => c.id === 'fd')
-    expect(fd?.status).toBe('active')
-    expect(fd?.badge).toBe('Active')
-
-    const remainingHelpers = FINANCIAL_CALCULATORS.filter(
-      (c) => c.category === 'helper' && c.id !== 'sip' && c.id !== 'investment' && c.id !== 'fd'
-    )
-    for (const helper of remainingHelpers) {
-      expect(helper.status).toBe('coming_soon')
-      expect(helper.badge).toBe('Coming Soon')
+  it('marks all four helper calculators as active', () => {
+    const helperIds = ['sip', 'investment', 'fd', 'interest']
+    for (const id of helperIds) {
+      const calc = FINANCIAL_CALCULATORS.find((c) => c.id === id)
+      expect(calc?.status).toBe('active')
+      expect(calc?.badge).toBe('Active')
     }
   })
 })

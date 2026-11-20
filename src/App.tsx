@@ -7,9 +7,10 @@ import FeaturesAndLogicPage from '@/pages/FeaturesAndLogicPage'
 import SipCalculatorPage from '@/pages/SipCalculatorPage'
 import InvestmentCalculatorPage from '@/pages/InvestmentCalculatorPage'
 import FdCalculatorPage from '@/pages/FdCalculatorPage'
+import LoanEmiCalculatorPage from '@/pages/LoanEmiCalculatorPage'
 
 export default function App() {
-  const { route, navigateToHome, navigateToLogic, navigateToCalculator, navigateToSIP, navigateToInvestment, navigateToFD, navigateBack } = useRouter()
+  const { route, navigateToHome, navigateToLogic, navigateToCalculator, navigateToSIP, navigateToInvestment, navigateToFD, navigateToLoanEMI, navigateBack } = useRouter()
   const { currentStep, goToStep } = useScenarioStore()
 
   // Sync route step with store when navigating via URL/history
@@ -31,7 +32,19 @@ export default function App() {
       navigateToInvestment()
     } else if (id === 'fd') {
       navigateToFD()
+    } else if (id === 'interest') {
+      navigateToLoanEMI()
     }
+  }
+
+  if (route.page === 'interest') {
+    return (
+      <LoanEmiCalculatorPage
+        onBackToHome={navigateToHome}
+        onSelectCalculator={handleSelectCalculator}
+        onViewLogic={navigateToLogic}
+      />
+    )
   }
 
   if (route.page === 'fd') {
