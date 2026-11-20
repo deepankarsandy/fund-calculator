@@ -13,6 +13,8 @@ import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
 import { syncStepToUrl } from '@/lib/router'
+import { getUserProfile } from '@/lib/userProfileStorage'
+import type { UserProfile } from '@/domain/models/userProfile'
 
 interface ScenarioState {
   // Data
@@ -59,6 +61,7 @@ interface ScenarioState {
   setResults: (r: CalculationResults) => void
   selectLifestylePlan: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
   applyShortfallRemedy: (type: 'savings' | 'salary' | 'retirement_age', value: number) => void
+  applyProfileDefaults: (customProfile?: UserProfile) => void
 
   // Navigation
   goToStep: (step: number) => void
@@ -464,6 +467,60 @@ export const useScenarioStore = create<ScenarioState>()(
         set({
           assets: updatedAssets,
           results: newResults,
+        });
+      },
+
+      applyProfileDefaults: (customProfile) => {
+        const p = customProfile || getUserProfile();
+        const selfMember: HouseholdMember = {
+          id: "self",
+          label: p.name ? `${p.name} (Self)` : "Self",
+          relationship: "self",
+          age: p.currentAge,
+          financiallyDependent: true,
+          hasHealthInsurance: false,
+        };
+
+        const updatedProfile: Profile = {
+          country: p.country,
+          region: get().profile.region || "Odisha",
+          city: get().profile.city || "",
+          currency: p.currency,
+          currentAge: p.currentAge,
+          targetAge: p.targetAge,
+          areaType: p.locationType,
+          lifestyleScenario: p.lifestyleBaseline,
+        };
+
+        const updatedAssets: Assets = {
+          ...get().assets,
+          monthlyIncome: p.monthlyIncome,
+          incomeEndAge: p.retirementAge,
+          incomeGrowthRate: p.annualIncomeGrowthRate / 100,
+          existingInvestableCorpus: p.existingInvestableCorpus,
+        };
+
+        const updatedAssumptions: Assumptions = {
+          ...get().assumptions,
+          globalInflationRate: p.overallInflationRate / 100,
+          inflationMode: p.inflationMode === "sector" ? "category" : "simple",
+          annualInvestmentReturn: p.expectedDebtReturn / 100,
+        };
+
+        const updatedCategories = buildCategoriesForProfile(
+          p.locationType,
+          p.lifestyleBaseline,
+          [selfMember],
+          p.inflationMode === "sector" ? (p.sectorInflationRates as unknown as Record<string, number>) : undefined,
+        );
+
+        set({
+          profile: updatedProfile,
+          members: [selfMember],
+          categories: updatedCategories,
+          assumptions: updatedAssumptions,
+          assets: updatedAssets,
+          results: null,
         });
       },
 

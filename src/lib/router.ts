@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
-export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd' | 'interest'
+export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd' | 'interest' | 'profile'
 
 export interface AppRoute {
   page: PageRoute
@@ -42,6 +42,8 @@ export function buildUrl(page: PageRoute, step?: number): string {
       return `${base}fd`
     case 'interest':
       return `${base}loan-emi`
+    case 'profile':
+      return `${base}profile`
     case 'calculator': {
       const s = typeof step === 'number' && !isNaN(step) ? Math.min(Math.max(1, step), 6) : 1
       return `${base}calculator?step=${s}`
@@ -114,6 +116,9 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
       if (lower === 'interest' || lower === 'loan-emi' || lower === 'emi-calculator' || lower === 'emi') {
         return { page: 'interest' }
       }
+      if (lower === 'profile' || lower === 'user-profile' || lower === 'my-profile') {
+        return { page: 'profile' }
+      }
       if (lower === 'calculator' || lower === 'wizard') {
         const step = getStoredSettings().currentStep || 1
         return { page: 'calculator', step }
@@ -160,6 +165,10 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
     normalizedPath === 'emi'
   ) {
     return { page: 'interest' }
+  }
+
+  if (normalizedPath === 'profile' || normalizedPath === 'user-profile' || normalizedPath === 'my-profile') {
+    return { page: 'profile' }
   }
 
   if (normalizedPath === 'calculator' || normalizedPath === 'wizard') {
@@ -237,6 +246,10 @@ export function navigateToFD(options?: { replace?: boolean }): void {
 
 export function navigateToLoanEMI(options?: { replace?: boolean }): void {
   navigateTo(buildUrl('interest'), options)
+}
+
+export function navigateToProfile(options?: { replace?: boolean }): void {
+  navigateTo(buildUrl('profile'), options)
 }
 
 export function navigateToCalculator(step: number = 1, options?: { replace?: boolean }): void {
@@ -354,6 +367,7 @@ export function useRouter() {
     navigateToInvestment,
     navigateToFD,
     navigateToLoanEMI,
+    navigateToProfile,
     navigateToCalculator,
     navigateBack,
     syncStepToUrl,

@@ -27,6 +27,7 @@ describe('Router & URL Navigation', () => {
       expect(buildUrl('investment')).toBe('/investment')
       expect(buildUrl('fd')).toBe('/fd')
       expect(buildUrl('interest')).toBe('/loan-emi')
+      expect(buildUrl('profile')).toBe('/profile')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -79,6 +80,12 @@ describe('Router & URL Navigation', () => {
       expect(parseRoute({ pathname: '/emi-calculator', search: '', hash: '' }).page).toBe('interest')
       expect(parseRoute({ pathname: '/interest', search: '', hash: '' }).page).toBe('interest')
       expect(parseRoute({ pathname: '/', search: '', hash: '#loan-emi' }).page).toBe('interest')
+    })
+
+    it('parses /profile as profile page', () => {
+      expect(parseRoute({ pathname: '/profile', search: '', hash: '' }).page).toBe('profile')
+      expect(parseRoute({ pathname: '/user-profile', search: '', hash: '' }).page).toBe('profile')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#profile' }).page).toBe('profile')
     })
 
     it('parses /logic and other logic aliases', () => {

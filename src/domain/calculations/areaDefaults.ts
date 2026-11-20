@@ -62,6 +62,7 @@ export function buildCategoriesForProfile(
   areaType: AreaType = 'small_town',
   lifestyle: LifestyleScenario = 'comfortable',
   membersOrCount: number | HouseholdMember[] = 1,
+  sectorInflationRates?: Record<string, number>,
 ): ExpenseCategory[] {
   let memberCount = 1
   let membersList: HouseholdMember[] = []
@@ -84,7 +85,12 @@ export function buildCategoriesForProfile(
       id: cat.id as CategoryId,
       label: cat.label,
       description: cat.description,
-      defaultInflationRate: cat.defaultInflationRate,
+      defaultInflationRate:
+        sectorInflationRates && sectorInflationRates[cat.id] != null
+          ? sectorInflationRates[cat.id] > 1
+            ? sectorInflationRates[cat.id] / 100
+            : sectorInflationRates[cat.id]
+          : cat.defaultInflationRate,
       skipped: false,
       parentAmount: undefined,
       parentFrequency: cat.parentInput.defaultFrequency,

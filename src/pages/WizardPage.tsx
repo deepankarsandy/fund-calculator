@@ -4,6 +4,7 @@ import { WIZARD_STEPS_CONFIG } from '@/config/formFields'
 import { DynamicStepRenderer } from '@/components/wizard/DynamicStepRenderer'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
+import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings } from '@/lib/settingsStorage'
 import {
@@ -18,6 +19,7 @@ import {
   Settings2,
   Landmark,
   BarChart2,
+  Sparkles,
 } from 'lucide-react'
 import { cn } from '@/lib/cn'
 import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
@@ -44,6 +46,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
     results,
     setResults,
     reset,
+    applyProfileDefaults,
   } = useScenarioStore()
 
   const currentStepConfig = WIZARD_STEPS_CONFIG[currentStep - 1]
@@ -137,6 +140,16 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
 
               <button
                 type="button"
+                onClick={() => applyProfileDefaults()}
+                className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-blue-200 dark:border-blue-800 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+                title="Populate profile & assumption baselines from saved User Profile"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span className="hidden lg:inline">Apply Profile</span>
+              </button>
+
+              <button
+                type="button"
                 onClick={handleReset}
                 className="text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-muted-foreground hover:text-foreground transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
                 title="Reset all fields to defaults and clear storage"
@@ -144,6 +157,9 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span className="hidden md:inline">Reset</span>
               </button>
+
+              {/* Profile Header Button - Right Most Side */}
+              <ProfileHeaderButton />
             </div>
           </div>
 

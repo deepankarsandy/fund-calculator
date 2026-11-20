@@ -16,6 +16,8 @@ import {
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
+import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
+import { getUserProfile, deriveFdInputsFromProfile } from '@/lib/userProfileStorage'
 import { formatINR, formatCrore } from '@/lib/currency'
 import {
   FdCalculationInputs,
@@ -93,6 +95,12 @@ export default function FdCalculatorPage({
     setInputs(DEFAULT_FD_INPUTS)
   }
 
+  const handleApplyProfileDefaults = () => {
+    const profile = getUserProfile()
+    const derived = deriveFdInputsFromProfile(profile)
+    setInputs(derived)
+  }
+
   const totalAmount = results.maturityAmount > 0 ? results.maturityAmount : 1
   const principalPct = Math.min(100, (results.principalAmount / totalAmount) * 100)
   const interestPct = Math.max(0, 100 - principalPct)
@@ -135,6 +143,9 @@ export default function FdCalculatorPage({
 
             <SocialLinks />
             <ThemeToggle />
+
+            {/* Profile Button - Right Most Side */}
+            <ProfileHeaderButton />
           </div>
         </div>
       </header>
@@ -153,15 +164,27 @@ export default function FdCalculatorPage({
               <span>Back to Home</span>
             </button>
 
-            <button
-              type="button"
-              onClick={handleReset}
-              className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer"
-              title="Reset all inputs to Indian defaults"
-            >
-              <RotateCcw className="w-3 h-3" />
-              <span>Reset Defaults</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleApplyProfileDefaults}
+                className="inline-flex items-center gap-1 text-xs font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60 px-2.5 py-1 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-100 transition-colors cursor-pointer shadow-2xs"
+                title="Populate baseline values from your saved User Profile (FD Rate, Senior Citizen, Tax Slab, Inflation)"
+              >
+                <Percent className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Auto-set from Profile</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground px-2.5 py-1 rounded-lg border border-border hover:bg-muted transition-colors cursor-pointer"
+                title="Reset all inputs to Indian defaults"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>Reset Defaults</span>
+              </button>
+            </div>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

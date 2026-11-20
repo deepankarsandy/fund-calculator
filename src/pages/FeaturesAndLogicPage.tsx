@@ -20,6 +20,7 @@ import {
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
+import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
 
 interface FeaturesAndLogicPageProps {
   onBack?: () => void
@@ -75,6 +76,8 @@ export default function FeaturesAndLogicPage({
             />
             <SocialLinks />
             <ThemeToggle />
+            {/* Profile Button - Right Most Side */}
+            <ProfileHeaderButton />
           </div>
         </div>
       </header>

@@ -18,6 +18,9 @@ import {
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { CalculatorsDropdown, FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
+import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
+import { HomePageProfileBanner } from '@/components/profile/HomePageProfileBanner'
+import { navigateToProfile } from '@/lib/router'
 import { cn } from '@/lib/cn'
 
 interface HomePageProps {
@@ -75,12 +78,18 @@ export default function HomePage({ onStart, onSelectCalculator, onViewLogic, onH
 
             <SocialLinks />
             <ThemeToggle />
+
+            {/* Profile CTA Header Button - Right Most Side */}
+            <ProfileHeaderButton onClick={() => navigateToProfile()} />
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <main className="flex-1 max-w-5xl mx-auto px-4 py-8 sm:py-14 space-y-14">
+      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 sm:py-10 space-y-10">
+        {/* Profile CTA Banner on Home Page Top */}
+        <HomePageProfileBanner onOpenProfile={() => navigateToProfile()} />
+
         <section className="text-center space-y-5 max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 text-xs font-bold">
             <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
