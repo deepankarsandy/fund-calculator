@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { calculateSip, calculateSwp } from '../sip'
+import { calculateSip, calculateSwp, calculateSipToSwp } from '../sip'
 
 describe('calculateSip', () => {
   it('calculates standard 10-year monthly SIP with 12% returns', () => {
@@ -137,5 +137,124 @@ describe('calculateSwp', () => {
 
     expect(res.yearlySchedule[1].monthlyWithdrawal).toBe(27500)
     expect(res.yearlySchedule[2].monthlyWithdrawal).toBe(30250)
+  })
+})
+
+describe('calculateSipToSwp (Accumulation to Decumulation Journey)', () => {
+  it('simulates a complete SIP-to-SWP journey from age 30 to 60 then 60 to 90', () => {
+    const res = calculateSipToSwp({
+      currentAge: 30,
+      retirementAge: 60,
+      targetAge: 90,
+      monthlySip: 15000,
+      sipReturnRate: 12.0,
+      monthlySwp: 60000,
+      swpReturnRate: 8.0,
+      enableSipStepUp: false,
+      enableSwpStepUp: false,
+    })
+
+    expect(res.currentAge).toBe(30)
+    expect(res.retirementAge).toBe(60)
+    expect(res.targetAge).toBe(90)
+    expect(res.sipYears).toBe(30)
+    expect(res.swpYears).toBe(30)
+    expect(res.totalYears).toBe(60)
+
+    // 15k/mo over 30 yrs = ₹54 Lakhs invested
+    expect(res.totalSipInvested).toBe(5400000)
+    // 15k/mo @ 12% over 30 yrs yields > ₹5 Crore
+    expect(res.sipAccumulatedCorpus).toBeGreaterThan(50000000)
+    expect(res.sipWealthGain).toBe(res.sipAccumulatedCorpus - res.totalSipInvested)
+
+    // With ~5.3 Cr starting corpus at 60 and 8% return, withdrawing 60k/mo (7.2L/yr) is easily sustainable
+    expect(res.isDepleted).toBe(false)
+    expect(res.isEnough).toBe(true)
+    expect(res.finalRemainingBalance).toBeGreaterThan(0)
+    expect(res.totalSwpWithdrawn).toBe(60000 * 360) // 2.16 Cr
+    expect(res.yearlySchedule).toHaveLength(60)
+
+    // Verify phase transition in schedule
+    expect(res.yearlySchedule[0].phase).toBe('sip')
+    expect(res.yearlySchedule[0].age).toBe(30)
+    expect(res.yearlySchedule[29].phase).toBe('sip')
+    expect(res.yearlySchedule[29].age).toBe(59)
+    expect(res.yearlySchedule[30].phase).toBe('swp')
+    expect(res.yearlySchedule[30].age).toBe(60)
+    expect(res.yearlySchedule[59].phase).toBe('swp')
+    expect(res.yearlySchedule[59].age).toBe(89)
+  })
+
+  it('accurately detects depletion when monthly withdrawal is unsustainably high', () => {
+    const res = calculateSipToSwp({
+      currentAge: 30,
+      retirementAge: 60,
+      targetAge: 90,
+      monthlySip: 5000, // Only 5k/mo (yields ~1.76 Cr)
+      sipReturnRate: 12.0,
+      monthlySwp: 250000, // Very high withdrawal 2.5L/mo (30L/yr)
+      swpReturnRate: 8.0,
+    })
+
+    expect(res.isDepleted).toBe(true)
+    expect(res.isEnough).toBe(false)
+    expect(res.finalRemainingBalance).toBe(0)
+    expect(res.depletionAge).toBeGreaterThanOrEqual(60)
+    expect(res.depletionAge).toBeLessThan(90)
+    expect(res.unfundedYears).toBeGreaterThan(0)
+
+    // Recommendations should be populated
+    expect(res.requiredMonthlySip).toBeGreaterThan(5000)
+    expect(res.sustainableMonthlySwp).toBeLessThan(250000)
+  })
+
+  it('provides actionable requiredMonthlySip and sustainableMonthlySwp', () => {
+    const res = calculateSipToSwp({
+      currentAge: 30,
+      retirementAge: 60,
+      targetAge: 90,
+      monthlySip: 10000,
+      sipReturnRate: 12.0,
+      monthlySwp: 100000,
+      swpReturnRate: 8.0,
+    })
+
+    // Required SIP should be a valid realistic number
+    expect(res.requiredMonthlySip).toBeGreaterThan(0)
+    expect(res.sustainableMonthlySwp).toBeGreaterThan(0)
+  })
+
+  it('supports annual step-up during SIP and SWP phases', () => {
+    const res = calculateSipToSwp({
+      currentAge: 30,
+      retirementAge: 40,
+      targetAge: 50,
+      monthlySip: 10000,
+      enableSipStepUp: true,
+      sipStepUpPercent: 10,
+      monthlySwp: 20000,
+      enableSwpStepUp: true,
+      swpStepUpPercent: 5,
+    })
+
+    expect(res.yearlySchedule[1].monthlyAmount).toBe(11000) // Year 2 of SIP
+    expect(res.yearlySchedule[11].monthlyAmount).toBe(21000) // Year 2 of SWP (20k * 1.05)
+  })
+
+  it('handles edge cases gracefully (zero SIP, zero SWP, invalid age ordering)', () => {
+    const res = calculateSipToSwp({
+      currentAge: 55,
+      retirementAge: 40, // invalid: less than currentAge
+      targetAge: 30, // invalid: less than retirementAge
+      monthlySip: 0,
+      monthlySwp: 0,
+    })
+
+    expect(res.currentAge).toBe(55)
+    expect(res.retirementAge).toBeGreaterThan(55)
+    expect(res.targetAge).toBeGreaterThan(res.retirementAge)
+    expect(res.sipAccumulatedCorpus).toBe(0)
+    expect(res.finalRemainingBalance).toBe(0)
+    expect(res.isDepleted).toBe(false)
   })
 })

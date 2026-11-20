@@ -3,22 +3,27 @@ import {
   SipCalculationResult,
   SwpCalculationInputs,
   SwpCalculationResult,
+  SipToSwpInputs,
+  SipToSwpCalculationResult,
   DEFAULT_SIP_INPUTS,
   DEFAULT_SWP_INPUTS,
+  DEFAULT_SIP_TO_SWP_INPUTS,
 } from '@/domain/calculations/sip'
 
-export type SipMode = 'sip' | 'swp'
+export type SipMode = 'sip' | 'swp' | 'combo'
 
 export interface StoredSipData {
   mode: SipMode
   sip: SipCalculationInputs
   swp: SwpCalculationInputs
+  combo: SipToSwpInputs
 }
 
 export interface StoredSipResultsData {
   mode: SipMode
   sip: SipCalculationResult | null
   swp: SwpCalculationResult | null
+  combo: SipToSwpCalculationResult | null
 }
 
 export const SIP_INPUTS_STORAGE_KEY = 'fundcalc_sip_inputs_v1'
@@ -28,6 +33,7 @@ export const DEFAULT_STORED_SIP_DATA: StoredSipData = {
   mode: 'sip',
   sip: DEFAULT_SIP_INPUTS,
   swp: DEFAULT_SWP_INPUTS,
+  combo: DEFAULT_SIP_TO_SWP_INPUTS,
 }
 
 export function getStoredSipInputs(): StoredSipData {
@@ -42,12 +48,15 @@ export function getStoredSipInputs(): StoredSipData {
           mode: 'sip',
           sip: { ...DEFAULT_SIP_INPUTS, ...parsed },
           swp: DEFAULT_SWP_INPUTS,
+          combo: DEFAULT_SIP_TO_SWP_INPUTS,
         }
       }
+      const validMode: SipMode = parsed.mode === 'swp' ? 'swp' : parsed.mode === 'combo' ? 'combo' : 'sip'
       return {
-        mode: parsed.mode === 'swp' ? 'swp' : 'sip',
+        mode: validMode,
         sip: { ...DEFAULT_SIP_INPUTS, ...(parsed.sip || {}) },
         swp: { ...DEFAULT_SWP_INPUTS, ...(parsed.swp || {}) },
+        combo: { ...DEFAULT_SIP_TO_SWP_INPUTS, ...(parsed.combo || {}) },
       }
     }
   } catch {
