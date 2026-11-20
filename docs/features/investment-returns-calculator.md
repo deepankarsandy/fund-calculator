@@ -76,3 +76,43 @@ All user configuration and simulation outputs are saved in the browser:
   - Stores total invested, gross returns, gross corpus, tax liabilities, net corpus, purchasing power, and year-by-year schedule.
 
 All calculations execute strictly locally on the client without external network calls.
+
+
+---
+
+## 4. Custom Policy & Cash Flow XIRR Calculator
+
+The calculator includes a dedicated **Custom Plan / Policy (XIRR)** tab designed specifically to evaluate complex, staggered financial products sold by insurance companies and financial institutions (e.g. Guaranteed Income Plans, Endowment Policies, Deferred Annuities, and Money-Back Policies).
+
+### Key Capabilities & Logic
+
+1. **Annualized Internal Rate of Return (IRR / XIRR)**:
+   Solves for the exact rate $r$ satisfying the Net Present Value equation:
+   $$\sum_{t=0}^{T} \frac{C_t}{(1 + r)^t} = 0$$
+   Where $C_t = \text{Inflow}_t - \text{Outflow}_t$ for each period $t$. Computed using high-precision Newton-Raphson method with automatic bisection bracket fallback.
+
+2. **Inflation-Adjusted Real Return & Present Purchasing Power**:
+   - Computes real return rate via Fisher formula:
+     $$r_{\text{real}} = \frac{1 + \text{XIRR}}{1 + \text{inflation}} - 1$$
+   - Discounts each future payout into today's purchasing power using the general inflation rate:
+     $$\text{PV}_t = \frac{\text{Payout}_t}{(1 + \text{inflation})^t}$$
+   - Quantifies the exact percentage of purchasing power eroded by multi-decade inflation.
+
+3. **Flexible Investment & Return Structures**:
+   - **Investment Phase**: Per-year investment or total investment distributed evenly across tenure; customizable duration and payment timing (start of year vs end of year).
+   - **Payout Phase**:
+     - *Annual Income + Maturity Lump Sum*: Regular annual income across duration, plus terminal lump sum or Return of Premium (ROP).
+     - *Annual Income Only*: Regular annuity/pension across retirement years.
+     - *Single Lump Sum*: Traditional endowment maturity.
+   - **Custom Cash Flow Table**: Toggle to customize individual years for policies with non-uniform benefits (e.g. survival benefits at Year 5, 10, 15).
+
+4. **Opportunity Cost Benchmarks**:
+   Simulates investing the identical annual cash flows into:
+   - **Public Provident Fund (PPF)** / Sovereign Debt at 7.1% p.a.
+   - **Nifty Index Mutual Fund** / Equity at 12.0% p.a.
+   - User-defined benchmark rate.
+
+5. **Storage Keys**:
+   - `fundcalc_custom_plan_inputs_v1`
+   - `fundcalc_custom_plan_results_v1`
+   - `fundcalc_investment_tab_v1`
