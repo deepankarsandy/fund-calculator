@@ -18,9 +18,13 @@ describe('FINANCIAL_CALCULATORS configuration', () => {
     expect(helperIds).toContain('interest')
   })
 
-  it('marks helper calculators with coming_soon status', () => {
-    const helpers = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper')
-    for (const helper of helpers) {
+  it('marks active helper calculators and remaining coming_soon', () => {
+    const sip = FINANCIAL_CALCULATORS.find((c) => c.id === 'sip')
+    expect(sip?.status).toBe('active')
+    expect(sip?.badge).toBe('Active')
+
+    const remainingHelpers = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.id !== 'sip')
+    for (const helper of remainingHelpers) {
       expect(helper.status).toBe('coming_soon')
       expect(helper.badge).toBe('Coming Soon')
     }

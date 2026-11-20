@@ -40,9 +40,9 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     shortDesc: 'Monthly systematic investment compounding & target wealth',
     longDesc: 'Calculate future wealth accumulation from monthly SIP contributions with customizable expected rate of return.',
     category: 'helper',
-    status: 'coming_soon',
+    status: 'active',
     icon: TrendingUp,
-    badge: 'Coming Soon',
+    badge: 'Active',
   },
   {
     id: 'investment',
@@ -79,7 +79,7 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
 interface CalculatorsDropdownProps {
   onSelectCalculator?: (id: string) => void
   onViewLogic?: () => void
-  currentActive?: 'fund' | 'logic'
+  currentActive?: string
   className?: string
 }
 
@@ -125,7 +125,8 @@ export function CalculatorsDropdown({
   }, [isOpen])
 
   const primaryCalc = FINANCIAL_CALCULATORS.find((c) => c.category === 'primary')
-  const helperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper')
+  const activeHelperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.status === 'active')
+  const upcomingHelperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.status === 'coming_soon')
 
   return (
     <div className={cn('relative inline-block text-left', className)} ref={dropdownRef}>
@@ -227,6 +228,44 @@ export function CalculatorsDropdown({
               </button>
             )}
 
+            {/* Active Helper Calculators */}
+            {activeHelperCalcs.map((calc) => {
+              const IconComponent = calc.icon
+              return (
+                <button
+                  key={calc.id}
+                  type="button"
+                  onClick={() => {
+                    setIsOpen(false)
+                    if (onSelectCalculator) onSelectCalculator(calc.id)
+                  }}
+                  className={cn(
+                    'w-full p-2.5 rounded-xl border text-left transition-all flex items-start gap-3 cursor-pointer group',
+                    currentActive === calc.id
+                      ? 'border-blue-500/50 bg-blue-50/60 dark:bg-blue-950/40 text-foreground'
+                      : 'border-border/80 bg-background hover:bg-muted/60 text-foreground hover:border-border'
+                  )}
+                >
+                  <div className="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-xs mt-0.5 group-hover:scale-105 transition-transform">
+                    <IconComponent className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-1">
+                      <span className="text-xs font-bold text-foreground truncate">
+                        {calc.name}
+                      </span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/70 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800 shrink-0">
+                        {calc.badge || 'Active'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5 leading-snug">
+                      {calc.shortDesc}
+                    </p>
+                  </div>
+                </button>
+              )
+            })}
+
             {/* Calculation Logic CTA */}
             {onViewLogic && (
               <button
@@ -263,44 +302,46 @@ export function CalculatorsDropdown({
           </div>
 
           {/* Upcoming Helper Calculators */}
-          <div className="space-y-1 pt-1 border-t border-border/70">
-            <div className="px-3 pt-1 flex items-center justify-between">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Upcoming Helper Calculators
-              </span>
-              <span className="text-[9px] font-medium text-muted-foreground/80">In Development</span>
-            </div>
+          {upcomingHelperCalcs.length > 0 && (
+            <div className="space-y-1 pt-1 border-t border-border/70">
+              <div className="px-3 pt-1 flex items-center justify-between">
+                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                  Upcoming Helper Calculators
+                </span>
+                <span className="text-[9px] font-medium text-muted-foreground/80">In Development</span>
+              </div>
 
-            <div className="grid grid-cols-1 gap-1 max-h-56 overflow-y-auto pr-0.5">
-              {helperCalcs.map((calc) => {
-                const IconComponent = calc.icon
-                return (
-                  <div
-                    key={calc.id}
-                    className="p-2 rounded-xl border border-border/50 bg-muted/20 opacity-80 flex items-center justify-between gap-2.5 text-left"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-7 h-7 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground shrink-0">
-                        <IconComponent className="w-3.5 h-3.5" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="text-xs font-semibold text-foreground truncate">
-                          {calc.name}
+              <div className="grid grid-cols-1 gap-1 max-h-56 overflow-y-auto pr-0.5">
+                {upcomingHelperCalcs.map((calc) => {
+                  const IconComponent = calc.icon
+                  return (
+                    <div
+                      key={calc.id}
+                      className="p-2 rounded-xl border border-border/50 bg-muted/20 opacity-80 flex items-center justify-between gap-2.5 text-left"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="w-7 h-7 rounded-lg bg-muted border border-border flex items-center justify-center text-muted-foreground shrink-0">
+                          <IconComponent className="w-3.5 h-3.5" />
                         </div>
-                        <div className="text-[10px] text-muted-foreground truncate">
-                          {calc.shortDesc}
+                        <div className="min-w-0">
+                          <div className="text-xs font-semibold text-foreground truncate">
+                            {calc.name}
+                          </div>
+                          <div className="text-[10px] text-muted-foreground truncate">
+                            {calc.shortDesc}
+                          </div>
                         </div>
                       </div>
+                      <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground shrink-0 flex items-center gap-1">
+                        <Clock className="w-2.5 h-2.5" />
+                        <span>Soon</span>
+                      </span>
                     </div>
-                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground shrink-0 flex items-center gap-1">
-                      <Clock className="w-2.5 h-2.5" />
-                      <span>Soon</span>
-                    </span>
-                  </div>
-                )
-              })}
+                  )
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

@@ -23,6 +23,7 @@ describe('Router & URL Navigation', () => {
     it('builds canonical URLs for all pages and steps', () => {
       expect(buildUrl('home')).toBe('/')
       expect(buildUrl('logic')).toBe('/calc-logic')
+      expect(buildUrl('sip')).toBe('/sip')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -50,6 +51,12 @@ describe('Router & URL Navigation', () => {
     it('parses /calc-logic as logic page', () => {
       const route = parseRoute({ pathname: '/calc-logic', search: '', hash: '' })
       expect(route.page).toBe('logic')
+    })
+
+    it('parses /sip as sip calculator page', () => {
+      expect(parseRoute({ pathname: '/sip', search: '', hash: '' }).page).toBe('sip')
+      expect(parseRoute({ pathname: '/sip-calculator', search: '', hash: '' }).page).toBe('sip')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#sip' }).page).toBe('sip')
     })
 
     it('parses /logic and other logic aliases', () => {

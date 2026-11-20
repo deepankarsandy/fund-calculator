@@ -18,14 +18,16 @@ import {
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { SocialLinks } from '@/components/ui/SocialLinks'
 import { CalculatorsDropdown, FINANCIAL_CALCULATORS } from '@/components/ui/CalculatorsDropdown'
+import { cn } from '@/lib/cn'
 
 interface HomePageProps {
   onStart: () => void
+  onSelectCalculator?: (id: string) => void
   onViewLogic?: () => void
   onHome?: () => void
 }
 
-export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps) {
+export default function HomePage({ onStart, onSelectCalculator, onViewLogic, onHome }: HomePageProps) {
   const primaryCalc = FINANCIAL_CALCULATORS.find((c) => c.category === 'primary')
   const helperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper')
 
@@ -65,7 +67,8 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
             {/* Calculators & Logic Dropdown */}
             <CalculatorsDropdown
               onSelectCalculator={(id) => {
-                if (id === 'fund') onStart()
+                if (onSelectCalculator) onSelectCalculator(id)
+                else if (id === 'fund') onStart()
               }}
               onViewLogic={onViewLogic}
             />
@@ -219,20 +222,40 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
             {/* Helper Calculators */}
             {helperCalcs.map((calc) => {
               const IconComponent = calc.icon
+              const isActive = calc.status === 'active'
               return (
                 <div
                   key={calc.id}
-                  className="p-5 rounded-2xl border border-border bg-card/60 shadow-xs flex flex-col justify-between space-y-4 transition-all hover:border-border/90"
+                  className={cn(
+                    'p-5 rounded-2xl border shadow-xs flex flex-col justify-between space-y-4 transition-all',
+                    isActive
+                      ? 'border-blue-500/40 bg-card hover:border-blue-500 hover:shadow-sm'
+                      : 'border-border bg-card/60 hover:border-border/90'
+                  )}
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between gap-2">
-                      <div className="w-10 h-10 rounded-xl bg-muted border border-border text-muted-foreground flex items-center justify-center">
+                      <div
+                        className={cn(
+                          'w-10 h-10 rounded-xl flex items-center justify-center',
+                          isActive
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'bg-muted border border-border text-muted-foreground'
+                        )}
+                      >
                         <IconComponent className="w-5 h-5" />
                       </div>
-                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-2.5 h-2.5" />
-                        <span>Coming Soon</span>
-                      </span>
+                      {isActive ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                          <Sparkles className="w-2.5 h-2.5" />
+                          <span>Active</span>
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-muted border border-border text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-2.5 h-2.5" />
+                          <span>Coming Soon</span>
+                        </span>
+                      )}
                     </div>
                     <div>
                       <h4 className="font-bold text-sm text-foreground">{calc.name}</h4>
@@ -243,14 +266,25 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
                   </div>
 
                   <div className="pt-2 border-t border-border/60">
-                    <button
-                      type="button"
-                      disabled
-                      className="w-full py-2.5 px-4 bg-muted/60 text-muted-foreground text-xs font-semibold rounded-xl border border-border/60 cursor-not-allowed flex items-center justify-center gap-1.5"
-                    >
-                      <Clock className="w-3 h-3" />
-                      <span>In Development</span>
-                    </button>
+                    {isActive ? (
+                      <button
+                        type="button"
+                        onClick={() => onSelectCalculator?.(calc.id)}
+                        className="w-full py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold rounded-xl transition-all cursor-pointer shadow-xs flex items-center justify-center gap-1.5 group/btn"
+                      >
+                        <span>Launch Calculator</span>
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover/btn:translate-x-0.5" />
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        disabled
+                        className="w-full py-2.5 px-4 bg-muted/60 text-muted-foreground text-xs font-semibold rounded-xl border border-border/60 cursor-not-allowed flex items-center justify-center gap-1.5"
+                      >
+                        <Clock className="w-3 h-3" />
+                        <span>In Development</span>
+                      </button>
+                    )}
                   </div>
                 </div>
               )

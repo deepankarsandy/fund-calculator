@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
-export type PageRoute = 'home' | 'logic' | 'calculator'
+export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip'
 
 export interface AppRoute {
   page: PageRoute
@@ -34,6 +34,8 @@ export function buildUrl(page: PageRoute, step?: number): string {
       return base
     case 'logic':
       return `${base}calc-logic`
+    case 'sip':
+      return `${base}sip`
     case 'calculator': {
       const s = typeof step === 'number' && !isNaN(step) ? Math.min(Math.max(1, step), 6) : 1
       return `${base}calculator?step=${s}`
@@ -94,6 +96,9 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
       ) {
         return { page: 'logic' }
       }
+      if (lower === 'sip' || lower === 'sip-calculator') {
+        return { page: 'sip' }
+      }
       if (lower === 'calculator' || lower === 'wizard') {
         const step = getStoredSettings().currentStep || 1
         return { page: 'calculator', step }
@@ -119,6 +124,10 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
     normalizedPath === 'methodology'
   ) {
     return { page: 'logic' }
+  }
+
+  if (normalizedPath === 'sip' || normalizedPath === 'sip-calculator') {
+    return { page: 'sip' }
   }
 
   if (normalizedPath === 'calculator' || normalizedPath === 'wizard') {
@@ -180,6 +189,10 @@ export function navigateToHome(options?: { replace?: boolean }): void {
 
 export function navigateToLogic(options?: { replace?: boolean }): void {
   navigateTo(buildUrl('logic'), options)
+}
+
+export function navigateToSIP(options?: { replace?: boolean }): void {
+  navigateTo(buildUrl('sip'), options)
 }
 
 export function navigateToCalculator(step: number = 1, options?: { replace?: boolean }): void {
@@ -293,6 +306,7 @@ export function useRouter() {
     navigateTo,
     navigateToHome,
     navigateToLogic,
+    navigateToSIP,
     navigateToCalculator,
     navigateBack,
     syncStepToUrl,
