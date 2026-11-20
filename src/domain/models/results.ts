@@ -23,6 +23,39 @@ export interface LifestyleComparison {
   peakAge: number
 }
 
+export interface SavingsRemedy {
+  currentSavings: number
+  totalSavingsNeeded: number
+  extraSavingsNeeded: number
+}
+
+export interface SalaryRemedy {
+  currentMonthlySalary: number
+  totalMonthlySalaryNeeded: number
+  extraMonthlySalaryNeeded: number
+  percentIncreaseNeeded: number
+  isAchievable: boolean
+  note?: string
+}
+
+export interface RetirementAgeRemedy {
+  currentRetirementAge: number
+  recommendedRetirementAge: number
+  extraYearsToWork: number
+  remainingRetirementYears: number
+  isAchievable: boolean
+  note?: string
+}
+
+export interface ShortfallRemedies {
+  hasShortfall: boolean
+  shortfallAmountAtRetirement: number
+  discountedShortfallToday: number
+  savingsRemedy: SavingsRemedy
+  salaryRemedy: SalaryRemedy
+  retirementAgeRemedy: RetirementAgeRemedy
+}
+
 export interface ScenarioResult {
   label: string
   inflationRate: number
@@ -55,6 +88,7 @@ export interface ScenarioResult {
   fundingGap: number                     // Starting corpus shortfall today
   safetyMarginAmount: number
   corpusWithSafetyMargin: number
+  shortfallRemedies?: ShortfallRemedies
   yearProjections: YearProjection[]
 }
 

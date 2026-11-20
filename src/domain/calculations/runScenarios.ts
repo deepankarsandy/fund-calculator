@@ -10,6 +10,7 @@ import { projectCashflows } from './projectCashflows'
 import { simulatePortfolio } from './simulatePortfolio'
 import { buildCategoriesForProfile } from './areaDefaults'
 import { generateWarnings } from '../validation/warnings'
+import { calculateShortfallRemedies } from './shortfallRemedies'
 import type { HouseholdMember } from '../models/household'
 import Decimal from 'decimal.js'
 
@@ -211,7 +212,7 @@ function runOneScenario(
   const totalLifetimeWithdrawals = rawProjections.reduce((sum, p) => sum + p.netWithdrawal, 0)
   const totalLifetimeInvestmentGrowth = yearProjections.reduce((sum, p) => sum + p.investmentGrowth, 0)
 
-  return {
+  const scenarioResult: ScenarioResult = {
     label,
     inflationRate,
     returnRate: effectiveReturn,
@@ -244,6 +245,19 @@ function runOneScenario(
     safetyMarginAmount,
     corpusWithSafetyMargin,
     yearProjections,
+  }
+
+  const shortfallRemedies = calculateShortfallRemedies({
+    scenario: scenarioResult,
+    profile,
+    assets,
+    assumptions,
+    categories,
+  })
+
+  return {
+    ...scenarioResult,
+    shortfallRemedies,
   }
 }
 

@@ -38,6 +38,7 @@ import {
   CartesianGrid,
 } from 'recharts'
 import { cn } from '@/lib/cn'
+import { ShortfallManagementCard } from '@/components/results/ShortfallManagementCard'
 
 const SCENARIO_COLORS = {
   Optimistic: '#10b981',
@@ -79,7 +80,7 @@ function ScenarioTab({
         'w-full text-left p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between space-y-2',
         active
           ? 'bg-blue-50/80 dark:bg-blue-950/30 border-blue-600 dark:border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
-          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/60 dark:hover:bg-zinc-850',
+          : 'bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-50/60 dark:hover:bg-zinc-800/60',
       )}
     >
       <div className="flex items-center justify-between gap-1 w-full">
@@ -97,7 +98,7 @@ function ScenarioTab({
             Active
           </span>
         ) : (
-          <span className="text-[10px] font-semibold text-zinc-400">
+          <span className="text-[10px] font-semibold text-zinc-400 dark:text-zinc-500">
             Select
           </span>
         )}
@@ -109,7 +110,7 @@ function ScenarioTab({
       </div>
 
       <div className="flex items-baseline justify-between text-xs pt-0.5 w-full">
-        <span className="text-[11px] text-zinc-500">Target Needed:</span>
+        <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Target Needed:</span>
         <span className="font-extrabold text-blue-600 dark:text-blue-400">
           {targetCorpus === 0 ? '₹0 (Self-Funded)' : formatCrore(targetCorpus)}
         </span>
@@ -139,7 +140,7 @@ function LifestyleComparisonSection({
               Cost of Living & Corpus Requirement by Lifestyle
             </h3>
           </div>
-          <p className="text-[11px] text-zinc-500 mt-0.5">
+          <p className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5">
             Click any plan card below to immediately apply it and recalculate your required corpus
           </p>
         </div>
@@ -176,7 +177,7 @@ function LifestyleComparisonSection({
                 'rounded-xl p-4 border transition-all flex flex-col justify-between space-y-3 relative text-left cursor-pointer group',
                 isSelected
                   ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 ring-2 ring-blue-500/25 shadow-xs'
-                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/60 dark:bg-zinc-850/40 hover:border-blue-400 dark:hover:border-blue-600 hover:bg-white dark:hover:bg-zinc-800 hover:shadow-xs',
+                  : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-950/50 hover:border-blue-400 dark:hover:border-blue-500/70 hover:bg-white dark:hover:bg-zinc-800/60 hover:shadow-xs',
               )}
             >
               <div className="w-full">
@@ -193,30 +194,30 @@ function LifestyleComparisonSection({
                     </span>
                   )}
                 </div>
-                <p className="text-[11px] text-zinc-500 leading-snug">{c.description}</p>
+                <p className="text-[11px] text-zinc-500 dark:text-zinc-400 leading-snug">{c.description}</p>
               </div>
 
-              <div className="space-y-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800/80 text-xs w-full">
+              <div className="space-y-2 pt-2 border-t border-zinc-200/70 dark:border-zinc-800 text-xs w-full">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Monthly Budget (Today)</span>
-                  <span className="font-bold text-zinc-800 dark:text-zinc-200">
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Monthly Budget (Today)</span>
+                  <span className="font-bold text-zinc-900 dark:text-zinc-100">
                     {formatCrore(c.monthlyExpenseToday)}/mo
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Total Lifetime Spend</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Total Lifetime Spend</span>
                   <span className="font-extrabold text-red-600 dark:text-red-400">
                     {formatCrore(c.totalLifetimeCostOfLiving)}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Corpus Target Needed</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Corpus Target Needed</span>
                   <span className="font-extrabold text-blue-600 dark:text-blue-400">
                     {c.requiredCorpus === 0 ? '₹0 (Self-Funded)' : formatCrore(c.requiredCorpus)}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline">
-                  <span className="text-[11px] text-zinc-500">Projected Accumulation</span>
+                  <span className="text-[11px] text-zinc-500 dark:text-zinc-400">Projected Accumulation</span>
                   <span className="font-bold text-emerald-600 dark:text-emerald-400">
                     {formatCrore(c.peakCorpus)}
                   </span>
@@ -226,12 +227,12 @@ function LifestyleComparisonSection({
               {/* Action Button at Bottom */}
               <div className="pt-1 w-full print:hidden">
                 {isSelected ? (
-                  <div className="w-full py-1.5 px-3 rounded-lg bg-blue-600/10 dark:bg-blue-500/20 text-blue-700 dark:text-blue-300 text-center font-bold text-[11px] flex items-center justify-center gap-1.5 border border-blue-200/60 dark:border-blue-800/60">
+                  <div className="w-full py-1.5 px-3 rounded-lg bg-blue-600/10 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-center font-bold text-[11px] flex items-center justify-center gap-1.5 border border-blue-200/60 dark:border-blue-700/60">
                     <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
                     <span>Current Active Plan</span>
                   </div>
                 ) : (
-                  <div className="w-full py-1.5 px-3 rounded-lg bg-zinc-200/70 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 group-hover:bg-blue-600 group-hover:text-white transition-all text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-2xs">
+                  <div className="w-full py-1.5 px-3 rounded-lg bg-zinc-200/80 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 group-hover:bg-blue-600 group-hover:text-white dark:group-hover:bg-blue-600 dark:group-hover:text-white transition-all text-center font-bold text-[11px] flex items-center justify-center gap-1.5 shadow-2xs">
                     <Sparkles className="w-3 h-3" />
                     <span>Apply {lifestyleName} Plan</span>
                   </div>
@@ -328,7 +329,7 @@ interface StepResultsProps {
 }
 
 export function StepResults({ onViewLogic }: StepResultsProps = {}) {
-  const { results, profile, assets, goToStep, selectLifestylePlan } = useScenarioStore()
+  const { results, profile, assets, goToStep, selectLifestylePlan, applyShortfallRemedy } = useScenarioStore()
   const [activeScenario, setActiveScenario] = useState(1) // Base by default
   const [showExplain, setShowExplain] = useState(false)
   const [activeTab, setActiveTab] = useState<'income_vs_expense' | 'portfolio' | 'categories' | 'table'>('income_vs_expense')
@@ -598,6 +599,16 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
           </div>
         </div>
       </div>
+
+      {/* SHORTFALL RESOLUTION PATHWAYS CARD: 3 Independent OR Possibilities */}
+      <ShortfallManagementCard
+        scenario={scenario}
+        allScenarios={results.scenarios}
+        activeScenarioIndex={activeScenario}
+        onSelectScenario={setActiveScenario}
+        onApplyRemedy={applyShortfallRemedy}
+        onEditStep={goToStep}
+      />
 
       {/* POSITIVE & NEGATIVE FLOW SUMMARY CARDS (Consistent Color Coding) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 print-break-inside-avoid">

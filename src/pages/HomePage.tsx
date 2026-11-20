@@ -52,6 +52,10 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
           </button>
 
           <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-200 dark:border-emerald-800">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>100% Local & Private</span>
+            </div>
             {onViewLogic && (
               <button
                 type="button"
@@ -112,14 +116,36 @@ export default function HomePage({ onStart, onViewLogic, onHome }: HomePageProps
               <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               Pre-filled Indian defaults
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 font-bold">
               <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              100% Client-Side Private
+              100% Local & Private (Zero Tracking)
             </span>
             <span className="flex items-center gap-1.5">
               <FileText className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               1-Click PDF Report
             </span>
+          </div>
+        </section>
+
+        {/* Prominent Local & Private Guarantee Banner */}
+        <section className="max-w-3xl mx-auto -mt-6">
+          <div className="rounded-2xl border-2 border-emerald-500/40 dark:border-emerald-500/30 bg-emerald-50/80 dark:bg-emerald-950/40 p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row items-start sm:items-center gap-3.5 sm:gap-4">
+            <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div className="space-y-1 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                <h3 className="text-sm font-extrabold text-emerald-950 dark:text-emerald-100">
+                  100% Local & Private to Your Computer
+                </h3>
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-200/90 dark:bg-emerald-900/80 text-emerald-900 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700">
+                  Zero Tracking · No Server
+                </span>
+              </div>
+              <p className="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed font-medium">
+                All calculations and financial data remain <strong>completely local to your browser on your computer</strong>. Nothing is ever sent to any remote server, cloud database, or third-party API, and zero analytics or trackers are used. Your privacy is absolute.
+              </p>
+            </div>
           </div>
         </section>
 
