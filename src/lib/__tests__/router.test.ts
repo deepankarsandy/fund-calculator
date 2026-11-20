@@ -24,6 +24,7 @@ describe('Router & URL Navigation', () => {
       expect(buildUrl('home')).toBe('/')
       expect(buildUrl('logic')).toBe('/calc-logic')
       expect(buildUrl('sip')).toBe('/sip')
+      expect(buildUrl('investment')).toBe('/investment')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -57,6 +58,12 @@ describe('Router & URL Navigation', () => {
       expect(parseRoute({ pathname: '/sip', search: '', hash: '' }).page).toBe('sip')
       expect(parseRoute({ pathname: '/sip-calculator', search: '', hash: '' }).page).toBe('sip')
       expect(parseRoute({ pathname: '/', search: '', hash: '#sip' }).page).toBe('sip')
+    })
+
+    it('parses /investment as investment calculator page', () => {
+      expect(parseRoute({ pathname: '/investment', search: '', hash: '' }).page).toBe('investment')
+      expect(parseRoute({ pathname: '/investment-calculator', search: '', hash: '' }).page).toBe('investment')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#investment' }).page).toBe('investment')
     })
 
     it('parses /logic and other logic aliases', () => {

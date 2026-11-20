@@ -5,9 +5,10 @@ import HomePage from '@/pages/HomePage'
 import WizardPage from '@/pages/WizardPage'
 import FeaturesAndLogicPage from '@/pages/FeaturesAndLogicPage'
 import SipCalculatorPage from '@/pages/SipCalculatorPage'
+import InvestmentCalculatorPage from '@/pages/InvestmentCalculatorPage'
 
 export default function App() {
-  const { route, navigateToHome, navigateToLogic, navigateToCalculator, navigateToSIP, navigateBack } = useRouter()
+  const { route, navigateToHome, navigateToLogic, navigateToCalculator, navigateToSIP, navigateToInvestment, navigateBack } = useRouter()
   const { currentStep, goToStep } = useScenarioStore()
 
   // Sync route step with store when navigating via URL/history
@@ -25,7 +26,19 @@ export default function App() {
       navigateToCalculator(currentStep || 1)
     } else if (id === 'sip') {
       navigateToSIP()
+    } else if (id === 'investment') {
+      navigateToInvestment()
     }
+  }
+
+  if (route.page === 'investment') {
+    return (
+      <InvestmentCalculatorPage
+        onBackToHome={navigateToHome}
+        onSelectCalculator={handleSelectCalculator}
+        onViewLogic={navigateToLogic}
+      />
+    )
   }
 
   if (route.page === 'sip') {

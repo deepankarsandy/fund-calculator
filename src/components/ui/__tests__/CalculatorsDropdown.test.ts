@@ -23,7 +23,13 @@ describe('FINANCIAL_CALCULATORS configuration', () => {
     expect(sip?.status).toBe('active')
     expect(sip?.badge).toBe('Active')
 
-    const remainingHelpers = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.id !== 'sip')
+    const investment = FINANCIAL_CALCULATORS.find((c) => c.id === 'investment')
+    expect(investment?.status).toBe('active')
+    expect(investment?.badge).toBe('Active')
+
+    const remainingHelpers = FINANCIAL_CALCULATORS.filter(
+      (c) => c.category === 'helper' && c.id !== 'sip' && c.id !== 'investment'
+    )
     for (const helper of remainingHelpers) {
       expect(helper.status).toBe('coming_soon')
       expect(helper.badge).toBe('Coming Soon')

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
-export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip'
+export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment'
 
 export interface AppRoute {
   page: PageRoute
@@ -36,6 +36,8 @@ export function buildUrl(page: PageRoute, step?: number): string {
       return `${base}calc-logic`
     case 'sip':
       return `${base}sip`
+    case 'investment':
+      return `${base}investment`
     case 'calculator': {
       const s = typeof step === 'number' && !isNaN(step) ? Math.min(Math.max(1, step), 6) : 1
       return `${base}calculator?step=${s}`
@@ -99,6 +101,9 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
       if (lower === 'sip' || lower === 'sip-calculator') {
         return { page: 'sip' }
       }
+      if (lower === 'investment' || lower === 'investment-calculator') {
+        return { page: 'investment' }
+      }
       if (lower === 'calculator' || lower === 'wizard') {
         const step = getStoredSettings().currentStep || 1
         return { page: 'calculator', step }
@@ -128,6 +133,10 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
 
   if (normalizedPath === 'sip' || normalizedPath === 'sip-calculator') {
     return { page: 'sip' }
+  }
+
+  if (normalizedPath === 'investment' || normalizedPath === 'investment-calculator') {
+    return { page: 'investment' }
   }
 
   if (normalizedPath === 'calculator' || normalizedPath === 'wizard') {
@@ -193,6 +202,10 @@ export function navigateToLogic(options?: { replace?: boolean }): void {
 
 export function navigateToSIP(options?: { replace?: boolean }): void {
   navigateTo(buildUrl('sip'), options)
+}
+
+export function navigateToInvestment(options?: { replace?: boolean }): void {
+  navigateTo(buildUrl('investment'), options)
 }
 
 export function navigateToCalculator(step: number = 1, options?: { replace?: boolean }): void {
@@ -307,6 +320,7 @@ export function useRouter() {
     navigateToHome,
     navigateToLogic,
     navigateToSIP,
+    navigateToInvestment,
     navigateToCalculator,
     navigateBack,
     syncStepToUrl,

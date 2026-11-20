@@ -50,9 +50,9 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     shortDesc: 'Lump-sum compound growth & multi-asset portfolio projection',
     longDesc: 'Forecast compound returns across equities, mutual funds, gold, and debt for lumpsum and staggered allocations.',
     category: 'helper',
-    status: 'coming_soon',
+    status: 'active',
     icon: PiggyBank,
-    badge: 'Coming Soon',
+    badge: 'Active',
   },
   {
     id: 'fd',
