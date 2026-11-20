@@ -104,6 +104,7 @@ export default function App() {
     return (
       <WizardPage
         onBackToHome={navigateToHome}
+        onSelectCalculator={handleSelectCalculator}
         onViewLogic={navigateToLogic}
       />
     )
