@@ -1,0 +1,10 @@
+#!/bin/sh
+# Pre-commit hook: Run Prettier on staged files
+
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.(ts|tsx|js|jsx|json|css|md|html)$')
+
+if [ -n "$STAGED_FILES" ]; then
+  echo "🎨 [pre-commit] Running Prettier on staged files..."
+  npx prettier --write $STAGED_FILES
+  git add $STAGED_FILES
+fi

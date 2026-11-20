@@ -6,12 +6,12 @@ export function simulatePortfolio(
   projections: YearProjection[],
   startingCorpus: number,
   annualReturn: number,
-  timing: WithdrawalTiming,
+  timing: WithdrawalTiming
 ): YearProjection[] {
   let balance = new Decimal(startingCorpus)
   const r = new Decimal(annualReturn)
 
-  return projections.map(row => {
+  return projections.map((row) => {
     const opening = balance
     let growth: Decimal
     let closing: Decimal
@@ -19,7 +19,10 @@ export function simulatePortfolio(
     if (timing === 'end_of_year') {
       growth = opening.mul(r)
       // Add savings surplus and subtract deficit withdrawals
-      closing = opening.plus(growth).plus(row.netSavings || 0).minus(row.netWithdrawal || 0)
+      closing = opening
+        .plus(growth)
+        .plus(row.netSavings || 0)
+        .minus(row.netWithdrawal || 0)
     } else {
       // Beginning of year timing: cashflows applied before investment growth
       const afterCashflow = opening.plus(row.netSavings || 0).minus(row.netWithdrawal || 0)

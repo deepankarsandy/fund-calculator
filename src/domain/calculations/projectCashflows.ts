@@ -82,7 +82,7 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
 
     // Recurring expenses inflated to year t
     const recurringExpense = recurringItems
-      .filter(i => t >= i.startYear && (i.endYear == null || t <= i.endYear))
+      .filter((i) => t >= i.startYear && (i.endYear == null || t <= i.endYear))
       .reduce((sum, i) => {
         return new Decimal(sum)
           .plus(projectInflation(i.annualBase, i.inflationRate, t - 1))
@@ -91,14 +91,14 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
 
     // One-time expenses occurring in year t
     const oneTimeExpense = oneTimeItems
-      .filter(i => i.year === t)
+      .filter((i) => i.year === t)
       .reduce((sum, i) => sum + i.amount, 0)
 
     const totalExpense = recurringExpense + oneTimeExpense
 
     // Other income (pensions, rent)
     const otherIncome = assets.otherIncome
-      .filter(inc => t >= inc.startYear && (inc.endYear == null || t <= inc.endYear))
+      .filter((inc) => t >= inc.startYear && (inc.endYear == null || t <= inc.endYear))
       .reduce((sum, inc) => {
         const amount = inc.inflationLinked
           ? projectInflation(inc.annualAmount, assumptions.globalInflationRate, t - 1)
@@ -108,7 +108,7 @@ export function projectCashflows(input: CashflowInput): YearProjection[] {
 
     // Scheduled future lump sums
     const lumpSum = assets.futureContributions
-      .filter(ls => ls.year === t)
+      .filter((ls) => ls.year === t)
       .reduce((sum, ls) => sum + ls.amount, 0)
 
     const totalNonEarnedIncome = otherIncome + lumpSum

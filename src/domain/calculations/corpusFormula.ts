@@ -14,7 +14,7 @@ export function calculateCorpus(
   r: number,
   g: number,
   n: number,
-  timing: WithdrawalTiming = 'end_of_year',
+  timing: WithdrawalTiming = 'end_of_year'
 ): number {
   if (n <= 0 || e0 <= 0) return 0
 
@@ -43,11 +43,7 @@ export function calculateCorpus(
 }
 
 /** Net effective return after fees and taxes from a gross return. */
-export function netReturn(
-  grossReturn: number,
-  feeRate: number,
-  taxDrag: number,
-): number {
+export function netReturn(grossReturn: number, feeRate: number, taxDrag: number): number {
   return new Decimal(grossReturn).minus(feeRate).minus(taxDrag).toNumber()
 }
 

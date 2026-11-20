@@ -24,21 +24,21 @@ describe('calculateCorpus - Convention A', () => {
     // E0=100000, r=0.07, g=0.05, n=10, end-of-year
     const corpus = calculateCorpus(100000, 0.07, 0.05, 10, 'end_of_year')
     // Formula: 100000 × [1 - (1.05/1.07)^10] / (0.07 - 0.05)
-    const expected = 100000 * (1 - Math.pow(1.05 / 1.07, 10)) / (0.07 - 0.05)
+    const expected = (100000 * (1 - Math.pow(1.05 / 1.07, 10))) / (0.07 - 0.05)
     expect(corpus).toBeCloseTo(expected, 0)
   })
 
   it('Test 4: r = g special case — no division by zero', () => {
     // C = E0 × n / (1 + r)
     const corpus = calculateCorpus(100000, 0.05, 0.05, 10, 'end_of_year')
-    const expected = 100000 * 10 / 1.05
+    const expected = (100000 * 10) / 1.05
     expect(corpus).toBeCloseTo(expected, 0)
   })
 
   it('Test 5: g = 0 reduces to level annuity PV', () => {
     // PV of level annuity = E0 × [1 - (1+r)^-n] / r
     const corpus = calculateCorpus(100000, 0.07, 0, 10, 'end_of_year')
-    const expected = 100000 * (1 - Math.pow(1.07, -10)) / 0.07
+    const expected = (100000 * (1 - Math.pow(1.07, -10))) / 0.07
     expect(corpus).toBeCloseTo(expected, 0)
   })
 

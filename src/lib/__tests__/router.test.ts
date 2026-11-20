@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  parseRoute,
-  buildUrl,
-  getBaseUrl,
-  navigateTo,
-  syncStepToUrl,
-} from '@/lib/router'
+import { parseRoute, buildUrl, getBaseUrl, navigateTo, syncStepToUrl } from '@/lib/router'
 
 describe('Router & URL Navigation', () => {
   beforeEach(() => {
@@ -23,6 +17,12 @@ describe('Router & URL Navigation', () => {
     it('builds canonical URLs for all pages and steps', () => {
       expect(buildUrl('home')).toBe('/')
       expect(buildUrl('logic')).toBe('/calc-logic')
+      expect(buildUrl('sip')).toBe('/sip')
+      expect(buildUrl('investment')).toBe('/investment')
+      expect(buildUrl('fd')).toBe('/fd')
+      expect(buildUrl('interest')).toBe('/loan-emi')
+      expect(buildUrl('profile')).toBe('/profile')
+      expect(buildUrl('export-import')).toBe('/export-import')
       expect(buildUrl('calculator')).toBe('/calculator?step=1')
       expect(buildUrl('calculator', 3)).toBe('/calculator?step=3')
       expect(buildUrl('calculator', 6)).toBe('/calculator?step=6')
@@ -52,9 +52,59 @@ describe('Router & URL Navigation', () => {
       expect(route.page).toBe('logic')
     })
 
+    it('parses /sip as sip calculator page', () => {
+      expect(parseRoute({ pathname: '/sip', search: '', hash: '' }).page).toBe('sip')
+      expect(parseRoute({ pathname: '/sip-calculator', search: '', hash: '' }).page).toBe('sip')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#sip' }).page).toBe('sip')
+    })
+
+    it('parses /investment as investment calculator page', () => {
+      expect(parseRoute({ pathname: '/investment', search: '', hash: '' }).page).toBe('investment')
+      expect(parseRoute({ pathname: '/investment-calculator', search: '', hash: '' }).page).toBe(
+        'investment'
+      )
+      expect(parseRoute({ pathname: '/', search: '', hash: '#investment' }).page).toBe('investment')
+    })
+
+    it('parses /fd as fixed deposit calculator page', () => {
+      expect(parseRoute({ pathname: '/fd', search: '', hash: '' }).page).toBe('fd')
+      expect(parseRoute({ pathname: '/fd-calculator', search: '', hash: '' }).page).toBe('fd')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#fd' }).page).toBe('fd')
+    })
+
+    it('parses /loan-emi as loan EMI calculator page', () => {
+      expect(parseRoute({ pathname: '/loan-emi', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/emi-calculator', search: '', hash: '' }).page).toBe(
+        'interest'
+      )
+      expect(parseRoute({ pathname: '/interest', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#loan-emi' }).page).toBe('interest')
+    })
+
+    it('parses /profile as profile page', () => {
+      expect(parseRoute({ pathname: '/profile', search: '', hash: '' }).page).toBe('profile')
+      expect(parseRoute({ pathname: '/user-profile', search: '', hash: '' }).page).toBe('profile')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#profile' }).page).toBe('profile')
+    })
+
+    it('parses /export-import and data management aliases', () => {
+      expect(parseRoute({ pathname: '/export-import', search: '', hash: '' }).page).toBe(
+        'export-import'
+      )
+      expect(parseRoute({ pathname: '/export', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/import', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/backup', search: '', hash: '' }).page).toBe('export-import')
+      expect(parseRoute({ pathname: '/', search: '', hash: '#export-import' }).page).toBe(
+        'export-import'
+      )
+      expect(parseRoute({ pathname: '/', search: '', hash: '#backup' }).page).toBe('export-import')
+    })
+
     it('parses /logic and other logic aliases', () => {
       expect(parseRoute({ pathname: '/logic', search: '', hash: '' }).page).toBe('logic')
-      expect(parseRoute({ pathname: '/features-and-logic', search: '', hash: '' }).page).toBe('logic')
+      expect(parseRoute({ pathname: '/features-and-logic', search: '', hash: '' }).page).toBe(
+        'logic'
+      )
       expect(parseRoute({ pathname: '/methodology', search: '', hash: '' }).page).toBe('logic')
     })
 
@@ -79,7 +129,11 @@ describe('Router & URL Navigation', () => {
       const routeTooLow = parseRoute({ pathname: '/calculator', search: '?step=-3', hash: '' })
       expect(routeTooLow.step).toBe(1)
 
-      const routeInvalid = parseRoute({ pathname: '/calculator', search: '?step=invalid', hash: '' })
+      const routeInvalid = parseRoute({
+        pathname: '/calculator',
+        search: '?step=invalid',
+        hash: '',
+      })
       expect(routeInvalid.step).toBe(1)
     })
 

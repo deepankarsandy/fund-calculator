@@ -4,20 +4,25 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lifetime Corpus Calculator</title>
-    <meta name="description" content="Estimate the investment corpus needed to fund your lifetime living expenses." />
+    <title>Fund Calculator</title>
+    <meta
+      name="description"
+      content="Fund Calculator - Comprehensive suite of personal finance calculators including Retirement Fund & Corpus, SIP, Investment, Fixed Deposit, and Interest modeling."
+    />
     <script>
-      (function() {
+      ;(function () {
         try {
-          const theme = localStorage.getItem('corpus_theme') || 'system';
-          const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          const theme = localStorage.getItem('corpus_theme') || 'system'
+          const isDark =
+            theme === 'dark' ||
+            (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
           if (isDark) {
-            document.documentElement.classList.add('dark');
+            document.documentElement.classList.add('dark')
           } else {
-            document.documentElement.classList.remove('dark');
+            document.documentElement.classList.remove('dark')
           }
         } catch (e) {}
-      })();
+      })()
     </script>
   </head>
   <body>

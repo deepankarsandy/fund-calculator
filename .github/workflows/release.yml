@@ -1,0 +1,81 @@
+name: Release on Push to Main
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create Tag and GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Read version from package.json
+        id: pkg
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "TAG=v$VERSION" >> $GITHUB_ENV
+
+      - name: Check if tag already exists
+        id: check_tag
+        run: |
+          if git rev-parse "$TAG" >/dev/null 2>&1; then
+            echo "Tag $TAG already exists on remote/local. Skipping release."
+            echo "exists=true" >> $GITHUB_ENV
+          else
+            echo "exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Locate release notes document
+        id: notes
+        if: env.exists == 'false'
+        run: |
+          DOC=""
+          if [ -f "docs/releases/v${VERSION}.md" ]; then
+            DOC="docs/releases/v${VERSION}.md"
+          elif [ -f "docs/releases/${VERSION}.md" ]; then
+            DOC="docs/releases/${VERSION}.md"
+          elif [ -f "docs/releases/v${VERSION}.markdown" ]; then
+            DOC="docs/releases/v${VERSION}.markdown"
+          elif [ -f "docs/releases/${VERSION}.markdown" ]; then
+            DOC="docs/releases/${VERSION}.markdown"
+          fi
+
+          if [ -n "$DOC" ]; then
+            echo "Found release document at $DOC"
+            echo "RELEASE_DOC=$DOC" >> $GITHUB_ENV
+          else
+            echo "No explicit release document found, will use auto-generated release notes."
+            echo "RELEASE_DOC=" >> $GITHUB_ENV
+          fi
+
+      - name: Create Git Tag and GitHub Release
+        if: env.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Creating Git Tag and GitHub Release for $TAG..."
+          if [ -n "$RELEASE_DOC" ]; then
+            gh release create "$TAG" \
+              --title "Release $TAG" \
+              --notes-file "$RELEASE_DOC"
+          else
+            gh release create "$TAG" \
+              --title "Release $TAG" \
+              --generate-notes
+          fi
+          echo "Successfully created release $TAG!"

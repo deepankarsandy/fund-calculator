@@ -11,7 +11,7 @@ person's living expenses over a selected period.
 support for local household costs. The design should remain configurable
 for other countries and currencies.
 
-------------------------------------------------------------------------
+---
 
 # 1. Product objective
 
@@ -30,23 +30,23 @@ investment performance or a substitute for regulated financial advice.
 
 ## 1.1 Core principles
 
--   Make all assumptions visible and editable.
--   Separate today's spending from future inflated spending.
--   Support both essential/bare-minimum and comfortable lifestyle
-    scenarios.
--   Allow any number of household members, dependents, expense
-    categories, and custom expense items.
--   Distinguish recurring expenses from irregular, periodic, and
-    one-time expenses.
--   Avoid silently assuming that a government hospital, insurance
-    policy, or investment return will cover every future cost.
--   Show the calculation methodology and cash-flow timeline, not just
-    one corpus number.
--   Present results in both nominal future rupees and today's
-    purchasing-power terms.
--   Allow users to save, edit, duplicate, and compare scenarios.
+- Make all assumptions visible and editable.
+- Separate today's spending from future inflated spending.
+- Support both essential/bare-minimum and comfortable lifestyle
+  scenarios.
+- Allow any number of household members, dependents, expense
+  categories, and custom expense items.
+- Distinguish recurring expenses from irregular, periodic, and
+  one-time expenses.
+- Avoid silently assuming that a government hospital, insurance
+  policy, or investment return will cover every future cost.
+- Show the calculation methodology and cash-flow timeline, not just
+  one corpus number.
+- Present results in both nominal future rupees and today's
+  purchasing-power terms.
+- Allow users to save, edit, duplicate, and compare scenarios.
 
-------------------------------------------------------------------------
+---
 
 # 2. User journey
 
@@ -71,45 +71,48 @@ investment performance or a substitute for regulated financial advice.
 A user should be able to get a preliminary result without completing
 every optional field. Clearly label incomplete assumptions.
 
-------------------------------------------------------------------------
+---
 
 # 3. Profile and household inputs
 
 ## 3.1 Main profile
 
-  ---------------------------------------------------------------------------
-  Field               Type                          Required Notes
-  ------------------- ---------------- --------------------- ----------------
-  Country             Select                             Yes Default India
+---
 
-  State/region        Select or text                      No Example: Odisha
+Field Type Required Notes
 
-  City/town/village   Text                                No Used for
-                                                             context, not
-                                                             automatic
-                                                             expense
-                                                             assumptions
+---
 
-  Currency            Select                             Yes Default INR
+Country Select Yes Default India
 
-  Current age         Number                             Yes Years; allow
-                                                             decimal age only
-                                                             if needed
+State/region Select or text No Example: Odisha
 
-  Target age          Number                             Yes Must be greater
-                                                             than current age
+City/town/village Text No Used for
+context, not
+automatic
+expense
+assumptions
 
-  Planning duration   Calculated                         Yes Target age minus
-                                                             current age
+Currency Select Yes Default INR
 
-  Household size      Number                             Yes Number of people
-                                                             covered by the
-                                                             budget
+Current age Number Yes Years; allow
+decimal age only
+if needed
 
-  Lifestyle scenario  Select                             Yes Bare minimum,
-                                                             comfortable,
-                                                             custom
-  ---------------------------------------------------------------------------
+Target age Number Yes Must be greater
+than current age
+
+Planning duration Calculated Yes Target age minus
+current age
+
+Household size Number Yes Number of people
+covered by the
+budget
+
+Lifestyle scenario Select Yes Bare minimum,
+comfortable,
+custom
+---------------------------------------------------------------------------
 
 The user may choose a planning horizon longer than a conventional
 retirement horizon. Encourage testing to age 90, 95, or 100 rather than
@@ -119,14 +122,14 @@ assuming the plan ends at age 70.
 
 Allow an editable list of people:
 
--   Name or label (optional; e.g. Self, Spouse, Parent 1, Child 1)
--   Relationship
--   Current age
--   Whether financially dependent
--   Whether fully or partially supported
--   Age until support is expected, if known
--   Expenses that apply specifically to this person
--   Health-insurance coverage status
+- Name or label (optional; e.g. Self, Spouse, Parent 1, Child 1)
+- Relationship
+- Current age
+- Whether financially dependent
+- Whether fully or partially supported
+- Age until support is expected, if known
+- Expenses that apply specifically to this person
+- Health-insurance coverage status
 
 Do not assume every dependent's costs stop at the same age. A child,
 spouse, or parent may have a different support period. The first version
@@ -137,58 +140,61 @@ Avoid collecting sensitive medical details unless genuinely necessary.
 For an expense calculator, estimated annual medical spending and
 insurance premiums are generally sufficient.
 
-------------------------------------------------------------------------
+---
 
 # 4. Expense input model
 
 Every expense item should have these properties:
 
-  -----------------------------------------------------------------------
-  Property                            Meaning
-  ----------------------------------- -----------------------------------
-  Category                            Broad grouping, such as Housing or
-                                      Food
+---
 
-  Item name                           Specific expense, such as
-                                      Electricity
+Property Meaning
 
-  Amount                              User-entered cost
+---
 
-  Frequency                           Weekly, monthly, quarterly,
-                                      half-yearly, yearly, every N years,
-                                      or one-time
+Category Broad grouping, such as Housing or
+Food
 
-  Essential/discretionary             Used to build minimum and
-                                      comfortable scenarios
+Item name Specific expense, such as
+Electricity
 
-  Applies to                          Whole household or selected
-                                      household members
+Amount User-entered cost
 
-  Inflation rate                      Default category rate or custom
-                                      rate
+Frequency Weekly, monthly, quarterly,
+half-yearly, yearly, every N years,
+or one-time
 
-  Start year                          When the expense begins
+Essential/discretionary Used to build minimum and
+comfortable scenarios
 
-  End year                            Optional; when the expense stops
+Applies to Whole household or selected
+household members
 
-  Replacement/renewal cycle           Optional; for items replaced every
-                                      few years
+Inflation rate Default category rate or custom
+rate
 
-  Notes                               Optional explanation
-  -----------------------------------------------------------------------
+Start year When the expense begins
+
+End year Optional; when the expense stops
+
+Replacement/renewal cycle Optional; for items replaced every
+few years
+
+Notes Optional explanation
+-----------------------------------------------------------------------
 
 Store the original amount and frequency. Convert to an annual baseline
 for calculations:
 
--   Weekly: amount × 52
--   Monthly: amount × 12
--   Quarterly: amount × 4
--   Half-yearly: amount × 2
--   Yearly: amount
--   Every N years: amount / N for a simple annualised budget, or model
-    as an actual periodic cash flow
--   One-time: model in the year it occurs; do not treat it as a
-    recurring annual expense
+- Weekly: amount × 52
+- Monthly: amount × 12
+- Quarterly: amount × 4
+- Half-yearly: amount × 2
+- Yearly: amount
+- Every N years: amount / N for a simple annualised budget, or model
+  as an actual periodic cash flow
+- One-time: model in the year it occurs; do not treat it as a
+  recurring annual expense
 
 For items with irregular timing, the cash-flow engine should preserve
 the actual timing where possible rather than relying only on annual
@@ -201,25 +207,25 @@ disable, delete, or add categories and line items.
 
 ### A. Housing and property
 
--   Rent (default zero; user owns home in the example)
--   Home loan / mortgage payments (if applicable; model separately from
-    ordinary living costs)
--   Property tax
--   Home insurance
--   Society / association / community fees
--   Electricity
--   Water
--   Cooking gas / LPG
--   Internet / broadband
--   Home phone
--   Repairs and maintenance
--   Painting and waterproofing
--   Plumbing and electrical repairs
--   Roof, structural, and major repairs
--   Furniture and household equipment replacement
--   Appliance replacement
--   Security, cleaning, and domestic help
--   Waste collection or other local charges
+- Rent (default zero; user owns home in the example)
+- Home loan / mortgage payments (if applicable; model separately from
+  ordinary living costs)
+- Property tax
+- Home insurance
+- Society / association / community fees
+- Electricity
+- Water
+- Cooking gas / LPG
+- Internet / broadband
+- Home phone
+- Repairs and maintenance
+- Painting and waterproofing
+- Plumbing and electrical repairs
+- Roof, structural, and major repairs
+- Furniture and household equipment replacement
+- Appliance replacement
+- Security, cleaning, and domestic help
+- Waste collection or other local charges
 
 **Important:** A home-maintenance budget should clarify whether it
 includes only routine repairs or also major renovation and structural
@@ -227,42 +233,42 @@ work. Avoid double-counting a separate major-repair reserve.
 
 ### B. Food and household consumables
 
--   Rice, wheat, and other staples
--   Groceries and packaged food
--   Vegetables and fruits
--   Fish, meat, eggs, and dairy
--   Drinking water
--   Cooking ingredients
--   Eating out / takeaway
--   Household cleaning supplies
--   Toiletries and personal-care consumables
+- Rice, wheat, and other staples
+- Groceries and packaged food
+- Vegetables and fruits
+- Fish, meat, eggs, and dairy
+- Drinking water
+- Cooking ingredients
+- Eating out / takeaway
+- Household cleaning supplies
+- Toiletries and personal-care consumables
 
 ### C. Utilities and communication
 
--   Electricity
--   Water
--   LPG / cooking fuel
--   Internet
--   Mobile recharge / phone bills
--   Cable / DTH / streaming subscriptions
--   Other recurring digital subscriptions
+- Electricity
+- Water
+- LPG / cooking fuel
+- Internet
+- Mobile recharge / phone bills
+- Cable / DTH / streaming subscriptions
+- Other recurring digital subscriptions
 
 Do not count LPG or electricity twice if already included under Housing.
 
 ### D. Transport and vehicles
 
--   Petrol / diesel / CNG / EV charging
--   Public transport
--   Taxi / auto / rideshare
--   Vehicle servicing
--   Repairs and spare parts
--   Tyres and batteries
--   Insurance
--   PUC / registration / permits / road tax
--   Parking and tolls
--   Driving licence renewals
--   Vehicle replacement reserve
--   Bicycle or other transport maintenance
+- Petrol / diesel / CNG / EV charging
+- Public transport
+- Taxi / auto / rideshare
+- Vehicle servicing
+- Repairs and spare parts
+- Tyres and batteries
+- Insurance
+- PUC / registration / permits / road tax
+- Parking and tolls
+- Driving licence renewals
+- Vehicle replacement reserve
+- Bicycle or other transport maintenance
 
 **Vehicle replacement:** Maintenance does not replace the vehicle.
 Capture the expected replacement cost, replacement interval, and whether
@@ -270,18 +276,18 @@ the user expects to stop owning a vehicle at a certain age.
 
 ### E. Healthcare and insurance
 
--   Routine doctor consultations
--   General medicines
--   Tests and checkups
--   Dental care
--   Eye care and spectacles
--   Physiotherapy / rehabilitation
--   Medical devices and aids
--   Health insurance premiums
--   Policy co-payments and deductibles
--   Out-of-pocket treatment
--   Emergency medical reserve
--   Long-term care / assisted living reserve, if relevant
+- Routine doctor consultations
+- General medicines
+- Tests and checkups
+- Dental care
+- Eye care and spectacles
+- Physiotherapy / rehabilitation
+- Medical devices and aids
+- Health insurance premiums
+- Policy co-payments and deductibles
+- Out-of-pocket treatment
+- Emergency medical reserve
+- Long-term care / assisted living reserve, if relevant
 
 A nearby government hospital may reduce routine treatment costs, but do
 not assume all medicines, diagnostics, specialist care, travel, or
@@ -291,67 +297,67 @@ both in annual medical spending and in an emergency reserve.
 
 ### F. Personal and lifestyle
 
--   Clothing and footwear
--   Haircuts and grooming
--   Toiletries not counted elsewhere
--   Fitness / sports
--   Hobbies
--   Books and learning
--   Entertainment
--   Festivals and celebrations
--   Gifts and donations
--   Religious / community events, if the user chooses to include them
--   Eating out and leisure
--   Holidays and travel
--   Family visits
+- Clothing and footwear
+- Haircuts and grooming
+- Toiletries not counted elsewhere
+- Fitness / sports
+- Hobbies
+- Books and learning
+- Entertainment
+- Festivals and celebrations
+- Gifts and donations
+- Religious / community events, if the user chooses to include them
+- Eating out and leisure
+- Holidays and travel
+- Family visits
 
 ### G. Household, technology, and devices
 
--   Mobile phone replacement
--   Computer / laptop replacement
--   TV and audio equipment
--   Refrigerator / washing machine / other appliance replacement
--   Furniture replacement
--   Small tools and equipment
--   Repairs for electronics
--   Software and cloud subscriptions
+- Mobile phone replacement
+- Computer / laptop replacement
+- TV and audio equipment
+- Refrigerator / washing machine / other appliance replacement
+- Furniture replacement
+- Small tools and equipment
+- Repairs for electronics
+- Software and cloud subscriptions
 
 ### H. Family and dependents
 
--   Financial support for parents
--   Spouse's personal expenses
--   Childcare
--   School fees
--   Higher education support
--   Special family events
--   Family travel
--   Support for other relatives
--   Caregiving and eldercare
+- Financial support for parents
+- Spouse's personal expenses
+- Childcare
+- School fees
+- Higher education support
+- Special family events
+- Family travel
+- Support for other relatives
+- Caregiving and eldercare
 
 Use person-specific start/end ages where possible. Education and
 childcare should not be treated as lifelong recurring expenses.
 
 ### I. Financial and administrative costs
 
--   Income tax on non-investment income
--   Investment tax provision
--   Investment management fees
--   Bank and account charges
--   Professional / legal / accounting fees
--   Document renewals and administrative costs
--   Loan payments (if any)
+- Income tax on non-investment income
+- Investment tax provision
+- Investment management fees
+- Bank and account charges
+- Professional / legal / accounting fees
+- Document renewals and administrative costs
+- Loan payments (if any)
 
 Taxes and investment fees should ideally be handled in the return
 assumptions or cash-flow engine to avoid double-counting.
 
 ### J. Emergencies and contingencies
 
--   General emergency reserve
--   Home emergency reserve
--   Vehicle emergency reserve
--   Medical reserve
--   Family emergency support
--   Other unforeseen expenses
+- General emergency reserve
+- Home emergency reserve
+- Vehicle emergency reserve
+- Medical reserve
+- Family emergency support
+- Other unforeseen expenses
 
 A reserve is not automatically an annual expense. It can be modelled as
 a separate starting reserve, a target reserve balance, or a
@@ -363,7 +369,7 @@ Users can add unlimited custom categories and items. Each custom item
 must support the same frequency, inflation, essential/discretionary,
 timing, and household-member properties.
 
-------------------------------------------------------------------------
+---
 
 # 5. Inflation assumptions
 
@@ -374,18 +380,20 @@ every expense. Support both a global rate and category-specific rates.
 
 These are editable planning assumptions, not forecasts or guarantees.
 
-  Category                               Example default assumption
-  ------------------------------------ ----------------------------
-  General household / mixed expenses                             5%
-  Food and groceries                                             5%
-  Housing repairs and services                                   5%
-  Electricity and utilities                                      5%
-  Transport and fuel                                             5%
-  Healthcare                                                     7%
-  Education                                                      7%
-  Insurance premiums                     User-defined / quote-based
-  Technology and electronics                                     3%
-  Travel and leisure                                             5%
+Category Example default assumption
+
+---
+
+General household / mixed expenses 5%
+Food and groceries 5%
+Housing repairs and services 5%
+Electricity and utilities 5%
+Transport and fuel 5%
+Healthcare 7%
+Education 7%
+Insurance premiums User-defined / quote-based
+Technology and electronics 3%
+Travel and leisure 5%
 
 The application should not imply that every category will follow these
 rates. Allow the user to override any default.
@@ -412,42 +420,45 @@ approximately ₹1,62,889 after 10 years.
 
 Do not describe a future nominal amount as today's purchasing power.
 
-------------------------------------------------------------------------
+---
 
 # 6. Investment and withdrawal assumptions
 
 ## 6.1 Required inputs
 
-  -----------------------------------------------------------------------
-  Input                               Meaning
-  ----------------------------------- -----------------------------------
-  Expected annual investment return   Expected nominal return before or
-                                      after tax, as explicitly selected
+---
 
-  Return basis                        Gross or net of fees/taxes
+Input Meaning
 
-  Investment fees                     Annual fee assumption, if return is
-                                      gross
+---
 
-  Tax assumption                      Effective tax drag or a simplified
-                                      net-return input
+Expected annual investment return Expected nominal return before or
+after tax, as explicitly selected
 
-  Compounding frequency               Annual or monthly
+Return basis Gross or net of fees/taxes
 
-  Withdrawal timing                   Beginning or end of each period
+Investment fees Annual fee assumption, if return is
+gross
 
-  Existing investable corpus          Money already available for this
-                                      purpose
+Tax assumption Effective tax drag or a simplified
+net-return input
 
-  Future lump sums                    Expected one-time additions, with
-                                      dates
+Compounding frequency Annual or monthly
 
-  Other income                        Pension, rent, annuity, or other
-                                      income, with start/end dates
+Withdrawal timing Beginning or end of each period
 
-  Safety margin                       Additional percentage or fixed
-                                      reserve
-  -----------------------------------------------------------------------
+Existing investable corpus Money already available for this
+purpose
+
+Future lump sums Expected one-time additions, with
+dates
+
+Other income Pension, rent, annuity, or other
+income, with start/end dates
+
+Safety margin Additional percentage or fixed
+reserve
+-----------------------------------------------------------------------
 
 Do not call an assumed 7% return guaranteed. Actual market returns vary,
 and the order of returns matters when withdrawals are occurring.
@@ -478,7 +489,7 @@ and tax circumstances.
 Show a warning if the user enters a gross return but leaves taxes and
 fees at zero.
 
-------------------------------------------------------------------------
+---
 
 # 7. Core calculation methodology
 
@@ -510,11 +521,11 @@ annual baseline.
 
 Let:
 
--   `E0` = current annual expense in today's money
--   `g` = annual expense inflation rate
--   `r` = effective annual investment return, net of fees and taxes
--   `n` = number of years
--   `C` = required starting corpus
+- `E0` = current annual expense in today's money
+- `g` = annual expense inflation rate
+- `r` = effective annual investment return, net of fees and taxes
+- `n` = number of years
+- `C` = required starting corpus
 
 ### Convention A: first withdrawal at the end of year 1 equals today's annual expense
 
@@ -607,10 +618,10 @@ annual rate.
 Calculate the required corpus for the projected expenses first. Then
 compare it with:
 
--   Existing investable assets
--   Future contributions
--   Expected pension or other reliable income
--   Future lump-sum receipts
+- Existing investable assets
+- Future contributions
+- Expected pension or other reliable income
+- Future lump-sum receipts
 
 Show:
 
@@ -623,32 +634,34 @@ valuation date or include it directly in the cash-flow projection.
 Do not include the user's primary residence as an investable asset
 unless the user explicitly plans to sell, rent, or monetise it.
 
-------------------------------------------------------------------------
+---
 
 # 8. Scenario analysis and stress testing
 
 Always show more than one scenario. Suggested initial presets:
 
-  Scenario               Expense inflation   Net investment return
-  -------------------- ------------------- -----------------------
-  Optimistic                            4%                      7%
-  Base planning case                    5%                      7%
-  Conservative                          6%                      7%
+Scenario Expense inflation Net investment return
+
+---
+
+Optimistic 4% 7%
+Base planning case 5% 7%
+Conservative 6% 7%
 
 These are illustrative assumptions, not recommended guaranteed returns.
 Users must be able to edit them.
 
 Also provide sensitivity analysis for:
 
--   Lower investment return
--   Higher inflation
--   Higher healthcare inflation
--   Longer lifespan
--   Early poor investment returns
--   One or more large medical expenses
--   Major home repair
--   Vehicle replacement
--   Loss or reduction of pension/other income
+- Lower investment return
+- Higher inflation
+- Higher healthcare inflation
+- Longer lifespan
+- Early poor investment returns
+- One or more large medical expenses
+- Major home repair
+- Vehicle replacement
+- Loss or reduction of pension/other income
 
 A useful stress test is to model a poor return in the first few years,
 rather than only reducing the average return. This demonstrates
@@ -658,7 +671,7 @@ For market-linked investments, a deterministic 7% every year is not a
 realistic representation of volatility. Label the quick estimate as
 deterministic and offer a variable-return simulation in a later version.
 
-------------------------------------------------------------------------
+---
 
 # 9. Results and reporting
 
@@ -666,42 +679,44 @@ deterministic and offer a variable-return simulation in a later version.
 
 Show:
 
--   Current monthly household budget
--   Current annual household budget
--   Essential annual expenses
--   Discretionary annual expenses
--   Planning duration
--   Assumed inflation
--   Assumed net investment return
--   Estimated starting corpus
--   Existing corpus
--   Funding gap or surplus
--   Safety reserve
--   Corpus after applying safety margin
+- Current monthly household budget
+- Current annual household budget
+- Essential annual expenses
+- Discretionary annual expenses
+- Planning duration
+- Assumed inflation
+- Assumed net investment return
+- Estimated starting corpus
+- Existing corpus
+- Funding gap or surplus
+- Safety reserve
+- Corpus after applying safety margin
 
 ## 9.2 Expense breakdown
 
 Show an editable table and a chart by category:
 
--   Current annual cost
--   Share of total
--   Inflation assumption
--   Projected cost in 5, 10, 20, and 30 years
--   Essential or discretionary status
+- Current annual cost
+- Share of total
+- Inflation assumption
+- Projected cost in 5, 10, 20, and 30 years
+- Essential or discretionary status
 
 ## 9.3 Projection table
 
 For every year, show:
 
-  Column              Description
-  ------------------- -------------------------------------------
-  Age                 User's age during the year
-  Opening corpus      Starting portfolio balance
-  Expenses            Projected expenses
-  Other income        Pension, rent, etc.
-  Net withdrawal      Expenses minus income
-  Investment growth   Growth based on the selected return model
-  Closing corpus      Balance after cash flows
+Column Description
+
+---
+
+Age User's age during the year
+Opening corpus Starting portfolio balance
+Expenses Projected expenses
+Other income Pension, rent, etc.
+Net withdrawal Expenses minus income
+Investment growth Growth based on the selected return model
+Closing corpus Balance after cash flows
 
 Allow the user to inspect a particular year and see which expense items
 contribute to the total.
@@ -723,57 +738,57 @@ Use clear labels and distinguish nominal rupees from today's rupees.
 
 Every result should include a plain-language explanation of:
 
--   The assumptions used
--   The withdrawal timing convention
--   Whether return is net or gross
--   Whether taxes and fees are included
--   Which expense items are missing or estimated
--   Whether the calculation includes an emergency reserve
--   Why the result is not guaranteed
+- The assumptions used
+- The withdrawal timing convention
+- Whether return is net or gross
+- Whether taxes and fees are included
+- Which expense items are missing or estimated
+- Whether the calculation includes an emergency reserve
+- Why the result is not guaranteed
 
-------------------------------------------------------------------------
+---
 
 # 10. Validation and warnings
 
 Implement these checks:
 
--   Current age must be greater than zero.
--   Target age must exceed current age.
--   Expense amounts cannot be negative.
--   Frequency must be valid.
--   Inflation must be greater than -100%.
--   Investment return must be greater than -100%.
--   Warn when investment return is equal to inflation; the formula has a
-    special case.
--   Warn when investment return is below inflation; the corpus
-    requirement may be very high.
--   Warn when the user has not entered healthcare, insurance, housing
-    maintenance, or replacement costs.
--   Warn when household size is greater than one but all expenses appear
-    to be individual-only.
--   Warn when a vehicle exists but replacement is not considered.
--   Warn when a house is owned but property tax, major repairs, or
-    appliance replacement have not been reviewed.
--   Warn when the user has dependents but no dependent-specific expenses
-    or end dates.
--   Warn when a gross investment return is used without fees/tax
-    assumptions.
--   Warn when the user plans only to age 70.
--   Warn when a large one-time expense is accidentally entered as a
-    recurring annual expense.
--   Warn about possible double-counting between category totals and
-    custom expenses.
+- Current age must be greater than zero.
+- Target age must exceed current age.
+- Expense amounts cannot be negative.
+- Frequency must be valid.
+- Inflation must be greater than -100%.
+- Investment return must be greater than -100%.
+- Warn when investment return is equal to inflation; the formula has a
+  special case.
+- Warn when investment return is below inflation; the corpus
+  requirement may be very high.
+- Warn when the user has not entered healthcare, insurance, housing
+  maintenance, or replacement costs.
+- Warn when household size is greater than one but all expenses appear
+  to be individual-only.
+- Warn when a vehicle exists but replacement is not considered.
+- Warn when a house is owned but property tax, major repairs, or
+  appliance replacement have not been reviewed.
+- Warn when the user has dependents but no dependent-specific expenses
+  or end dates.
+- Warn when a gross investment return is used without fees/tax
+  assumptions.
+- Warn when the user plans only to age 70.
+- Warn when a large one-time expense is accidentally entered as a
+  recurring annual expense.
+- Warn about possible double-counting between category totals and
+  custom expenses.
 
 Warnings should guide the user, not prevent them from generating a
 result.
 
-------------------------------------------------------------------------
+---
 
 # 11. Data model suggestion
 
 A simple conceptual model:
 
-``` json
+```json
 {
   "profile": {
     "country": "India",
@@ -826,7 +841,7 @@ production, use stable IDs, schema validation, currency-safe decimal
 handling, and explicit units. Store rates consistently as decimals (5% =
 0.05).
 
-------------------------------------------------------------------------
+---
 
 # 12. Example baseline data for initial testing
 
@@ -834,61 +849,65 @@ Use this sample as a seeded example, not as a default for every user.
 
 **Profile**
 
--   Current age: 30
--   Target age: 70
--   Location: Small town in Odisha, India
--   Own house; no rent
--   Household size: To be confirmed
+- Current age: 30
+- Target age: 70
+- Location: Small town in Odisha, India
+- Own house; no rent
+- Household size: To be confirmed
 
 **Recurring monthly expenses**
 
-  Item                                        Monthly amount
-  ----------------------------------------- ----------------
-  Electricity                                           ₹800
-  Water                                                   ₹0
-  Internet                                              ₹700
-  Mobile recharge                                       ₹500
-  Fuel                                                ₹1,000
-  Cooking gas                                         ₹1,000
-  Groceries, vegetables, fish, meat, rice             ₹2,000
-  **Total**                                       **₹9,000**
+Item Monthly amount
+
+---
+
+Electricity ₹800
+Water ₹0
+Internet ₹700
+Mobile recharge ₹500
+Fuel ₹1,000
+Cooking gas ₹1,000
+Groceries, vegetables, fish, meat, rice ₹2,000
+**Total** **₹9,000**
 
 **Additional annual expenses**
 
-  Item                               Annual amount
-  -------------------------------- ---------------
-  General medicines and checkups           ₹10,000
-  Health insurance                         ₹15,000
-  House maintenance                        ₹50,000
-  Vehicle and device maintenance           ₹10,000
-  **Total**                            **₹85,000**
+Item Annual amount
+
+---
+
+General medicines and checkups ₹10,000
+Health insurance ₹15,000
+House maintenance ₹50,000
+Vehicle and device maintenance ₹10,000
+**Total** **₹85,000**
 
 **Baseline totals**
 
--   Monthly recurring subtotal: ₹9,000
--   Annual recurring subtotal: ₹1,08,000
--   Additional annual expenses: ₹85,000
--   Total annual baseline: ₹1,93,000
--   Monthly equivalent including annual costs: approximately ₹16,083
+- Monthly recurring subtotal: ₹9,000
+- Annual recurring subtotal: ₹1,08,000
+- Additional annual expenses: ₹85,000
+- Total annual baseline: ₹1,93,000
+- Monthly equivalent including annual costs: approximately ₹16,083
 
 Potential additional items to review before treating this as complete:
 
--   Clothing and footwear
--   Toiletries and personal care
--   Property tax and home insurance
--   Appliance and furniture replacement
--   Vehicle replacement
--   Vehicle insurance and registration
--   Dental and eye care
--   Travel, festivals, gifts, and social expenses
--   Family/dependent support
--   Emergency and major medical costs
--   Taxes, investment fees, and investment tax drag
+- Clothing and footwear
+- Toiletries and personal care
+- Property tax and home insurance
+- Appliance and furniture replacement
+- Vehicle replacement
+- Vehicle insurance and registration
+- Dental and eye care
+- Travel, festivals, gifts, and social expenses
+- Family/dependent support
+- Emergency and major medical costs
+- Taxes, investment fees, and investment tax drag
 
 Do not automatically add these to the user's budget. Ask the user to
 confirm or enter them.
 
-------------------------------------------------------------------------
+---
 
 # 13. Test cases and expected behaviour
 
@@ -966,7 +985,7 @@ Expected: - Extending the target age while keeping assumptions and
 expenses unchanged must not reduce the required corpus when all annual
 net withdrawals are non-negative.
 
-------------------------------------------------------------------------
+---
 
 # 14. Technical architecture recommendation
 
@@ -974,7 +993,7 @@ Keep the calculation engine independent from the user interface.
 
 Suggested modules:
 
-``` text
+```text
 src/
   domain/
     models/
@@ -1017,23 +1036,23 @@ src/
 
 Implementation guidance:
 
--   Use TypeScript or another strongly typed language for calculation
-    models.
--   Keep all calculations in pure functions where possible.
--   Use decimal-safe arithmetic or a well-tested decimal library for
-    financial calculations.
--   Keep internal rates as decimals and document all units.
--   Do not mix display formatting with calculation logic.
--   Unit-test formula edge cases and reconcile the formula with the
-    portfolio simulation.
--   Version the calculation methodology so saved scenarios remain
-    interpretable if formulas change.
--   Store user data securely; provide export and delete controls.
--   If data is stored locally, explain backup limitations. If cloud
-    storage is used, implement authentication, access controls,
-    encryption, and a clear retention policy.
+- Use TypeScript or another strongly typed language for calculation
+  models.
+- Keep all calculations in pure functions where possible.
+- Use decimal-safe arithmetic or a well-tested decimal library for
+  financial calculations.
+- Keep internal rates as decimals and document all units.
+- Do not mix display formatting with calculation logic.
+- Unit-test formula edge cases and reconcile the formula with the
+  portfolio simulation.
+- Version the calculation methodology so saved scenarios remain
+  interpretable if formulas change.
+- Store user data securely; provide export and delete controls.
+- If data is stored locally, explain backup limitations. If cloud
+  storage is used, implement authentication, access controls,
+  encryption, and a clear retention policy.
 
-------------------------------------------------------------------------
+---
 
 # 15. MVP implementation scope
 
@@ -1058,48 +1077,48 @@ Later versions can add monthly cash flows, variable-return simulations,
 probability-based longevity, tax-aware asset modelling, multiple
 currencies, and shared household planning.
 
-------------------------------------------------------------------------
+---
 
 # 16. Important financial limitations and disclosures
 
 The application must clearly state:
 
--   Inflation and investment returns are uncertain.
--   A constant annual return is a simplifying assumption.
--   Market volatility and the sequence of returns can materially change
-    the outcome.
--   Tax treatment depends on the user's investments and circumstances.
--   Health insurance premiums, exclusions, co-payments, and coverage can
-    change.
--   Government healthcare availability and out-of-pocket costs can
-    change.
--   The estimate depends on the completeness and accuracy of entered
-    expenses.
--   The primary home is not a liquid investment unless monetisation is
-    planned.
--   A 40-year estimate does not guarantee funds will last 40 years.
--   The result is not a guaranteed safe withdrawal amount or
-    personalised investment recommendation.
+- Inflation and investment returns are uncertain.
+- A constant annual return is a simplifying assumption.
+- Market volatility and the sequence of returns can materially change
+  the outcome.
+- Tax treatment depends on the user's investments and circumstances.
+- Health insurance premiums, exclusions, co-payments, and coverage can
+  change.
+- Government healthcare availability and out-of-pocket costs can
+  change.
+- The estimate depends on the completeness and accuracy of entered
+  expenses.
+- The primary home is not a liquid investment unless monetisation is
+  planned.
+- A 40-year estimate does not guarantee funds will last 40 years.
+- The result is not a guaranteed safe withdrawal amount or
+  personalised investment recommendation.
 
 **Recommended output wording:** "Estimated corpus under the assumptions
 you entered" rather than "You need exactly this amount."
 
-------------------------------------------------------------------------
+---
 
 # 17. Final product success criteria
 
 The application is successful if a user can:
 
--   Enter a realistic household budget without needing financial
-    expertise.
--   See which costs are included and which are missing.
--   Add dependents and custom expenses.
--   Understand how inflation changes each category.
--   Change the expected return and planning age.
--   Compare bare-minimum and comfortable lifestyles.
--   See the required corpus and funding gap.
--   Understand the assumptions and limitations behind the result.
--   Export a report that another person can review and reproduce.
+- Enter a realistic household budget without needing financial
+  expertise.
+- See which costs are included and which are missing.
+- Add dependents and custom expenses.
+- Understand how inflation changes each category.
+- Change the expected return and planning age.
+- Compare bare-minimum and comfortable lifestyles.
+- See the required corpus and funding gap.
+- Understand the assumptions and limitations behind the result.
+- Export a report that another person can review and reproduce.
 
 The most important design decision is transparency: every corpus figure
 should be traceable to the expense inputs, inflation assumptions,

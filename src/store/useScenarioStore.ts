@@ -13,6 +13,8 @@ import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
 import { syncStepToUrl } from '@/lib/router'
+import { getUserProfile } from '@/lib/userProfileStorage'
+import type { UserProfile } from '@/domain/models/userProfile'
 
 interface ScenarioState {
   // Data
@@ -58,6 +60,8 @@ interface ScenarioState {
   // Results
   setResults: (r: CalculationResults) => void
   selectLifestylePlan: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
+  applyShortfallRemedy: (type: 'savings' | 'salary' | 'retirement_age', value: number) => void
+  applyProfileDefaults: (customProfile?: UserProfile) => void
 
   // Navigation
   goToStep: (step: number) => void
@@ -82,7 +86,11 @@ export const useScenarioStore = create<ScenarioState>()(
     (set, get) => ({
       profile: DEFAULT_PROFILE,
       members: [initialSelf],
-      categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario, [initialSelf]),
+      categories: buildCategoriesForProfile(
+        DEFAULT_PROFILE.areaType,
+        DEFAULT_PROFILE.lifestyleScenario,
+        [initialSelf]
+      ),
       assumptions: DEFAULT_ASSUMPTIONS,
       assets: DEFAULT_ASSETS,
       results: null,
@@ -91,13 +99,13 @@ export const useScenarioStore = create<ScenarioState>()(
 
       setStepFieldValue: (stepKey, fieldId, value) => {
         if (stepKey === 'profile') {
-          set(s => {
+          set((s) => {
             const updatedProfile = { ...s.profile, [fieldId]: value }
             // Auto update member age if currentAge changes
             let updatedMembers = s.members
             if (fieldId === 'currentAge') {
-              updatedMembers = s.members.map(m =>
-                m.id === 'self' ? { ...m, age: Number(value) } : m,
+              updatedMembers = s.members.map((m) =>
+                m.id === 'self' ? { ...m, age: Number(value) } : m
               )
             }
 
@@ -107,7 +115,7 @@ export const useScenarioStore = create<ScenarioState>()(
               updatedCategories = buildCategoriesForProfile(
                 updatedProfile.areaType,
                 updatedProfile.lifestyleScenario,
-                updatedMembers,
+                updatedMembers
               )
             }
 
@@ -123,25 +131,29 @@ export const useScenarioStore = create<ScenarioState>()(
             const { profile } = get()
             set({
               members: newMembers,
-              categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario, newMembers),
+              categories: buildCategoriesForProfile(
+                profile.areaType,
+                profile.lifestyleScenario,
+                newMembers
+              ),
             })
           }
         } else if (stepKey === 'assumptions') {
-          set(s => ({ assumptions: { ...s.assumptions, [fieldId]: value } }))
+          set((s) => ({ assumptions: { ...s.assumptions, [fieldId]: value } }))
         } else if (stepKey === 'assets') {
-          set(s => ({ assets: { ...s.assets, [fieldId]: value } }))
+          set((s) => ({ assets: { ...s.assets, [fieldId]: value } }))
         }
       },
 
-      setProfile: p =>
-        set(s => {
+      setProfile: (p) =>
+        set((s) => {
           const updatedProfile = { ...s.profile, ...p }
           let updatedCategories = s.categories
           if (p.areaType || p.lifestyleScenario) {
             updatedCategories = buildCategoriesForProfile(
               updatedProfile.areaType,
               updatedProfile.lifestyleScenario,
-              s.members,
+              s.members
             )
           }
           return { profile: updatedProfile, categories: updatedCategories }
@@ -150,118 +162,148 @@ export const useScenarioStore = create<ScenarioState>()(
       recalibrateCategories: () => {
         const { profile, members } = get()
         set({
-          categories: buildCategoriesForProfile(profile.areaType, profile.lifestyleScenario, members),
+          categories: buildCategoriesForProfile(
+            profile.areaType,
+            profile.lifestyleScenario,
+            members
+          ),
         })
       },
 
-      addMember: m =>
-        set(s => {
+      addMember: (m) =>
+        set((s) => {
           const nextMembers = [...s.members, m]
           return {
             members: nextMembers,
-            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+            categories: buildCategoriesForProfile(
+              s.profile.areaType,
+              s.profile.lifestyleScenario,
+              nextMembers
+            ),
           }
         }),
 
       updateMember: (id, patch) =>
-        set(s => {
-          const nextMembers = s.members.map(m => (m.id === id ? { ...m, ...patch } : m))
+        set((s) => {
+          const nextMembers = s.members.map((m) => (m.id === id ? { ...m, ...patch } : m))
           return {
             members: nextMembers,
-            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+            categories: buildCategoriesForProfile(
+              s.profile.areaType,
+              s.profile.lifestyleScenario,
+              nextMembers
+            ),
           }
         }),
 
-      removeMember: id =>
-        set(s => {
-          const nextMembers = s.members.filter(m => m.id !== id)
+      removeMember: (id) =>
+        set((s) => {
+          const nextMembers = s.members.filter((m) => m.id !== id)
           return {
             members: nextMembers,
-            categories: buildCategoriesForProfile(s.profile.areaType, s.profile.lifestyleScenario, nextMembers),
+            categories: buildCategoriesForProfile(
+              s.profile.areaType,
+              s.profile.lifestyleScenario,
+              nextMembers
+            ),
           }
         }),
 
       updateCategory: (id, patch) =>
-        set(s => ({
-          categories: s.categories.map(c => (c.id === id ? { ...c, ...patch } : c)),
+        set((s) => ({
+          categories: s.categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
         })),
       addExpenseItem: (categoryId, item) =>
-        set(s => ({
-          categories: s.categories.map(c =>
-            c.id === categoryId ? { ...c, items: [...c.items, item] } : c,
+        set((s) => ({
+          categories: s.categories.map((c) =>
+            c.id === categoryId ? { ...c, items: [...c.items, item] } : c
           ),
         })),
       updateExpenseItem: (categoryId, itemId, patch) =>
-        set(s => ({
-          categories: s.categories.map(c =>
+        set((s) => ({
+          categories: s.categories.map((c) =>
             c.id === categoryId
               ? {
                   ...c,
-                  items: c.items.map(i => (i.id === itemId ? { ...i, ...patch } : i)),
+                  items: c.items.map((i) => (i.id === itemId ? { ...i, ...patch } : i)),
                 }
-              : c,
+              : c
           ),
         })),
       removeExpenseItem: (categoryId, itemId) =>
-        set(s => ({
-          categories: s.categories.map(c =>
-            c.id === categoryId
-              ? { ...c, items: c.items.filter(i => i.id !== itemId) }
-              : c,
+        set((s) => ({
+          categories: s.categories.map((c) =>
+            c.id === categoryId ? { ...c, items: c.items.filter((i) => i.id !== itemId) } : c
           ),
         })),
 
-      setAssumptions: a =>
-        set(s => ({ assumptions: { ...s.assumptions, ...a } })),
-      setAssets: a =>
-        set(s => ({ assets: { ...s.assets, ...a } })),
-      addOtherIncome: income =>
-        set(s => ({ assets: { ...s.assets, otherIncome: [...s.assets.otherIncome, income] } })),
-      updateOtherIncome: (id, patch) =>
-        set(s => ({
+      setAssumptions: (a) => set((s) => ({ assumptions: { ...s.assumptions, ...a } })),
+      setAssets: (a) => set((s) => ({ assets: { ...s.assets, ...a } })),
+      addOtherIncome: (income) =>
+        set((s) => ({
           assets: {
             ...s.assets,
-            otherIncome: s.assets.otherIncome.map(i => (i.id === id ? { ...i, ...patch } : i)),
+            otherIncome: [...s.assets.otherIncome, income],
           },
         })),
-      removeOtherIncome: id =>
-        set(s => ({
-          assets: { ...s.assets, otherIncome: s.assets.otherIncome.filter(i => i.id !== id) },
-        })),
-      addLumpSum: ls =>
-        set(s => ({
-          assets: { ...s.assets, futureContributions: [...s.assets.futureContributions, ls] },
-        })),
-      updateLumpSum: (id, patch) =>
-        set(s => ({
+      updateOtherIncome: (id, patch) =>
+        set((s) => ({
           assets: {
             ...s.assets,
-            futureContributions: s.assets.futureContributions.map(l =>
-              l.id === id ? { ...l, ...patch } : l,
+            otherIncome: s.assets.otherIncome.map((i) => (i.id === id ? { ...i, ...patch } : i)),
+          },
+        })),
+      removeOtherIncome: (id) =>
+        set((s) => ({
+          assets: {
+            ...s.assets,
+            otherIncome: s.assets.otherIncome.filter((i) => i.id !== id),
+          },
+        })),
+      addLumpSum: (ls) =>
+        set((s) => ({
+          assets: {
+            ...s.assets,
+            futureContributions: [...s.assets.futureContributions, ls],
+          },
+        })),
+      updateLumpSum: (id, patch) =>
+        set((s) => ({
+          assets: {
+            ...s.assets,
+            futureContributions: s.assets.futureContributions.map((l) =>
+              l.id === id ? { ...l, ...patch } : l
             ),
           },
         })),
-      removeLumpSum: id =>
-        set(s => ({
+      removeLumpSum: (id) =>
+        set((s) => ({
           assets: {
             ...s.assets,
-            futureContributions: s.assets.futureContributions.filter(l => l.id !== id),
+            futureContributions: s.assets.futureContributions.filter((l) => l.id !== id),
           },
         })),
 
-      setResults: r => set({ results: r }),
+      setResults: (r) => set({ results: r }),
 
       selectLifestylePlan: (lifestyle) => {
         const { profile, members, categories, assumptions, assets } = get()
-        const updatedProfile: Profile = { ...profile, lifestyleScenario: lifestyle }
+        const updatedProfile: Profile = {
+          ...profile,
+          lifestyleScenario: lifestyle,
+        }
 
         // Derive updated categories for this lifestyle
         let updatedCategories: ExpenseCategory[]
-        const comfortableDefaults = buildCategoriesForProfile(profile.areaType, 'comfortable', members)
+        const comfortableDefaults = buildCategoriesForProfile(
+          profile.areaType,
+          'comfortable',
+          members
+        )
 
         if (lifestyle === 'bare_minimum') {
           // Keep essentials, reduce discretionary to 0 (skipped)
-          updatedCategories = categories.map(cat => {
+          updatedCategories = categories.map((cat) => {
             if (cat.parentAmount != null && cat.parentFrequency) {
               return {
                 ...cat,
@@ -270,20 +312,22 @@ export const useScenarioStore = create<ScenarioState>()(
             }
             return {
               ...cat,
-              items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+              items: cat.items.map((it) =>
+                it.essential ? it : { ...it, amount: 0, skipped: true }
+              ),
             }
           })
         } else if (lifestyle === 'luxury') {
           // Derive from comfortable baseline
           let baseCategories = categories
           if (profile.lifestyleScenario === 'bare_minimum') {
-            baseCategories = comfortableDefaults.map(cat => {
-              const currentCat = categories.find(c => c.id === cat.id)
+            baseCategories = comfortableDefaults.map((cat) => {
+              const currentCat = categories.find((c) => c.id === cat.id)
               if (!currentCat) return cat
               return {
                 ...cat,
-                items: cat.items.map(defItem => {
-                  const currentItem = currentCat.items.find(ci => ci.name === defItem.name)
+                items: cat.items.map((defItem) => {
+                  const currentItem = currentCat.items.find((ci) => ci.name === defItem.name)
                   if (currentItem && currentItem.essential && currentItem.amount > 0) {
                     return { ...defItem, amount: currentItem.amount }
                   }
@@ -293,7 +337,7 @@ export const useScenarioStore = create<ScenarioState>()(
             })
           }
 
-          updatedCategories = baseCategories.map(cat => {
+          updatedCategories = baseCategories.map((cat) => {
             if (cat.parentAmount != null && cat.parentFrequency) {
               return {
                 ...cat,
@@ -302,7 +346,7 @@ export const useScenarioStore = create<ScenarioState>()(
             }
             return {
               ...cat,
-              items: cat.items.map(it => ({
+              items: cat.items.map((it) => ({
                 ...it,
                 skipped: false,
                 amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
@@ -313,16 +357,19 @@ export const useScenarioStore = create<ScenarioState>()(
           // 'comfortable'
           if (profile.lifestyleScenario === 'bare_minimum') {
             // Restore comfortable defaults for non-essential items while preserving any user-entered essentials
-            updatedCategories = comfortableDefaults.map(cat => {
-              const currentCat = categories.find(c => c.id === cat.id)
+            updatedCategories = comfortableDefaults.map((cat) => {
+              const currentCat = categories.find((c) => c.id === cat.id)
               if (!currentCat) return cat
               if (currentCat.parentAmount != null && currentCat.parentFrequency) {
-                return { ...cat, parentAmount: Math.round(currentCat.parentAmount / 0.65) }
+                return {
+                  ...cat,
+                  parentAmount: Math.round(currentCat.parentAmount / 0.65),
+                }
               }
               return {
                 ...cat,
-                items: cat.items.map(defItem => {
-                  const currentItem = currentCat.items.find(ci => ci.name === defItem.name)
+                items: cat.items.map((defItem) => {
+                  const currentItem = currentCat.items.find((ci) => ci.name === defItem.name)
                   if (currentItem && currentItem.essential && currentItem.amount > 0) {
                     return { ...defItem, amount: currentItem.amount }
                   }
@@ -332,13 +379,16 @@ export const useScenarioStore = create<ScenarioState>()(
             })
           } else if (profile.lifestyleScenario === 'luxury') {
             // Unscale back to comfortable
-            updatedCategories = categories.map(cat => {
+            updatedCategories = categories.map((cat) => {
               if (cat.parentAmount != null && cat.parentFrequency) {
-                return { ...cat, parentAmount: Math.round(cat.parentAmount / 1.4) }
+                return {
+                  ...cat,
+                  parentAmount: Math.round(cat.parentAmount / 1.4),
+                }
               }
               return {
                 ...cat,
-                items: cat.items.map(it => ({
+                items: cat.items.map((it) => ({
                   ...it,
                   amount: it.essential ? Math.round(it.amount / 1.15) : Math.round(it.amount / 1.5),
                 })),
@@ -365,7 +415,86 @@ export const useScenarioStore = create<ScenarioState>()(
         })
       },
 
-      goToStep: step => {
+      applyShortfallRemedy: (type, value) => {
+        const { profile, members, categories, assumptions, assets } = get()
+        let updatedAssets = { ...assets }
+        if (type === 'savings') {
+          updatedAssets = { ...updatedAssets, existingInvestableCorpus: value }
+        } else if (type === 'salary') {
+          updatedAssets = { ...updatedAssets, monthlyIncome: value }
+        } else if (type === 'retirement_age') {
+          updatedAssets = { ...updatedAssets, incomeEndAge: value }
+        }
+        const newResults = runScenarios({
+          profile,
+          members,
+          categories,
+          assumptions,
+          assets: updatedAssets,
+        })
+        set({
+          assets: updatedAssets,
+          results: newResults,
+        })
+      },
+
+      applyProfileDefaults: (customProfile) => {
+        const p = customProfile || getUserProfile()
+        const selfMember: HouseholdMember = {
+          id: 'self',
+          label: p.name ? `${p.name} (Self)` : 'Self',
+          relationship: 'self',
+          age: p.currentAge,
+          financiallyDependent: true,
+          hasHealthInsurance: false,
+        }
+
+        const updatedProfile: Profile = {
+          country: p.country,
+          region: get().profile.region || 'Odisha',
+          city: get().profile.city || '',
+          currency: p.currency,
+          currentAge: p.currentAge,
+          targetAge: p.targetAge,
+          areaType: p.locationType,
+          lifestyleScenario: p.lifestyleBaseline,
+        }
+
+        const updatedAssets: Assets = {
+          ...get().assets,
+          monthlyIncome: p.monthlyIncome,
+          incomeEndAge: p.retirementAge,
+          incomeGrowthRate: p.annualIncomeGrowthRate / 100,
+          existingInvestableCorpus: p.existingInvestableCorpus,
+        }
+
+        const updatedAssumptions: Assumptions = {
+          ...get().assumptions,
+          globalInflationRate: p.overallInflationRate / 100,
+          inflationMode: p.inflationMode === 'sector' ? 'category' : 'simple',
+          annualInvestmentReturn: p.expectedDebtReturn / 100,
+        }
+
+        const updatedCategories = buildCategoriesForProfile(
+          p.locationType,
+          p.lifestyleBaseline,
+          [selfMember],
+          p.inflationMode === 'sector'
+            ? (p.sectorInflationRates as unknown as Record<string, number>)
+            : undefined
+        )
+
+        set({
+          profile: updatedProfile,
+          members: [selfMember],
+          categories: updatedCategories,
+          assumptions: updatedAssumptions,
+          assets: updatedAssets,
+          results: null,
+        })
+      },
+
+      goToStep: (step) => {
         const { totalSteps } = get()
         if (step >= 1 && step <= totalSteps) {
           updateStoredSettings({ currentStep: step })
@@ -400,7 +529,11 @@ export const useScenarioStore = create<ScenarioState>()(
         set({
           profile: DEFAULT_PROFILE,
           members: [{ ...initialSelf, age: DEFAULT_PROFILE.currentAge }],
-          categories: buildCategoriesForProfile(DEFAULT_PROFILE.areaType, DEFAULT_PROFILE.lifestyleScenario, [initialSelf]),
+          categories: buildCategoriesForProfile(
+            DEFAULT_PROFILE.areaType,
+            DEFAULT_PROFILE.lifestyleScenario,
+            [initialSelf]
+          ),
           assumptions: DEFAULT_ASSUMPTIONS,
           assets: DEFAULT_ASSETS,
           results: null,
@@ -409,6 +542,6 @@ export const useScenarioStore = create<ScenarioState>()(
         syncStepToUrl(1, { replace: true })
       },
     }),
-    { name: 'corpus-calc-v1' },
-  ),
+    { name: 'corpus-calc-v2' }
+  )
 )

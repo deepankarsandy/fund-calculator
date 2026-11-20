@@ -35,6 +35,7 @@
    - Calculate required corpus, funding gap, safety margin addition, and year-by-year projections for each.
 
 ## Acceptance Criteria
+
 - [ ] All calculations implemented as pure functions in `src/domain/calculations/`.
 - [ ] Division by zero prevented when return equals inflation ($r = g$).
 - [ ] Precision handled reliably using `decimal.js`.

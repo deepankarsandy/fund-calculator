@@ -10,7 +10,7 @@ import { DEFAULT_PROFILE, type Profile } from '../../models/profile'
 describe('Active Earned Income & Career Savings Cashflow Projections', () => {
   const baseAssumptions: Assumptions = {
     ...DEFAULT_ASSUMPTIONS,
-    annualInvestmentReturn: 0.10,
+    annualInvestmentReturn: 0.1,
     globalInflationRate: 0.06,
     withdrawalTiming: 'beginning_of_year',
   }
@@ -32,9 +32,9 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
     const assets: Assets = {
       ...DEFAULT_ASSETS,
       existingInvestableCorpus: 1000000, // 10 Lakhs
-      monthlyIncome: 100000,             // 1 Lakh/month = 12 Lakhs/year
-      incomeEndAge: 40,                  // works till 40
-      incomeGrowthRate: 0.10,            // 10% annual salary hike
+      monthlyIncome: 100000, // 1 Lakh/month = 12 Lakhs/year
+      incomeEndAge: 40, // works till 40
+      incomeGrowthRate: 0.1, // 10% annual salary hike
     }
 
     const currentAge = 35 // 5 working years (age 35, 36, 37, 38, 39)
@@ -137,7 +137,7 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
       assumptions: baseAssumptions,
     })
 
-    const baseScenario = result.scenarios.find(s => s.label === 'Base')
+    const baseScenario = result.scenarios.find((s) => s.label === 'Base')
     expect(baseScenario).toBeDefined()
     expect(baseScenario!.totalAccumulatedSavings).toBeGreaterThan(0)
     expect(baseScenario!.peakCorpus).toBeGreaterThan(1000000)
@@ -154,7 +154,7 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
     expect(comfortable.totalLifetimeCostOfLiving).toBeLessThan(luxury.totalLifetimeCostOfLiving)
 
     // Warnings include dependents recommendation when no dependents are present
-    expect(result.warnings.some(w => w.includes('No dependents'))).toBe(true)
+    expect(result.warnings.some((w) => w.includes('No dependents'))).toBe(true)
   })
 
   it('correctly calculates shortfall and early depletion when savings are insufficient', () => {
@@ -181,8 +181,8 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
     const assets: Assets = {
       ...DEFAULT_ASSETS,
       existingInvestableCorpus: 100000, // only 1 Lakh
-      monthlyIncome: 90000,             // only saves 10k/mo
-      incomeEndAge: 55,                 // retires in 10 years
+      monthlyIncome: 90000, // only saves 10k/mo
+      incomeEndAge: 55, // retires in 10 years
       incomeGrowthRate: 0.03,
     }
 
@@ -194,7 +194,7 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
       assumptions: DEFAULT_ASSUMPTIONS,
     })
 
-    const base = result.scenarios.find(s => s.label === 'Base')!
+    const base = result.scenarios.find((s) => s.label === 'Base')!
     expect(base.readinessScore).toBeLessThan(100)
     expect(base.retirementFundingGap).toBeGreaterThan(0)
     expect(base.requiredCorpus).toBeGreaterThan(0)

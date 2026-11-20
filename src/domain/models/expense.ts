@@ -1,11 +1,5 @@
 export type Frequency =
-  | 'weekly'
-  | 'monthly'
-  | 'quarterly'
-  | 'half_yearly'
-  | 'yearly'
-  | 'every_n_years'
-  | 'one_time'
+  'weekly' | 'monthly' | 'quarterly' | 'half_yearly' | 'yearly' | 'every_n_years' | 'one_time'
 
 export type ExpenseType = 'recurring' | 'one_time' | 'periodic'
 

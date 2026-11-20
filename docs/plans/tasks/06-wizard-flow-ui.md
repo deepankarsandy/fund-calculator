@@ -21,6 +21,7 @@
    - Lightweight state storage in memory and `localStorage` so refreshing does not discard work.
 
 ## Acceptance Criteria
+
 - [ ] Users can navigate forward and backward through all steps.
 - [ ] Clicking "Skip" on a step proceeds to the next step using defaults.
 - [ ] Mobile navigation is seamless with touch-friendly button targets.

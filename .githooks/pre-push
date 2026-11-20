@@ -1,0 +1,5 @@
+#!/bin/sh
+# Pre-push hook:
+# Enforces SemVer bump and release doc verification when pushing to main branch
+
+node scripts/verify-release.js

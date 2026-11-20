@@ -10,6 +10,7 @@ import { projectCashflows } from './projectCashflows'
 import { simulatePortfolio } from './simulatePortfolio'
 import { buildCategoriesForProfile } from './areaDefaults'
 import { generateWarnings } from '../validation/warnings'
+import { calculateShortfallRemedies } from './shortfallRemedies'
 import type { HouseholdMember } from '../models/household'
 import Decimal from 'decimal.js'
 
@@ -55,7 +56,7 @@ function runOneScenario(
   label: string,
   inflationRate: number,
   returnRate: number,
-  input: RunScenariosInput,
+  input: RunScenariosInput
 ): ScenarioResult {
   const { profile, categories, assumptions, assets } = input
   const planningYears = profile.targetAge - profile.currentAge
@@ -95,21 +96,21 @@ function runOneScenario(
   const startingSimulationCorpus = hasActiveIncome
     ? assets.existingInvestableCorpus
     : assets.existingInvestableCorpus > 0
-    ? assets.existingInvestableCorpus
-    : calculateCorpus(
-        total,
-        effectiveReturn,
-        inflationRate,
-        planningYears,
-        assumptions.withdrawalTiming,
-      )
+      ? assets.existingInvestableCorpus
+      : calculateCorpus(
+          total,
+          effectiveReturn,
+          inflationRate,
+          planningYears,
+          assumptions.withdrawalTiming
+        )
 
   // Simulate lifetime portfolio balance
   const yearProjections = simulatePortfolio(
     rawProjections,
     startingSimulationCorpus,
     effectiveReturn,
-    assumptions.withdrawalTiming,
+    assumptions.withdrawalTiming
   )
 
   // Calculate Target Corpus Required at Retirement Age
@@ -120,18 +121,16 @@ function runOneScenario(
       effectiveReturn,
       inflationRate,
       retirementYears,
-      assumptions.withdrawalTiming,
+      assumptions.withdrawalTiming
     )
   } else {
     // First year of retirement expense (year index = workingYears)
     const firstRetirementExpense =
-      rawProjections[workingYears]?.expenses ??
-      total * Math.pow(1 + inflationRate, workingYears)
-    const firstRetirementOtherIncome =
-      rawProjections[workingYears]?.otherIncome ?? 0
+      rawProjections[workingYears]?.expenses ?? total * Math.pow(1 + inflationRate, workingYears)
+    const firstRetirementOtherIncome = rawProjections[workingYears]?.otherIncome ?? 0
     const netRetirementAnnualBaseline = Math.max(
       0,
-      firstRetirementExpense - firstRetirementOtherIncome,
+      firstRetirementExpense - firstRetirementOtherIncome
     )
 
     targetCorpusAtRetirement = calculateCorpus(
@@ -139,24 +138,18 @@ function runOneScenario(
       effectiveReturn,
       inflationRate,
       retirementYears,
-      assumptions.withdrawalTiming,
+      assumptions.withdrawalTiming
     )
   }
 
   // Projected portfolio accumulated by Retirement Age
   const projectedCorpusAtRetirement =
     workingYears > 0
-      ? yearProjections[workingYears - 1]?.closingCorpus ?? assets.existingInvestableCorpus
+      ? (yearProjections[workingYears - 1]?.closingCorpus ?? assets.existingInvestableCorpus)
       : assets.existingInvestableCorpus
 
-  const retirementFundingGap = Math.max(
-    0,
-    targetCorpusAtRetirement - projectedCorpusAtRetirement,
-  )
-  const retirementSurplus = Math.max(
-    0,
-    projectedCorpusAtRetirement - targetCorpusAtRetirement,
-  )
+  const retirementFundingGap = Math.max(0, targetCorpusAtRetirement - projectedCorpusAtRetirement)
+  const retirementSurplus = Math.max(0, projectedCorpusAtRetirement - targetCorpusAtRetirement)
   const readinessScore =
     targetCorpusAtRetirement > 0
       ? Math.min(250, Math.round((projectedCorpusAtRetirement / targetCorpusAtRetirement) * 100))
@@ -182,7 +175,8 @@ function runOneScenario(
     }
   }
 
-  const safetyMarginAmount = (targetCorpusAtRetirement || requiredCorpus) * assumptions.safetyMarginPercent
+  const safetyMarginAmount =
+    (targetCorpusAtRetirement || requiredCorpus) * assumptions.safetyMarginPercent
   const corpusWithSafetyMargin = (targetCorpusAtRetirement || requiredCorpus) + safetyMarginAmount
 
   // Find peak corpus and when it occurs
@@ -191,7 +185,7 @@ function runOneScenario(
   let totalAccumulatedSavings = 0
   let depletionAge: number | undefined
 
-  yearProjections.forEach(p => {
+  yearProjections.forEach((p) => {
     totalAccumulatedSavings += p.netSavings
     if (p.closingCorpus > peakCorpus) {
       peakCorpus = p.closingCorpus
@@ -209,9 +203,12 @@ function runOneScenario(
   const totalLifetimeIncome = rawProjections.reduce((sum, p) => sum + p.totalIncome, 0)
   const totalLifetimeSavingsInvested = rawProjections.reduce((sum, p) => sum + p.netSavings, 0)
   const totalLifetimeWithdrawals = rawProjections.reduce((sum, p) => sum + p.netWithdrawal, 0)
-  const totalLifetimeInvestmentGrowth = yearProjections.reduce((sum, p) => sum + p.investmentGrowth, 0)
+  const totalLifetimeInvestmentGrowth = yearProjections.reduce(
+    (sum, p) => sum + p.investmentGrowth,
+    0
+  )
 
-  return {
+  const scenarioResult: ScenarioResult = {
     label,
     inflationRate,
     returnRate: effectiveReturn,
@@ -245,11 +242,24 @@ function runOneScenario(
     corpusWithSafetyMargin,
     yearProjections,
   }
+
+  const shortfallRemedies = calculateShortfallRemedies({
+    scenario: scenarioResult,
+    profile,
+    assets,
+    assumptions,
+    categories,
+  })
+
+  return {
+    ...scenarioResult,
+    shortfallRemedies,
+  }
 }
 
 function computeLifestyleComparisons(
   baseInput: RunScenariosInput,
-  baseScenario: ScenarioResult,
+  baseScenario: ScenarioResult
 ): LifestyleComparison[] {
   const { categories, assumptions, profile, members } = baseInput
   const r = assumptions.annualInvestmentReturn
@@ -265,16 +275,16 @@ function computeLifestyleComparisons(
 
     // Derive comfortable baseline
     const comfortableDefaults = buildCategoriesForProfile(profile.areaType, 'comfortable', members)
-    const comfortableCategories: ExpenseCategory[] = comfortableDefaults.map(cat => {
-      const userCat = categories.find(c => c.id === cat.id)
+    const comfortableCategories: ExpenseCategory[] = comfortableDefaults.map((cat) => {
+      const userCat = categories.find((c) => c.id === cat.id)
       if (!userCat) return cat
       if (userCat.parentAmount != null && userCat.parentFrequency) {
         return { ...cat, parentAmount: Math.round(userCat.parentAmount / 0.65) }
       }
       return {
         ...cat,
-        items: cat.items.map(defItem => {
-          const userItem = userCat.items.find(ui => ui.name === defItem.name)
+        items: cat.items.map((defItem) => {
+          const userItem = userCat.items.find((ui) => ui.name === defItem.name)
           if (userItem && userItem.essential && userItem.amount > 0) {
             return { ...defItem, amount: userItem.amount }
           }
@@ -288,13 +298,13 @@ function computeLifestyleComparisons(
       categories: comfortableCategories,
     })
 
-    const luxuryCategories: ExpenseCategory[] = comfortableCategories.map(cat => {
+    const luxuryCategories: ExpenseCategory[] = comfortableCategories.map((cat) => {
       if (cat.parentAmount != null && cat.parentFrequency) {
         return { ...cat, parentAmount: Math.round(cat.parentAmount * 1.4) }
       }
       return {
         ...cat,
-        items: cat.items.map(it => ({
+        items: cat.items.map((it) => ({
           ...it,
           amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
         })),
@@ -309,13 +319,13 @@ function computeLifestyleComparisons(
     luxuryScenario = baseScenario
 
     // Reverse scale to comfortable baseline
-    const comfortableCategories: ExpenseCategory[] = categories.map(cat => {
+    const comfortableCategories: ExpenseCategory[] = categories.map((cat) => {
       if (cat.parentAmount != null && cat.parentFrequency) {
         return { ...cat, parentAmount: Math.round(cat.parentAmount / 1.4) }
       }
       return {
         ...cat,
-        items: cat.items.map(it => ({
+        items: cat.items.map((it) => ({
           ...it,
           amount: it.essential ? Math.round(it.amount / 1.15) : Math.round(it.amount / 1.5),
         })),
@@ -327,13 +337,13 @@ function computeLifestyleComparisons(
       categories: comfortableCategories,
     })
 
-    const bareMinCategories: ExpenseCategory[] = comfortableCategories.map(cat => {
+    const bareMinCategories: ExpenseCategory[] = comfortableCategories.map((cat) => {
       if (cat.parentAmount != null && cat.parentFrequency) {
         return { ...cat, parentAmount: Math.round(cat.parentAmount * 0.65) }
       }
       return {
         ...cat,
-        items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+        items: cat.items.map((it) => (it.essential ? it : { ...it, amount: 0, skipped: true })),
       }
     })
 
@@ -346,7 +356,7 @@ function computeLifestyleComparisons(
     comfortableScenario = baseScenario
 
     // 1. Bare Minimum Categories (essentials only, or 65% of parent amount)
-    const bareMinCategories: ExpenseCategory[] = categories.map(cat => {
+    const bareMinCategories: ExpenseCategory[] = categories.map((cat) => {
       if (cat.parentAmount != null && cat.parentFrequency) {
         return {
           ...cat,
@@ -355,7 +365,7 @@ function computeLifestyleComparisons(
       }
       return {
         ...cat,
-        items: cat.items.map(it => (it.essential ? it : { ...it, amount: 0, skipped: true })),
+        items: cat.items.map((it) => (it.essential ? it : { ...it, amount: 0, skipped: true })),
       }
     })
 
@@ -365,7 +375,7 @@ function computeLifestyleComparisons(
     })
 
     // 2. Luxury / Aspirational Categories (+40% to parent, or 1.5x discretionary)
-    const luxuryCategories: ExpenseCategory[] = categories.map(cat => {
+    const luxuryCategories: ExpenseCategory[] = categories.map((cat) => {
       if (cat.parentAmount != null && cat.parentFrequency) {
         return {
           ...cat,
@@ -374,7 +384,7 @@ function computeLifestyleComparisons(
       }
       return {
         ...cat,
-        items: cat.items.map(it => ({
+        items: cat.items.map((it) => ({
           ...it,
           amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
         })),
@@ -391,32 +401,51 @@ function computeLifestyleComparisons(
     {
       lifestyle: 'bare_minimum',
       label: 'Frugal / Bare Minimum',
-      description: 'Covers only core survival essentials (basic food, shelter, healthcare). No luxuries.',
+      description:
+        'Covers only core survival essentials (basic food, shelter, healthcare). No luxuries.',
       monthlyExpenseToday: bareScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: bareScenario.totalLifetimeExpenses,
-      requiredCorpus: bareScenario.isRetired ? bareScenario.requiredCorpus : bareScenario.targetCorpusAtRetirement,
-      peakCorpus: bareScenario.isRetired ? bareScenario.peakCorpus : bareScenario.projectedCorpusAtRetirement,
+      requiredCorpus: bareScenario.isRetired
+        ? bareScenario.requiredCorpus
+        : bareScenario.targetCorpusAtRetirement,
+      peakCorpus: bareScenario.isRetired
+        ? bareScenario.peakCorpus
+        : bareScenario.projectedCorpusAtRetirement,
       peakAge: bareScenario.isRetired ? bareScenario.peakCorpusAge : bareScenario.retirementAge,
     },
     {
       lifestyle: 'comfortable',
       label: 'Comfortable',
-      description: 'Your configured balanced lifestyle with moderate leisure, gadgets, and vacations.',
+      description:
+        'Your configured balanced lifestyle with moderate leisure, gadgets, and vacations.',
       monthlyExpenseToday: comfortableScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: comfortableScenario.totalLifetimeExpenses,
-      requiredCorpus: comfortableScenario.isRetired ? comfortableScenario.requiredCorpus : comfortableScenario.targetCorpusAtRetirement,
-      peakCorpus: comfortableScenario.isRetired ? comfortableScenario.peakCorpus : comfortableScenario.projectedCorpusAtRetirement,
-      peakAge: comfortableScenario.isRetired ? comfortableScenario.peakCorpusAge : comfortableScenario.retirementAge,
+      requiredCorpus: comfortableScenario.isRetired
+        ? comfortableScenario.requiredCorpus
+        : comfortableScenario.targetCorpusAtRetirement,
+      peakCorpus: comfortableScenario.isRetired
+        ? comfortableScenario.peakCorpus
+        : comfortableScenario.projectedCorpusAtRetirement,
+      peakAge: comfortableScenario.isRetired
+        ? comfortableScenario.peakCorpusAge
+        : comfortableScenario.retirementAge,
     },
     {
       lifestyle: 'luxury',
       label: 'Luxury / Aspirational',
-      description: 'Elevated lifestyle with premium housing, luxury travel, dining, and higher discretionary spending.',
+      description:
+        'Elevated lifestyle with premium housing, luxury travel, dining, and higher discretionary spending.',
       monthlyExpenseToday: luxuryScenario.currentMonthlyEquivalent,
       totalLifetimeCostOfLiving: luxuryScenario.totalLifetimeExpenses,
-      requiredCorpus: luxuryScenario.isRetired ? luxuryScenario.requiredCorpus : luxuryScenario.targetCorpusAtRetirement,
-      peakCorpus: luxuryScenario.isRetired ? luxuryScenario.peakCorpus : luxuryScenario.projectedCorpusAtRetirement,
-      peakAge: luxuryScenario.isRetired ? luxuryScenario.peakCorpusAge : luxuryScenario.retirementAge,
+      requiredCorpus: luxuryScenario.isRetired
+        ? luxuryScenario.requiredCorpus
+        : luxuryScenario.targetCorpusAtRetirement,
+      peakCorpus: luxuryScenario.isRetired
+        ? luxuryScenario.peakCorpus
+        : luxuryScenario.projectedCorpusAtRetirement,
+      peakAge: luxuryScenario.isRetired
+        ? luxuryScenario.peakCorpusAge
+        : luxuryScenario.retirementAge,
     },
   ]
 }
@@ -428,7 +457,7 @@ export function runScenarios(input: RunScenariosInput): CalculationResults {
     'Base',
     assumptions.globalInflationRate,
     assumptions.annualInvestmentReturn,
-    input,
+    input
   )
 
   const scenarios: ScenarioResult[] = [
@@ -436,14 +465,14 @@ export function runScenarios(input: RunScenariosInput): CalculationResults {
       'Optimistic',
       SCENARIO_PRESETS.optimistic.globalInflationRate,
       SCENARIO_PRESETS.optimistic.annualInvestmentReturn,
-      input,
+      input
     ),
     baseScenario,
     runOneScenario(
       'Conservative',
       SCENARIO_PRESETS.conservative.globalInflationRate,
       SCENARIO_PRESETS.conservative.annualInvestmentReturn,
-      input,
+      input
     ),
   ]
 
@@ -459,7 +488,7 @@ export function runScenarios(input: RunScenariosInput): CalculationResults {
   // Add warning if active income ends but portfolio depletes early
   if (input.assets.monthlyIncome > 0 && scenarios[1].depletionAge) {
     warnings.push(
-      `Under base assumptions, your savings may be depleted around Age ${scenarios[1].depletionAge}. Consider saving more or adjusting your retirement age.`,
+      `Under base assumptions, your savings may be depleted around Age ${scenarios[1].depletionAge}. Consider saving more or adjusting your retirement age.`
     )
   }
 

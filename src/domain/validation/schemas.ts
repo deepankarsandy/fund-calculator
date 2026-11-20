@@ -6,11 +6,7 @@ export const profileSchema = z
     region: z.string().optional(),
     city: z.string().optional(),
     currency: z.string().min(1),
-    currentAge: z
-      .number()
-      .int()
-      .min(1, 'Age must be at least 1')
-      .max(120, 'Age must be under 120'),
+    currentAge: z.number().int().min(1, 'Age must be at least 1').max(120, 'Age must be under 120'),
     targetAge: z
       .number()
       .int()
@@ -19,7 +15,7 @@ export const profileSchema = z
     householdSize: z.number().int().min(1).max(50).optional(),
     lifestyleScenario: z.enum(['bare_minimum', 'comfortable', 'luxury', 'custom']),
   })
-  .refine(d => d.targetAge > d.currentAge, {
+  .refine((d) => d.targetAge > d.currentAge, {
     message: 'Target age must be greater than current age',
     path: ['targetAge'],
   })
@@ -42,7 +38,7 @@ export const expenseItemSchema = z
     startYear: z.number().int().min(1),
     endYear: z.number().int().min(1).optional(),
   })
-  .refine(d => !d.endYear || d.endYear >= d.startYear, {
+  .refine((d) => !d.endYear || d.endYear >= d.startYear, {
     message: 'End year must be ≥ start year',
     path: ['endYear'],
   })

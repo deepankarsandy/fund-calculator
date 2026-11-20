@@ -9,7 +9,13 @@ interface StepHeaderProps {
   className?: string
 }
 
-export function StepHeader({ title, subtitle, onSkip, skipLabel = 'Skip this step', className }: StepHeaderProps) {
+export function StepHeader({
+  title,
+  subtitle,
+  onSkip,
+  skipLabel = 'Skip this step',
+  className,
+}: StepHeaderProps) {
   return (
     <div className={cn('flex items-start justify-between gap-4 mb-6', className)}>
       <div>
