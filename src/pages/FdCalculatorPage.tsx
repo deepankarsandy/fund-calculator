@@ -151,7 +151,7 @@ export default function FdCalculatorPage({
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-5xl mx-auto px-4 py-6 sm:py-10 space-y-8 w-full">
+      <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-8 w-full">
         {/* Navigation & Header */}
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
@@ -197,7 +197,8 @@ export default function FdCalculatorPage({
                 Fixed Deposit (FD) Calculator
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
-                Calculate maturity values, quarterly compounding yield, senior citizen rates, and Section 194A TDS deductions.
+                Calculate maturity values, quarterly compounding yield, senior
+                citizen rates, and Section 194A TDS deductions.
               </p>
             </div>
           </div>
@@ -207,33 +208,33 @@ export default function FdCalculatorPage({
         <div className="flex items-center gap-2 p-1 bg-muted/60 rounded-xl border border-border max-w-lg">
           <button
             type="button"
-            onClick={() => handlePayoutTypeChange('cumulative')}
+            onClick={() => handlePayoutTypeChange("cumulative")}
             className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
-              inputs.payoutType === 'cumulative'
-                ? 'bg-card text-foreground shadow-xs border border-border'
-                : 'text-muted-foreground hover:text-foreground'
+              inputs.payoutType === "cumulative"
+                ? "bg-card text-foreground shadow-xs border border-border"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Cumulative (Reinvestment)
           </button>
           <button
             type="button"
-            onClick={() => handlePayoutTypeChange('quarterly')}
+            onClick={() => handlePayoutTypeChange("quarterly")}
             className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
-              inputs.payoutType === 'quarterly'
-                ? 'bg-card text-foreground shadow-xs border border-border'
-                : 'text-muted-foreground hover:text-foreground'
+              inputs.payoutType === "quarterly"
+                ? "bg-card text-foreground shadow-xs border border-border"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Quarterly Payout
           </button>
           <button
             type="button"
-            onClick={() => handlePayoutTypeChange('monthly')}
+            onClick={() => handlePayoutTypeChange("monthly")}
             className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
-              inputs.payoutType === 'monthly'
-                ? 'bg-card text-foreground shadow-xs border border-border'
-                : 'text-muted-foreground hover:text-foreground'
+              inputs.payoutType === "monthly"
+                ? "bg-card text-foreground shadow-xs border border-border"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Monthly Payout
@@ -263,17 +264,23 @@ export default function FdCalculatorPage({
                   max={2500000}
                   step={10000}
                   value={inputs.principalAmount}
-                  onChange={(e) => handlePrincipalChange(Number(e.target.value))}
+                  onChange={(e) =>
+                    handlePrincipalChange(Number(e.target.value))
+                  }
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
                 />
                 <div className="relative w-28 sm:w-32 shrink-0">
-                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">₹</span>
+                  <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                    ₹
+                  </span>
                   <input
                     type="number"
                     min={1000}
                     step={10000}
                     value={inputs.principalAmount}
-                    onChange={(e) => handlePrincipalChange(Number(e.target.value))}
+                    onChange={(e) =>
+                      handlePrincipalChange(Number(e.target.value))
+                    }
                     className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -281,20 +288,25 @@ export default function FdCalculatorPage({
 
               {/* Quick preset chips */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {[50000, 100000, 200000, 500000, 1000000, 2500000].map((amt) => (
-                  <button
-                    key={amt}
-                    type="button"
-                    onClick={() => handlePrincipalChange(amt)}
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                      inputs.principalAmount === amt
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    ₹{amt >= 100000 ? `${amt / 100000} Lakh` : `${amt / 1000}k`}
-                  </button>
-                ))}
+                {[50000, 100000, 200000, 500000, 1000000, 2500000].map(
+                  (amt) => (
+                    <button
+                      key={amt}
+                      type="button"
+                      onClick={() => handlePrincipalChange(amt)}
+                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+                        inputs.principalAmount === amt
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      ₹
+                      {amt >= 100000
+                        ? `${amt / 100000} Lakh`
+                        : `${amt / 1000}k`}
+                    </button>
+                  ),
+                )}
               </div>
             </div>
 
@@ -335,7 +347,9 @@ export default function FdCalculatorPage({
                     onChange={(e) => handleRateChange(Number(e.target.value))}
                     className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
-                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">%</span>
+                  <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                    %
+                  </span>
                 </div>
               </div>
 
@@ -346,7 +360,10 @@ export default function FdCalculatorPage({
                     type="checkbox"
                     checked={inputs.isSeniorCitizen}
                     onChange={(e) =>
-                      setInputs((prev) => ({ ...prev, isSeniorCitizen: e.target.checked }))
+                      setInputs((prev) => ({
+                        ...prev,
+                        isSeniorCitizen: e.target.checked,
+                      }))
                     }
                     className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
                   />
@@ -369,8 +386,8 @@ export default function FdCalculatorPage({
                     onClick={() => handleRateChange(rate)}
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                       inputs.annualInterestRate === rate
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
+                        ? "bg-emerald-600 text-white border-emerald-600"
+                        : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {rate}%
@@ -387,7 +404,10 @@ export default function FdCalculatorPage({
                   <span>Deposit Tenure</span>
                 </label>
                 <div className="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
-                  {inputs.tenureYears} Years {inputs.tenureMonths > 0 ? `${inputs.tenureMonths} Months` : ''}
+                  {inputs.tenureYears} Years{" "}
+                  {inputs.tenureMonths > 0
+                    ? `${inputs.tenureMonths} Months`
+                    : ""}
                 </div>
               </div>
 
@@ -395,7 +415,9 @@ export default function FdCalculatorPage({
                 <div>
                   <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
                     <span>Years</span>
-                    <span className="font-bold text-foreground">{inputs.tenureYears} Yrs</span>
+                    <span className="font-bold text-foreground">
+                      {inputs.tenureYears} Yrs
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -411,7 +433,9 @@ export default function FdCalculatorPage({
                 <div>
                   <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
                     <span>Months</span>
-                    <span className="font-bold text-foreground">{inputs.tenureMonths} Mos</span>
+                    <span className="font-bold text-foreground">
+                      {inputs.tenureMonths} Mos
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -428,23 +452,24 @@ export default function FdCalculatorPage({
               {/* Presets */}
               <div className="flex flex-wrap gap-1.5 pt-1">
                 {[
-                  { label: '1 Year', y: 1, m: 0 },
-                  { label: '2 Years', y: 2, m: 0 },
-                  { label: '3 Years', y: 3, m: 0 },
-                  { label: '5 Years (Tax Saver)', y: 5, m: 0 },
-                  { label: '10 Years', y: 10, m: 0 },
+                  { label: "1 Year", y: 1, m: 0 },
+                  { label: "2 Years", y: 2, m: 0 },
+                  { label: "3 Years", y: 3, m: 0 },
+                  { label: "5 Years (Tax Saver)", y: 5, m: 0 },
+                  { label: "10 Years", y: 10, m: 0 },
                 ].map((item) => (
                   <button
                     key={item.label}
                     type="button"
                     onClick={() => {
-                      handleYearsChange(item.y)
-                      handleMonthsChange(item.m)
+                      handleYearsChange(item.y);
+                      handleMonthsChange(item.m);
                     }}
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                      inputs.tenureYears === item.y && inputs.tenureMonths === item.m
-                        ? 'bg-indigo-600 text-white border-indigo-600'
-                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
+                      inputs.tenureYears === item.y &&
+                      inputs.tenureMonths === item.m
+                        ? "bg-indigo-600 text-white border-indigo-600"
+                        : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {item.label}
@@ -454,26 +479,30 @@ export default function FdCalculatorPage({
             </div>
 
             {/* Compounding Frequency */}
-            {inputs.payoutType === 'cumulative' && (
+            {inputs.payoutType === "cumulative" && (
               <div className="space-y-2 pt-2 border-t border-border/60">
                 <label className="text-xs font-bold text-foreground block">
                   Compounding Frequency (Indian RBI Default: Quarterly)
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
-                    { id: 'quarterly', label: 'Quarterly (RBI Std)' },
-                    { id: 'monthly', label: 'Monthly' },
-                    { id: 'half_yearly', label: 'Half-Yearly' },
-                    { id: 'annually', label: 'Annually' },
+                    { id: "quarterly", label: "Quarterly (RBI Std)" },
+                    { id: "monthly", label: "Monthly" },
+                    { id: "half_yearly", label: "Half-Yearly" },
+                    { id: "annually", label: "Annually" },
                   ].map((freq) => (
                     <button
                       key={freq.id}
                       type="button"
-                      onClick={() => handleCompoundingChange(freq.id as FdCompoundingFrequency)}
+                      onClick={() =>
+                        handleCompoundingChange(
+                          freq.id as FdCompoundingFrequency,
+                        )
+                      }
                       className={`py-1.5 px-2 text-[11px] font-bold rounded-lg border text-center transition-all cursor-pointer ${
                         inputs.compoundingFrequency === freq.id
-                          ? 'bg-blue-600 text-white border-blue-600'
-                          : 'border-border bg-muted/30 text-muted-foreground hover:text-foreground'
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "border-border bg-muted/30 text-muted-foreground hover:text-foreground"
                       }`}
                     >
                       {freq.label}
@@ -497,7 +526,11 @@ export default function FdCalculatorPage({
                     Section 194A (10% TDS)
                   </span>
                 </div>
-                {showTaxDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {showTaxDetails ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               {showTaxDetails && (
@@ -507,7 +540,10 @@ export default function FdCalculatorPage({
                       type="checkbox"
                       checked={inputs.enableTax}
                       onChange={(e) =>
-                        setInputs((prev) => ({ ...prev, enableTax: e.target.checked }))
+                        setInputs((prev) => ({
+                          ...prev,
+                          enableTax: e.target.checked,
+                        }))
                       }
                       className="w-4 h-4 rounded text-blue-600 cursor-pointer"
                     />
@@ -578,7 +614,9 @@ export default function FdCalculatorPage({
                       }
                       className="w-32 px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs font-bold"
                     />
-                    <span className="text-[10px] text-muted-foreground ml-2">Indian CPI benchmark ~ 6.0%</span>
+                    <span className="text-[10px] text-muted-foreground ml-2">
+                      Indian CPI benchmark ~ 6.0%
+                    </span>
                   </div>
                 </div>
               )}
@@ -590,7 +628,9 @@ export default function FdCalculatorPage({
             <div className="p-5 sm:p-6 rounded-2xl border-2 border-blue-500/40 bg-gradient-to-b from-blue-50/60 via-card to-card dark:from-blue-950/40 dark:via-card dark:to-card shadow-sm space-y-5">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-                  {inputs.payoutType === 'cumulative' ? 'Maturity Amount' : 'Total Value Received'}
+                  {inputs.payoutType === "cumulative"
+                    ? "Maturity Amount"
+                    : "Total Value Received"}
                 </span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300">
                   {results.effectiveYieldPercent}% Annual Yield
@@ -601,13 +641,13 @@ export default function FdCalculatorPage({
               <div>
                 <div className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
                   {formatCrore(
-                    inputs.payoutType === 'cumulative'
+                    inputs.payoutType === "cumulative"
                       ? results.maturityAmount
-                      : results.principalAmount + results.totalInterestEarned
+                      : results.principalAmount + results.totalInterestEarned,
                   )}
                 </div>
                 <div className="text-xs font-semibold text-muted-foreground mt-0.5">
-                  {inputs.payoutType === 'cumulative'
+                  {inputs.payoutType === "cumulative"
                     ? `Gross Maturity (${formatINR(results.maturityAmount)})`
                     : `Principal (${formatINR(results.principalAmount)}) + Total Interest (${formatINR(results.totalInterestEarned)})`}
                 </div>
@@ -642,23 +682,35 @@ export default function FdCalculatorPage({
               {/* Detail Metrics Breakdown */}
               <div className="space-y-2.5 pt-2 border-t border-border/70 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">Principal Deposited:</span>
-                  <span className="font-bold text-foreground">{formatINR(results.principalAmount)}</span>
+                  <span className="text-muted-foreground font-medium">
+                    Principal Deposited:
+                  </span>
+                  <span className="font-bold text-foreground">
+                    {formatINR(results.principalAmount)}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">Total Interest Earned:</span>
+                  <span className="text-muted-foreground font-medium">
+                    Total Interest Earned:
+                  </span>
                   <span className="font-extrabold text-emerald-600 dark:text-emerald-400">
                     +{formatINR(results.totalInterestEarned)}
                   </span>
                 </div>
 
                 {/* Non-cumulative payout display */}
-                {inputs.payoutType !== 'cumulative' && (
+                {inputs.payoutType !== "cumulative" && (
                   <div className="flex items-center justify-between text-blue-600 dark:text-blue-400 bg-blue-50/50 dark:bg-blue-950/40 p-2 rounded-lg">
                     <span className="font-semibold">
-                      Periodic {inputs.payoutType === 'monthly' ? 'Monthly' : 'Quarterly'} Payout:
+                      Periodic{" "}
+                      {inputs.payoutType === "monthly"
+                        ? "Monthly"
+                        : "Quarterly"}{" "}
+                      Payout:
                     </span>
-                    <span className="font-black text-sm">{formatINR(results.periodicPayoutAmount)}</span>
+                    <span className="font-black text-sm">
+                      {formatINR(results.periodicPayoutAmount)}
+                    </span>
                   </div>
                 )}
 
@@ -666,18 +718,28 @@ export default function FdCalculatorPage({
                   <>
                     {results.estimatedTds > 0 && (
                       <div className="flex items-center justify-between text-amber-600 dark:text-amber-400">
-                        <span className="font-medium">Bank TDS Deducted (10% Sec 194A):</span>
-                        <span className="font-bold">-{formatINR(results.estimatedTds)}</span>
+                        <span className="font-medium">
+                          Bank TDS Deducted (10% Sec 194A):
+                        </span>
+                        <span className="font-bold">
+                          -{formatINR(results.estimatedTds)}
+                        </span>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between text-amber-700 dark:text-amber-300">
-                      <span className="font-medium">Total Tax Liability ({inputs.taxSlabRatePercent}% slab):</span>
-                      <span className="font-bold">-{formatINR(results.estimatedTaxLiability)}</span>
+                      <span className="font-medium">
+                        Total Tax Liability ({inputs.taxSlabRatePercent}% slab):
+                      </span>
+                      <span className="font-bold">
+                        -{formatINR(results.estimatedTaxLiability)}
+                      </span>
                     </div>
 
                     <div className="flex items-center justify-between pt-1 border-t border-border/50">
-                      <span className="font-bold text-foreground">Net Post-Tax In-Hand:</span>
+                      <span className="font-bold text-foreground">
+                        Net Post-Tax In-Hand:
+                      </span>
                       <span className="font-black text-blue-600 dark:text-blue-400 text-sm">
                         {formatINR(results.netPostTaxMaturity)}
                       </span>
@@ -687,8 +749,12 @@ export default function FdCalculatorPage({
 
                 <div className="flex items-center justify-between pt-2 border-t border-border/50 bg-muted/30 p-2 rounded-lg">
                   <div>
-                    <span className="font-bold text-foreground block">Inflation-Adjusted Value</span>
-                    <span className="text-[10px] text-muted-foreground">Today's purchasing power @ {inputs.inflationRatePercent}%</span>
+                    <span className="font-bold text-foreground block">
+                      Inflation-Adjusted Value
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      Today's purchasing power @ {inputs.inflationRatePercent}%
+                    </span>
                   </div>
                   <span className="font-extrabold text-foreground text-sm">
                     {formatCrore(results.realPurchasingPower)}
@@ -704,7 +770,9 @@ export default function FdCalculatorPage({
                 <span>Indian Banking & Privacy Note</span>
               </div>
               <p className="text-[11px] leading-relaxed">
-                TDS is deducted by banks under Section 194A if total interest exceeds ₹40,000 (₹50,000 for Senior Citizens under Sec 80TTB). All calculations remain local to your browser.
+                TDS is deducted by banks under Section 194A if total interest
+                exceeds ₹40,000 (₹50,000 for Senior Citizens under Sec 80TTB).
+                All calculations remain local to your browser.
               </p>
             </div>
           </div>
@@ -718,7 +786,8 @@ export default function FdCalculatorPage({
                 Year-by-Year Balance & Interest Schedule
               </h3>
               <p className="text-xs text-muted-foreground">
-                Review annual interest accumulations across your {inputs.tenureYears}-year deposit tenure
+                Review annual interest accumulations across your{" "}
+                {inputs.tenureYears}-year deposit tenure
               </p>
             </div>
             <button
@@ -726,8 +795,14 @@ export default function FdCalculatorPage({
               onClick={() => setShowScheduleTable((prev) => !prev)}
               className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              <span>{showScheduleTable ? 'Collapse Schedule' : 'View Full Schedule'}</span>
-              {showScheduleTable ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+              <span>
+                {showScheduleTable ? "Collapse Schedule" : "View Full Schedule"}
+              </span>
+              {showScheduleTable ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
             </button>
           </div>
 
@@ -739,15 +814,24 @@ export default function FdCalculatorPage({
                     <th className="py-2.5 px-3">Year</th>
                     <th className="py-2.5 px-3 text-right">Principal</th>
                     <th className="py-2.5 px-3 text-right">Interest (Year)</th>
-                    <th className="py-2.5 px-3 text-right">Cumulative Interest</th>
+                    <th className="py-2.5 px-3 text-right">
+                      Cumulative Interest
+                    </th>
                     <th className="py-2.5 px-3 text-right">End Balance</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {results.yearlySchedule.map((row) => (
-                    <tr key={row.year} className="hover:bg-muted/30 transition-colors">
-                      <td className="py-2 px-3 font-bold text-foreground">Year {row.year}</td>
-                      <td className="py-2 px-3 text-right font-medium">{formatINR(row.invested)}</td>
+                    <tr
+                      key={row.year}
+                      className="hover:bg-muted/30 transition-colors"
+                    >
+                      <td className="py-2 px-3 font-bold text-foreground">
+                        Year {row.year}
+                      </td>
+                      <td className="py-2 px-3 text-right font-medium">
+                        {formatINR(row.invested)}
+                      </td>
                       <td className="py-2 px-3 text-right font-semibold text-emerald-600 dark:text-emerald-400">
                         +{formatINR(row.interestEarnedYear)}
                       </td>
@@ -766,5 +850,5 @@ export default function FdCalculatorPage({
         </div>
       </main>
     </div>
-  )
+  );
 }
