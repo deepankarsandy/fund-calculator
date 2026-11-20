@@ -1,8 +1,19 @@
-export type { Profile, LifestyleScenario, WithdrawalTiming, InflationMode as ProfileInflationMode, ReturnBasis } from './profile'
+export type {
+  Profile,
+  LifestyleScenario,
+  WithdrawalTiming,
+  InflationMode as ProfileInflationMode,
+  ReturnBasis,
+} from './profile'
 export { DEFAULT_PROFILE } from './profile'
 
 export type { UserProfile, SectorInflationRates, InflationMode, TaxRegime } from './userProfile'
-export { DEFAULT_USER_PROFILE, DEFAULT_SECTOR_INFLATION, calculateAgeFromDob, calculateDobFromAge } from './userProfile'
+export {
+  DEFAULT_USER_PROFILE,
+  DEFAULT_SECTOR_INFLATION,
+  calculateAgeFromDob,
+  calculateDobFromAge,
+} from './userProfile'
 
 export type { HouseholdMember, Relationship } from './household'
 

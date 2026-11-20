@@ -78,7 +78,7 @@ export function calculateLoanEmi(
   const interestMethod = merged.interestMethod || 'reducing'
   const isFlatRate = interestMethod === 'flat'
 
-  const monthlyRate = annualRate > 0 ? (annualRate / 100) / 12 : 0
+  const monthlyRate = annualRate > 0 ? annualRate / 100 / 12 : 0
   const monthlyExtra = Math.max(0, merged.monthlyExtraPrepayment || 0)
   const annualLumpSum = Math.max(0, merged.annualLumpSumPrepayment || 0)
 

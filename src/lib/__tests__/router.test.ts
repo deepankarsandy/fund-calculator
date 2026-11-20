@@ -1,11 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import {
-  parseRoute,
-  buildUrl,
-  getBaseUrl,
-  navigateTo,
-  syncStepToUrl,
-} from '@/lib/router'
+import { parseRoute, buildUrl, getBaseUrl, navigateTo, syncStepToUrl } from '@/lib/router'
 
 describe('Router & URL Navigation', () => {
   beforeEach(() => {
@@ -65,7 +59,9 @@ describe('Router & URL Navigation', () => {
 
     it('parses /investment as investment calculator page', () => {
       expect(parseRoute({ pathname: '/investment', search: '', hash: '' }).page).toBe('investment')
-      expect(parseRoute({ pathname: '/investment-calculator', search: '', hash: '' }).page).toBe('investment')
+      expect(parseRoute({ pathname: '/investment-calculator', search: '', hash: '' }).page).toBe(
+        'investment'
+      )
       expect(parseRoute({ pathname: '/', search: '', hash: '#investment' }).page).toBe('investment')
     })
 
@@ -77,7 +73,9 @@ describe('Router & URL Navigation', () => {
 
     it('parses /loan-emi as loan EMI calculator page', () => {
       expect(parseRoute({ pathname: '/loan-emi', search: '', hash: '' }).page).toBe('interest')
-      expect(parseRoute({ pathname: '/emi-calculator', search: '', hash: '' }).page).toBe('interest')
+      expect(parseRoute({ pathname: '/emi-calculator', search: '', hash: '' }).page).toBe(
+        'interest'
+      )
       expect(parseRoute({ pathname: '/interest', search: '', hash: '' }).page).toBe('interest')
       expect(parseRoute({ pathname: '/', search: '', hash: '#loan-emi' }).page).toBe('interest')
     })
@@ -90,7 +88,9 @@ describe('Router & URL Navigation', () => {
 
     it('parses /logic and other logic aliases', () => {
       expect(parseRoute({ pathname: '/logic', search: '', hash: '' }).page).toBe('logic')
-      expect(parseRoute({ pathname: '/features-and-logic', search: '', hash: '' }).page).toBe('logic')
+      expect(parseRoute({ pathname: '/features-and-logic', search: '', hash: '' }).page).toBe(
+        'logic'
+      )
       expect(parseRoute({ pathname: '/methodology', search: '', hash: '' }).page).toBe('logic')
     })
 
@@ -115,7 +115,11 @@ describe('Router & URL Navigation', () => {
       const routeTooLow = parseRoute({ pathname: '/calculator', search: '?step=-3', hash: '' })
       expect(routeTooLow.step).toBe(1)
 
-      const routeInvalid = parseRoute({ pathname: '/calculator', search: '?step=invalid', hash: '' })
+      const routeInvalid = parseRoute({
+        pathname: '/calculator',
+        search: '?step=invalid',
+        hash: '',
+      })
       expect(routeInvalid.step).toBe(1)
     })
 

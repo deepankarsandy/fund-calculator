@@ -86,9 +86,10 @@ export const CustomPlanCalculator: React.FC<CustomPlanCalculatorProps> = ({
     field: 'invested' | 'received' | 'note',
     value: number | string
   ) => {
-    const schedule = (inputs.customSchedule && inputs.customSchedule.length > 0
-      ? inputs.customSchedule
-      : buildScheduleFromInputs(inputs)
+    const schedule = (
+      inputs.customSchedule && inputs.customSchedule.length > 0
+        ? inputs.customSchedule
+        : buildScheduleFromInputs(inputs)
     ).map((row) => {
       if (row.year === year) {
         return {
@@ -105,9 +106,10 @@ export const CustomPlanCalculator: React.FC<CustomPlanCalculatorProps> = ({
   }
 
   const handleAddYear = () => {
-    const schedule = (inputs.customSchedule && inputs.customSchedule.length > 0
-      ? inputs.customSchedule
-      : buildScheduleFromInputs(inputs)
+    const schedule = (
+      inputs.customSchedule && inputs.customSchedule.length > 0
+        ? inputs.customSchedule
+        : buildScheduleFromInputs(inputs)
     ).slice()
     const nextYear = schedule.length > 0 ? schedule[schedule.length - 1].year + 1 : 1
     schedule.push({
@@ -123,9 +125,10 @@ export const CustomPlanCalculator: React.FC<CustomPlanCalculatorProps> = ({
   }
 
   const handleRemoveYear = (year: number) => {
-    const schedule = (inputs.customSchedule && inputs.customSchedule.length > 0
-      ? inputs.customSchedule
-      : buildScheduleFromInputs(inputs)
+    const schedule = (
+      inputs.customSchedule && inputs.customSchedule.length > 0
+        ? inputs.customSchedule
+        : buildScheduleFromInputs(inputs)
     ).filter((r) => r.year !== year)
     updateInputs({
       useCustomSchedule: true,
@@ -203,18 +206,16 @@ Generated via Fund Calculator (100% Private & Open Source)
                   <div className="flex items-center justify-between gap-1 mb-1">
                     <span
                       className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                        isSelected
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-muted text-muted-foreground'
+                        isSelected ? 'bg-purple-600 text-white' : 'bg-muted text-muted-foreground'
                       }`}
                     >
                       {preset.badge}
                     </span>
-                    {isSelected && <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />}
+                    {isSelected && (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
+                    )}
                   </div>
-                  <h4 className="text-xs font-bold text-foreground leading-snug">
-                    {preset.name}
-                  </h4>
+                  <h4 className="text-xs font-bold text-foreground leading-snug">{preset.name}</h4>
                 </div>
                 <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
                   {preset.description}
@@ -232,9 +233,7 @@ Generated via Fund Calculator (100% Private & Open Source)
           {/* Header of Form */}
           <div className="flex items-center justify-between gap-2 pb-3 border-b border-border/70">
             <div>
-              <h3 className="text-sm font-extrabold text-foreground">
-                Plan Setup & Cash Flows
-              </h3>
+              <h3 className="text-sm font-extrabold text-foreground">Plan Setup & Cash Flows</h3>
               <p className="text-[11px] text-muted-foreground">
                 Configure your annual investments and payout timeline
               </p>
@@ -339,7 +338,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
                   />
                   <div className="relative w-32 shrink-0">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">₹</span>
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min={1000}
@@ -394,7 +395,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
                   />
                   <div className="relative w-32 shrink-0">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">₹</span>
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min={10000}
@@ -419,7 +422,8 @@ Generated via Fund Calculator (100% Private & Open Source)
                     <span>Investment Duration</span>
                   </label>
                   <span className="text-xs font-bold text-blue-600 dark:text-blue-400">
-                    {inputs.investmentDurationYears} Years (Yr {inputs.investmentStartYear || 1}–{investEndYear})
+                    {inputs.investmentDurationYears} Years (Yr {inputs.investmentStartYear || 1}–
+                    {investEndYear})
                   </span>
                 </div>
                 <input
@@ -438,9 +442,7 @@ Generated via Fund Calculator (100% Private & Open Source)
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground block">
-                  Payment Timing
-                </label>
+                <label className="text-xs font-bold text-foreground block">Payment Timing</label>
                 <div className="flex gap-2">
                   <button
                     type="button"
@@ -525,11 +527,10 @@ Generated via Fund Calculator (100% Private & Open Source)
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-bold text-foreground">
-                    Payout Begins At
-                  </label>
+                  <label className="text-xs font-bold text-foreground">Payout Begins At</label>
                   <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
-                    Year {inputs.payoutStartYear} (Age {(inputs.startAge || 30) + inputs.payoutStartYear - 1})
+                    Year {inputs.payoutStartYear} (Age{' '}
+                    {(inputs.startAge || 30) + inputs.payoutStartYear - 1})
                   </span>
                 </div>
                 <input
@@ -553,9 +554,7 @@ Generated via Fund Calculator (100% Private & Open Source)
               {inputs.payoutType !== 'lumpsum_only' && (
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-foreground">
-                      Payout Duration
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Payout Duration</label>
                     <span className="text-xs font-extrabold text-emerald-600 dark:text-emerald-400">
                       {inputs.payoutDurationYears} Years (Till Yr {payoutEndYear})
                     </span>
@@ -604,7 +603,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
                   <div className="relative w-32 shrink-0">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">₹</span>
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min={1000}
@@ -666,7 +667,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-purple-600"
                   />
                   <div className="relative w-32 shrink-0">
-                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">₹</span>
+                    <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
+                      ₹
+                    </span>
                     <input
                       type="number"
                       min={0}
@@ -733,13 +736,12 @@ Generated via Fund Calculator (100% Private & Open Source)
                   max={12}
                   step={0.5}
                   value={inputs.inflationRatePercent}
-                  onChange={(e) =>
-                    updateInputs({ inflationRatePercent: Number(e.target.value) })
-                  }
+                  onChange={(e) => updateInputs({ inflationRatePercent: Number(e.target.value) })}
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-amber-600"
                 />
                 <p className="text-[10px] text-muted-foreground">
-                  India historical average is ~6.0%. Discounted to determine today's purchasing power.
+                  India historical average is ~6.0%. Discounted to determine today's purchasing
+                  power.
                 </p>
               </div>
 
@@ -902,8 +904,8 @@ Generated via Fund Calculator (100% Private & Open Source)
                   results.verdict.rating === 'poor' || results.verdict.rating === 'negative'
                     ? 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border-amber-300 dark:border-amber-800'
                     : results.verdict.rating === 'fair'
-                    ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
-                    : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
+                      ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border-blue-300 dark:border-blue-800'
+                      : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
                 }`}
               >
                 {results.verdict.tag}
@@ -918,7 +920,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                 <span className="text-sm font-bold text-muted-foreground">p.a. XIRR</span>
               </div>
               <div className="flex items-center gap-2 mt-1 text-xs">
-                <span className="font-semibold text-muted-foreground">Real Return (after {inputs.inflationRatePercent}% inflation):</span>
+                <span className="font-semibold text-muted-foreground">
+                  Real Return (after {inputs.inflationRatePercent}% inflation):
+                </span>
                 <span
                   className={`font-black ${
                     results.realXirrPercent < 0
@@ -926,7 +930,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                       : 'text-emerald-600 dark:text-emerald-400'
                   }`}
                 >
-                  {results.realXirrPercent > 0 ? `+${results.realXirrPercent}%` : `${results.realXirrPercent}%`}
+                  {results.realXirrPercent > 0
+                    ? `+${results.realXirrPercent}%`
+                    : `${results.realXirrPercent}%`}
                 </span>
               </div>
             </div>
@@ -1024,7 +1030,9 @@ Generated via Fund Calculator (100% Private & Open Source)
                 </div>
 
                 <div className="flex items-center justify-between text-[10px] text-muted-foreground">
-                  <span>Purchasing power retained: {100 - results.purchasingPowerLossPercent}%</span>
+                  <span>
+                    Purchasing power retained: {100 - results.purchasingPowerLossPercent}%
+                  </span>
                   <span className="text-amber-700 dark:text-amber-400 font-bold">
                     Eroded by inflation: -{results.purchasingPowerLossPercent}%
                   </span>
@@ -1050,7 +1058,9 @@ Generated via Fund Calculator (100% Private & Open Source)
               <div className="flex items-center justify-between p-2.5 rounded-lg border border-border/70 bg-muted/20">
                 <div>
                   <div className="font-bold text-foreground">PPF / Sovereign Debt (7.1% p.a.)</div>
-                  <div className="text-[10px] text-muted-foreground">Risk-free sovereign guaranteed</div>
+                  <div className="text-[10px] text-muted-foreground">
+                    Risk-free sovereign guaranteed
+                  </div>
                 </div>
                 <div className="text-right">
                   <span className="font-extrabold text-foreground text-sm">
@@ -1084,7 +1094,11 @@ Generated via Fund Calculator (100% Private & Open Source)
               onClick={handleCopyReport}
               className="flex-1 py-2 px-3 text-xs font-bold rounded-xl border border-border hover:bg-muted text-foreground transition-all cursor-pointer flex items-center justify-center gap-1.5"
             >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? (
+                <Check className="w-3.5 h-3.5 text-emerald-600" />
+              ) : (
+                <Copy className="w-3.5 h-3.5" />
+              )}
               <span>{copied ? 'Report Copied!' : 'Copy Summary'}</span>
             </button>
 
@@ -1114,7 +1128,8 @@ Generated via Fund Calculator (100% Private & Open Source)
           </div>
           {results.breakEvenYear && (
             <div className="text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800">
-              Break-Even at Year {results.breakEvenYear} (Age {(inputs.startAge || 30) + results.breakEvenYear - 1})
+              Break-Even at Year {results.breakEvenYear} (Age{' '}
+              {(inputs.startAge || 30) + results.breakEvenYear - 1})
             </div>
           )}
         </div>
@@ -1127,7 +1142,8 @@ Generated via Fund Calculator (100% Private & Open Source)
               <span>Yrs 1 to {investEndYear}</span>
             </div>
             <p className="text-[11px] text-muted-foreground">
-              {inputs.investmentDurationYears} annual payments totaling {formatINR(results.totalInvested)}.
+              {inputs.investmentDurationYears} annual payments totaling{' '}
+              {formatINR(results.totalInvested)}.
             </p>
           </div>
 
@@ -1150,7 +1166,9 @@ Generated via Fund Calculator (100% Private & Open Source)
           <div className="p-3 rounded-xl border border-emerald-200 dark:border-emerald-900 bg-emerald-50/50 dark:bg-emerald-950/30 space-y-1">
             <div className="font-bold text-emerald-900 dark:text-emerald-300 flex items-center justify-between">
               <span>Phase 3: Payouts & Maturity</span>
-              <span>Yrs {inputs.payoutStartYear} to {payoutEndYear}</span>
+              <span>
+                Yrs {inputs.payoutStartYear} to {payoutEndYear}
+              </span>
             </div>
             <p className="text-[11px] text-muted-foreground">
               Receives total {formatINR(results.totalReceived)} in payouts and maturity benefits.
@@ -1177,7 +1195,11 @@ Generated via Fund Calculator (100% Private & Open Source)
             className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
           >
             <span>{showFullSchedule ? 'Collapse Table' : 'Expand Full Table'}</span>
-            {showFullSchedule ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+            {showFullSchedule ? (
+              <ChevronUp className="w-3.5 h-3.5" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5" />
+            )}
           </button>
         </div>
 
@@ -1199,7 +1221,8 @@ Generated via Fund Calculator (100% Private & Open Source)
                 {results.schedule.map((row) => (
                   <tr key={row.year} className="hover:bg-muted/30 transition-colors">
                     <td className="py-2 px-3 font-bold text-foreground">
-                      Yr {row.year} <span className="text-muted-foreground font-normal">(Age {row.age})</span>
+                      Yr {row.year}{' '}
+                      <span className="text-muted-foreground font-normal">(Age {row.age})</span>
                     </td>
                     <td className="py-2 px-3 text-right font-medium text-amber-700 dark:text-amber-400">
                       {row.invested > 0 ? `-${formatINR(row.invested)}` : '—'}
@@ -1212,8 +1235,8 @@ Generated via Fund Calculator (100% Private & Open Source)
                         row.netCashFlow > 0
                           ? 'text-emerald-600 dark:text-emerald-400'
                           : row.netCashFlow < 0
-                          ? 'text-amber-700 dark:text-amber-400'
-                          : 'text-muted-foreground'
+                            ? 'text-amber-700 dark:text-amber-400'
+                            : 'text-muted-foreground'
                       }`}
                     >
                       {row.netCashFlow !== 0 ? formatINR(row.netCashFlow) : '—'}

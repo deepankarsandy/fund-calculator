@@ -7,11 +7,13 @@ The Fixed Deposit (FD) Calculator calculates maturity returns, effective annual 
 ## 1. Mathematical Formulas & Logic
 
 ### Cumulative (Reinvestment) FD Compounding
+
 Per RBI regulations, Indian banks compound FD interest on a **quarterly** basis ($n = 4$):
 
 $$A = P \times \left(1 + \frac{r}{n}\right)^{n \times t}$$
 
 Where:
+
 - $P$ = Principal deposit amount (₹)
 - $r$ = Annual nominal interest rate (decimal, e.g. 0.07 for 7.0%)
 - $n$ = Compounding frequency per year ($n = 4$ for quarterly, $n = 12$ for monthly, $n = 2$ for semi-annually, $n = 1$ for annually)
@@ -20,19 +22,24 @@ Where:
 - Total Interest Earned: $I = A - P$
 
 ### Simple Interest FD (Tenures $< 180$ Days or Short-Term)
+
 $$A = P \times (1 + r \times t)$$
 
 ### Non-Cumulative Regular Payout FD
+
 In non-cumulative deposits, interest is paid out periodically (monthly or quarterly) into the investor's savings account rather than being reinvested:
+
 - Periodic Payout Amount:
   $$\text{Payout} = \frac{P \times r}{\text{Payouts Per Year}}$$
 - Total Principal Returned at Maturity: $P$
 - Total Interest Received: $P \times r \times t$
 
 ### Effective Annual Yield (APY)
+
 $$\text{Effective Yield} = \left[\left(1 + \frac{r}{n}\right)^n - 1\right] \times 100\%$$
 
 ### Inflation Adjustment (Real Purchasing Power)
+
 $$\text{Real Maturity Value} = \frac{A}{(1 + g)^t}$$
 
 ---
@@ -40,6 +47,7 @@ $$\text{Real Maturity Value} = \frac{A}{(1 + g)^t}$$
 ## 2. Indian Market Defaults & Tax Treatment
 
 ### Default Baseline Parameters (India)
+
 - **Principal Deposit Amount**: ₹2,00,000 (configurable from ₹5,000 to ₹1,00,00,000)
 - **Interest Rate**: 7.0% p.a. (standard Indian scheduled commercial bank rate for 1 to 5-year deposits)
 - **Senior Citizen Option**: +0.50% additional interest bonus (standard practice across Indian banks), raising rate to 7.50%
@@ -48,6 +56,7 @@ $$\text{Real Maturity Value} = \frac{A}{(1 + g)^t}$$
 - **Assumed General Inflation**: 6.0% p.a.
 
 ### Indian Taxation on FD Interest
+
 1. **Tax Treatment ("Income from Other Sources")**:
    - Unlike equity mutual funds, FD interest is not eligible for capital gains tax benefits.
    - It is added to the taxpayer's total annual taxable income and taxed at their applicable income tax slab rate (e.g. 0%, 5%, 10%, 15%, 20%, 30%). Default modeled at 20%.
@@ -65,6 +74,7 @@ $$\text{Real Maturity Value} = \frac{A}{(1 + g)^t}$$
 ## 3. Local Storage Architecture
 
 All user configuration and simulation outputs are persisted locally in the browser:
+
 - **Inputs Key**: `fundcalc_fd_inputs_v1`
   - Stores principal, tenure (years/months), base interest rate, senior citizen toggle, compounding frequency, payout mode, tax slab rate, Form 15G/H submission status.
 - **Results Key**: `fundcalc_fd_results_v1`

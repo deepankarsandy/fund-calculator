@@ -8,8 +8,8 @@ import { DEFAULT_PROFILE, type Profile } from '../../models/profile'
 describe('Shortfall Remedies (3 Independent OR Pathways)', () => {
   const assumptions: Assumptions = {
     ...DEFAULT_ASSUMPTIONS,
-    annualInvestmentReturn: 0.10, // 10%
-    globalInflationRate: 0.06,    // 6%
+    annualInvestmentReturn: 0.1, // 10%
+    globalInflationRate: 0.06, // 6%
     withdrawalTiming: 'beginning_of_year',
   }
 
@@ -65,7 +65,7 @@ describe('Shortfall Remedies (3 Independent OR Pathways)', () => {
     expect(remedies.savingsRemedy.currentSavings).toBe(1000000)
     expect(remedies.savingsRemedy.extraSavingsNeeded).toBeGreaterThan(0)
     expect(remedies.savingsRemedy.totalSavingsNeeded).toBe(
-      remedies.savingsRemedy.currentSavings + remedies.savingsRemedy.extraSavingsNeeded,
+      remedies.savingsRemedy.currentSavings + remedies.savingsRemedy.extraSavingsNeeded
     )
 
     // 2. Monthly Salary Pathway
@@ -73,7 +73,7 @@ describe('Shortfall Remedies (3 Independent OR Pathways)', () => {
     expect(remedies.salaryRemedy.currentMonthlySalary).toBe(120000)
     expect(remedies.salaryRemedy.totalMonthlySalaryNeeded).toBeGreaterThan(120000)
     expect(remedies.salaryRemedy.extraMonthlySalaryNeeded).toBe(
-      remedies.salaryRemedy.totalMonthlySalaryNeeded - 120000,
+      remedies.salaryRemedy.totalMonthlySalaryNeeded - 120000
     )
     expect(remedies.salaryRemedy.percentIncreaseNeeded).toBeGreaterThan(0)
 
@@ -97,10 +97,10 @@ describe('Shortfall Remedies (3 Independent OR Pathways)', () => {
     expect(remedies.retirementAgeRemedy.currentRetirementAge).toBe(55)
     expect(remedies.retirementAgeRemedy.recommendedRetirementAge).toBeGreaterThan(55)
     expect(remedies.retirementAgeRemedy.extraYearsToWork).toBe(
-      remedies.retirementAgeRemedy.recommendedRetirementAge - 55,
+      remedies.retirementAgeRemedy.recommendedRetirementAge - 55
     )
     expect(remedies.retirementAgeRemedy.remainingRetirementYears).toBe(
-      80 - remedies.retirementAgeRemedy.recommendedRetirementAge,
+      80 - remedies.retirementAgeRemedy.recommendedRetirementAge
     )
 
     // Verify that applying the recommended retirement age alone eliminates the shortfall:

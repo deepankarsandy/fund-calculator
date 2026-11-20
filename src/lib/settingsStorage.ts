@@ -19,14 +19,18 @@ export function getStoredSettings(): AppSettings {
     if (raw) {
       const parsed = JSON.parse(raw)
       return {
-        currentStep: typeof parsed.currentStep === 'number' && parsed.currentStep >= 1 && parsed.currentStep <= 6
-          ? parsed.currentStep
-          : 1,
+        currentStep:
+          typeof parsed.currentStep === 'number' &&
+          parsed.currentStep >= 1 &&
+          parsed.currentStep <= 6
+            ? parsed.currentStep
+            : 1,
         expandedCategories: Array.isArray(parsed.expandedCategories)
           ? parsed.expandedCategories
           : ['housing', 'food', 'healthcare'],
         lastFilledId: typeof parsed.lastFilledId === 'string' ? parsed.lastFilledId : undefined,
-        lastFilledStep: typeof parsed.lastFilledStep === 'number' ? parsed.lastFilledStep : undefined,
+        lastFilledStep:
+          typeof parsed.lastFilledStep === 'number' ? parsed.lastFilledStep : undefined,
       }
     }
   } catch {

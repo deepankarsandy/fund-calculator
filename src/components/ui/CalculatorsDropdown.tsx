@@ -28,7 +28,8 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     id: 'fund',
     name: 'Retirement Fund Calculator',
     shortDesc: 'Lifetime living costs, inflation compounding & retirement corpus',
-    longDesc: 'Estimate the exact investment corpus required to fund your lifestyle for life, calibrated for Indian inflation and geography.',
+    longDesc:
+      'Estimate the exact investment corpus required to fund your lifestyle for life, calibrated for Indian inflation and geography.',
     category: 'primary',
     status: 'active',
     icon: Calculator,
@@ -38,7 +39,8 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     id: 'sip',
     name: 'SIP Calculator',
     shortDesc: 'Monthly systematic investment compounding & target wealth',
-    longDesc: 'Calculate future wealth accumulation from monthly SIP contributions with customizable expected rate of return.',
+    longDesc:
+      'Calculate future wealth accumulation from monthly SIP contributions with customizable expected rate of return.',
     category: 'helper',
     status: 'active',
     icon: TrendingUp,
@@ -48,7 +50,8 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     id: 'investment',
     name: 'Investment & Returns',
     shortDesc: 'Lump-sum compound growth & multi-asset portfolio projection',
-    longDesc: 'Forecast compound returns across equities, mutual funds, gold, and debt for lumpsum and staggered allocations.',
+    longDesc:
+      'Forecast compound returns across equities, mutual funds, gold, and debt for lumpsum and staggered allocations.',
     category: 'helper',
     status: 'active',
     icon: PiggyBank,
@@ -58,7 +61,8 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     id: 'fd',
     name: 'Fixed Deposit (FD)',
     shortDesc: 'Bank FD quarterly compounding, interest payouts & maturity',
-    longDesc: 'Compute maturity amounts and effective yields across standard, cumulative, and monthly payout fixed deposits.',
+    longDesc:
+      'Compute maturity amounts and effective yields across standard, cumulative, and monthly payout fixed deposits.',
     category: 'helper',
     status: 'active',
     icon: Landmark,
@@ -68,7 +72,8 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
     id: 'interest',
     name: 'Loan & Interest EMI',
     shortDesc: 'Home/car loan EMI, interest amortization & pre-payment benefits',
-    longDesc: 'Visualize principal vs interest breakdown, EMI schedules, and loan tenure reduction through extra payments.',
+    longDesc:
+      'Visualize principal vs interest breakdown, EMI schedules, and loan tenure reduction through extra payments.',
     category: 'helper',
     status: 'active',
     icon: Percent,
@@ -125,8 +130,12 @@ export function CalculatorsDropdown({
   }, [isOpen])
 
   const primaryCalc = FINANCIAL_CALCULATORS.find((c) => c.category === 'primary')
-  const activeHelperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.status === 'active')
-  const upcomingHelperCalcs = FINANCIAL_CALCULATORS.filter((c) => c.category === 'helper' && c.status === 'coming_soon')
+  const activeHelperCalcs = FINANCIAL_CALCULATORS.filter(
+    (c) => c.category === 'helper' && c.status === 'active'
+  )
+  const upcomingHelperCalcs = FINANCIAL_CALCULATORS.filter(
+    (c) => c.category === 'helper' && c.status === 'coming_soon'
+  )
 
   return (
     <div className={cn('relative inline-block text-left', className)} ref={dropdownRef}>
@@ -308,7 +317,9 @@ export function CalculatorsDropdown({
                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   Upcoming Helper Calculators
                 </span>
-                <span className="text-[9px] font-medium text-muted-foreground/80">In Development</span>
+                <span className="text-[9px] font-medium text-muted-foreground/80">
+                  In Development
+                </span>
               </div>
 
               <div className="grid grid-cols-1 gap-1 max-h-56 overflow-y-auto pr-0.5">

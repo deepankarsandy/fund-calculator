@@ -3,15 +3,7 @@ import type { ScenarioResult } from '@/domain/models/results'
 import { formatCrore } from '@/lib/currency'
 import { formatPercent } from '@/lib/format'
 import { cn } from '@/lib/cn'
-import {
-  Wallet,
-  Briefcase,
-  Clock,
-  Sparkles,
-  CheckCircle2,
-  Info,
-  ShieldAlert,
-} from 'lucide-react'
+import { Wallet, Briefcase, Clock, Sparkles, CheckCircle2, Info, ShieldAlert } from 'lucide-react'
 
 interface ShortfallManagementCardProps {
   scenario: ScenarioResult
@@ -39,20 +31,20 @@ export function ShortfallManagementCard({
 
   // Check if any scenario in results has a shortfall
   const anyScenarioHasShortfall = allScenarios.some(
-    s =>
+    (s) =>
       (s.shortfallRemedies?.hasShortfall ?? false) ||
       s.readinessScore < 100 ||
       s.retirementFundingGap > 0 ||
-      s.fundingGap > 0,
+      s.fundingGap > 0
   )
 
   // Find first scenario that has a shortfall (if active scenario does not)
   const shortfallScenarioIndex = allScenarios.findIndex(
-    s =>
+    (s) =>
       (s.shortfallRemedies?.hasShortfall ?? false) ||
       s.readinessScore < 100 ||
       s.retirementFundingGap > 0 ||
-      s.fundingGap > 0,
+      s.fundingGap > 0
   )
 
   // If no scenario in any plan/mode has any shortfall
@@ -61,12 +53,12 @@ export function ShortfallManagementCard({
       <div className="rounded-2xl border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/70 dark:bg-zinc-900 p-5 space-y-3 shadow-xs print-break-inside-avoid">
         <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-200">
           <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-          <h3 className="text-sm font-bold">
-            Zero Shortfall Detected Across All Modes
-          </h3>
+          <h3 className="text-sm font-bold">Zero Shortfall Detected Across All Modes</h3>
         </div>
         <p className="text-xs text-emerald-800 dark:text-zinc-300 leading-relaxed font-medium">
-          Your current retirement trajectory is 100% self-funded across all market scenarios (Optimistic, Base, and Conservative). No extra savings, salary increments, or retirement deferrals are required.
+          Your current retirement trajectory is 100% self-funded across all market scenarios
+          (Optimistic, Base, and Conservative). No extra savings, salary increments, or retirement
+          deferrals are required.
         </p>
       </div>
     )
@@ -91,7 +83,12 @@ export function ShortfallManagementCard({
           </button>
         </div>
         <p className="text-xs text-amber-900 dark:text-zinc-300 leading-relaxed font-medium">
-          Your active plan is on track under <strong>{scenario.label}</strong> conditions (+{formatCrore(scenario.retirementSurplus)} surplus). However, under the <strong>{alternativeScenario.label}</strong> scenario ({formatPercent(alternativeScenario.inflationRate)} inflation, {formatPercent(alternativeScenario.returnRate)} returns), a shortfall of <strong>{formatCrore(alternativeScenario.retirementFundingGap)}</strong> would emerge.
+          Your active plan is on track under <strong>{scenario.label}</strong> conditions (+
+          {formatCrore(scenario.retirementSurplus)} surplus). However, under the{' '}
+          <strong>{alternativeScenario.label}</strong> scenario (
+          {formatPercent(alternativeScenario.inflationRate)} inflation,{' '}
+          {formatPercent(alternativeScenario.returnRate)} returns), a shortfall of{' '}
+          <strong>{formatCrore(alternativeScenario.retirementFundingGap)}</strong> would emerge.
         </p>
         <button
           type="button"
@@ -108,7 +105,11 @@ export function ShortfallManagementCard({
   const remedies = currentRemedies!
   const { savingsRemedy, salaryRemedy, retirementAgeRemedy } = remedies
 
-  const handleApply = (type: 'savings' | 'salary' | 'retirement_age', value: number, label: string) => {
+  const handleApply = (
+    type: 'savings' | 'salary' | 'retirement_age',
+    value: number,
+    label: string
+  ) => {
     onApplyRemedy(type, value)
     setAppliedOption(label)
     setTimeout(() => {
@@ -128,7 +129,8 @@ export function ShortfallManagementCard({
             </h3>
           </div>
           <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-0.5">
-            Projected shortfall of <strong>{formatCrore(scenario.retirementFundingGap)}</strong> at retirement (or {formatCrore(scenario.fundingGap)} today)
+            Projected shortfall of <strong>{formatCrore(scenario.retirementFundingGap)}</strong> at
+            retirement (or {formatCrore(scenario.fundingGap)} today)
           </p>
         </div>
 
@@ -145,7 +147,7 @@ export function ShortfallManagementCard({
                     'px-2 py-0.5 text-[10px] font-bold rounded-md transition-all cursor-pointer',
                     activeScenarioIndex === idx
                       ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-2xs'
-                      : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100',
+                      : 'text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100'
                   )}
                 >
                   {s.label}
@@ -164,7 +166,10 @@ export function ShortfallManagementCard({
       {/* Explanatory Banner highlighting the OR logic */}
       <div className="p-3.5 rounded-xl border border-amber-200/90 dark:border-amber-800/50 bg-amber-50/60 dark:bg-amber-950/30 text-xs text-amber-950 dark:text-amber-200 leading-relaxed font-medium">
         <p>
-          <strong>Independent OR Solutions:</strong> You do <em>not</em> need to implement all three. Achieving <strong>any single one</strong> of the three targets below will independently complete the entire shortfall and bring your retirement readiness to <strong>100% Fully Funded</strong>.
+          <strong>Independent OR Solutions:</strong> You do <em>not</em> need to implement all
+          three. Achieving <strong>any single one</strong> of the three targets below will
+          independently complete the entire shortfall and bring your retirement readiness to{' '}
+          <strong>100% Fully Funded</strong>.
         </p>
       </div>
 
@@ -206,13 +211,17 @@ export function ShortfallManagementCard({
 
             <div className="p-3 rounded-lg bg-blue-50/70 dark:bg-blue-950/40 border border-blue-100 dark:border-blue-900/50 space-y-2 text-xs">
               <div className="flex justify-between items-baseline">
-                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Extra Savings Needed:</span>
+                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                  Extra Savings Needed:
+                </span>
                 <span className="font-black text-blue-700 dark:text-blue-400 text-sm">
                   +{formatCrore(savingsRemedy.extraSavingsNeeded)}
                 </span>
               </div>
               <div className="flex justify-between items-baseline pt-1 border-t border-blue-100 dark:border-blue-900/50">
-                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Total Savings Needed Today:</span>
+                <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                  Total Savings Needed Today:
+                </span>
                 <span className="font-extrabold text-zinc-900 dark:text-zinc-100">
                   {formatCrore(savingsRemedy.totalSavingsNeeded)}
                 </span>
@@ -226,7 +235,9 @@ export function ShortfallManagementCard({
             </div>
 
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Adding <strong>+{formatCrore(savingsRemedy.extraSavingsNeeded)}</strong> today grows at {formatPercent(scenario.returnRate)} for {scenario.workingYears} career years into {formatCrore(scenario.retirementFundingGap)} at retirement.
+              Adding <strong>+{formatCrore(savingsRemedy.extraSavingsNeeded)}</strong> today grows
+              at {formatPercent(scenario.returnRate)} for {scenario.workingYears} career years into{' '}
+              {formatCrore(scenario.retirementFundingGap)} at retirement.
             </p>
           </div>
 
@@ -237,7 +248,7 @@ export function ShortfallManagementCard({
                 handleApply(
                   'savings',
                   savingsRemedy.totalSavingsNeeded,
-                  `Total Savings to ${formatCrore(savingsRemedy.totalSavingsNeeded)}`,
+                  `Total Savings to ${formatCrore(savingsRemedy.totalSavingsNeeded)}`
                 )
               }
               className="w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
@@ -273,13 +284,17 @@ export function ShortfallManagementCard({
             {salaryRemedy.isAchievable ? (
               <div className="p-3 rounded-lg bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900/50 space-y-2 text-xs">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Extra Monthly Salary:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                    Extra Monthly Salary:
+                  </span>
                   <span className="font-black text-emerald-700 dark:text-emerald-400 text-sm">
                     +{formatCrore(salaryRemedy.extraMonthlySalaryNeeded)}/mo
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline pt-1 border-t border-emerald-100 dark:border-emerald-900/50">
-                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Total Monthly Salary Needed:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                    Total Monthly Salary Needed:
+                  </span>
                   <span className="font-extrabold text-zinc-900 dark:text-zinc-100">
                     {formatCrore(salaryRemedy.totalMonthlySalaryNeeded)}/mo
                   </span>
@@ -287,7 +302,11 @@ export function ShortfallManagementCard({
                 <div className="flex justify-between items-baseline text-[11px] text-zinc-500 dark:text-zinc-400">
                   <span>Current monthly salary today:</span>
                   <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                    {formatCrore(salaryRemedy.currentMonthlySalary)}/mo ({salaryRemedy.percentIncreaseNeeded > 0 ? `+${salaryRemedy.percentIncreaseNeeded}%` : '0%'})
+                    {formatCrore(salaryRemedy.currentMonthlySalary)}/mo (
+                    {salaryRemedy.percentIncreaseNeeded > 0
+                      ? `+${salaryRemedy.percentIncreaseNeeded}%`
+                      : '0%'}
+                    )
                   </span>
                 </div>
               </div>
@@ -298,7 +317,9 @@ export function ShortfallManagementCard({
             )}
 
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
-              Earning <strong>{formatCrore(salaryRemedy.totalMonthlySalaryNeeded)}/mo</strong> invests an extra +{formatCrore(salaryRemedy.extraMonthlySalaryNeeded)}/mo monthly, compounding each year with salary hikes to bridge the shortfall.
+              Earning <strong>{formatCrore(salaryRemedy.totalMonthlySalaryNeeded)}/mo</strong>{' '}
+              invests an extra +{formatCrore(salaryRemedy.extraMonthlySalaryNeeded)}/mo monthly,
+              compounding each year with salary hikes to bridge the shortfall.
             </p>
           </div>
 
@@ -310,7 +331,7 @@ export function ShortfallManagementCard({
                   handleApply(
                     'salary',
                     salaryRemedy.totalMonthlySalaryNeeded,
-                    `Salary to ${formatCrore(salaryRemedy.totalMonthlySalaryNeeded)}/mo`,
+                    `Salary to ${formatCrore(salaryRemedy.totalMonthlySalaryNeeded)}/mo`
                   )
                 }
                 className="w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 dark:bg-emerald-600 dark:hover:bg-emerald-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
@@ -351,13 +372,17 @@ export function ShortfallManagementCard({
             {retirementAgeRemedy.isAchievable ? (
               <div className="p-3 rounded-lg bg-purple-50/70 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/50 space-y-2 text-xs">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Recommended Retirement Age:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                    Recommended Retirement Age:
+                  </span>
                   <span className="font-black text-purple-700 dark:text-purple-400 text-sm">
                     Age {retirementAgeRemedy.recommendedRetirementAge}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline pt-1 border-t border-purple-100 dark:border-purple-900/50">
-                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">Extra Time to Continue Working:</span>
+                  <span className="text-zinc-500 dark:text-zinc-400 text-[11px]">
+                    Extra Time to Continue Working:
+                  </span>
                   <span className="font-extrabold text-zinc-900 dark:text-zinc-100">
                     +{retirementAgeRemedy.extraYearsToWork} years
                   </span>
@@ -365,7 +390,8 @@ export function ShortfallManagementCard({
                 <div className="flex justify-between items-baseline text-[11px] text-zinc-500 dark:text-zinc-400">
                   <span>Current planned retirement:</span>
                   <span className="font-medium text-zinc-700 dark:text-zinc-300">
-                    Age {retirementAgeRemedy.currentRetirementAge} ({retirementAgeRemedy.remainingRetirementYears} yrs in ret.)
+                    Age {retirementAgeRemedy.currentRetirementAge} (
+                    {retirementAgeRemedy.remainingRetirementYears} yrs in ret.)
                   </span>
                 </div>
               </div>
@@ -378,11 +404,15 @@ export function ShortfallManagementCard({
             <p className="text-[11px] text-zinc-600 dark:text-zinc-400 leading-relaxed">
               {retirementAgeRemedy.isAchievable ? (
                 <>
-                  Working until <strong>Age {retirementAgeRemedy.recommendedRetirementAge}</strong> adds {retirementAgeRemedy.extraYearsToWork} years of career compounding while reducing retirement living costs to {retirementAgeRemedy.remainingRetirementYears} years.
+                  Working until <strong>Age {retirementAgeRemedy.recommendedRetirementAge}</strong>{' '}
+                  adds {retirementAgeRemedy.extraYearsToWork} years of career compounding while
+                  reducing retirement living costs to {retirementAgeRemedy.remainingRetirementYears}{' '}
+                  years.
                 </>
               ) : (
                 <>
-                  Monthly living costs exceed current income surplus. Please utilize Option 1 (Savings) or Option 2 (Salary).
+                  Monthly living costs exceed current income surplus. Please utilize Option 1
+                  (Savings) or Option 2 (Salary).
                 </>
               )}
             </p>
@@ -396,7 +426,7 @@ export function ShortfallManagementCard({
                   handleApply(
                     'retirement_age',
                     retirementAgeRemedy.recommendedRetirementAge,
-                    `Retirement Age to ${retirementAgeRemedy.recommendedRetirementAge}`,
+                    `Retirement Age to ${retirementAgeRemedy.recommendedRetirementAge}`
                   )
                 }
                 className="w-full py-2 px-3 rounded-lg bg-purple-600 hover:bg-purple-700 dark:bg-purple-600 dark:hover:bg-purple-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer"
@@ -417,7 +447,10 @@ export function ShortfallManagementCard({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 border-t border-amber-200/80 dark:border-zinc-800 text-[11px] text-zinc-500 dark:text-zinc-400 print:hidden">
         <span className="flex items-center gap-1">
           <Info className="w-3.5 h-3.5 text-zinc-400 dark:text-zinc-500" />
-          <span>Clicking any "Apply" button updates your inputs and immediately simulates a 100% funded plan.</span>
+          <span>
+            Clicking any "Apply" button updates your inputs and immediately simulates a 100% funded
+            plan.
+          </span>
         </span>
         {onEditStep && (
           <button

@@ -66,7 +66,7 @@ export const DEFAULT_SECTOR_INFLATION: SectorInflationRates = {
   healthcare: 7.0, // Healthcare historically inflates higher in India (~7-10%)
   personal: 5.0,
   technology: 3.0, // Gadgets/electronics inflate at lower rates (~2-4%)
-  family: 7.0,     // Education & dependent care inflate higher (~7-9%)
+  family: 7.0, // Education & dependent care inflate higher (~7-9%)
   financial: 5.0,
   emergency: 5.0,
   custom: 5.0,

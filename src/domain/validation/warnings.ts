@@ -18,14 +18,10 @@ export function generateWarnings(ctx: WarningContext): string[] {
   const g = assumptions.globalInflationRate
 
   if (r < g) {
-    warnings.push(
-      'Investment return is below inflation. The required corpus may be very large.',
-    )
+    warnings.push('Investment return is below inflation. The required corpus may be very large.')
   }
   if (Math.abs(r - g) < 0.001) {
-    warnings.push(
-      'Return equals inflation — a special formula case (r = g) is used.',
-    )
+    warnings.push('Return equals inflation — a special formula case (r = g) is used.')
   }
 
   if (
@@ -34,73 +30,67 @@ export function generateWarnings(ctx: WarningContext): string[] {
     assumptions.taxDragRate === 0
   ) {
     warnings.push(
-      'Gross return selected but no fees or tax drag entered. The estimate may be optimistic.',
+      'Gross return selected but no fees or tax drag entered. The estimate may be optimistic.'
     )
   }
 
   if (profile.targetAge < 85) {
     warnings.push(
-      `Planning only to age ${profile.targetAge}. Consider testing to age 90 or 95 to account for longevity.`,
+      `Planning only to age ${profile.targetAge}. Consider testing to age 90 or 95 to account for longevity.`
     )
   }
 
-  const healthCat = categories.find(c => c.id === 'healthcare')
+  const healthCat = categories.find((c) => c.id === 'healthcare')
   const healthFilled =
     healthCat &&
     !healthCat.skipped &&
     ((healthCat.parentAmount && healthCat.parentAmount > 0) ||
-      healthCat.items.some(i => !i.skipped && i.amount > 0))
+      healthCat.items.some((i) => !i.skipped && i.amount > 0))
   if (!healthFilled) {
     warnings.push(
-      'Healthcare & insurance expenses appear to be empty. These often grow faster than general inflation.',
+      'Healthcare & insurance expenses appear to be empty. These often grow faster than general inflation.'
     )
   }
 
-  const housingCat = categories.find(c => c.id === 'housing')
+  const housingCat = categories.find((c) => c.id === 'housing')
   const hasRepairs = housingCat?.items.some(
-    i =>
+    (i) =>
       !i.skipped &&
       i.amount > 0 &&
-      (i.name.toLowerCase().includes('repair') ||
-        i.name.toLowerCase().includes('maintenance')),
+      (i.name.toLowerCase().includes('repair') || i.name.toLowerCase().includes('maintenance'))
   )
   if (!hasRepairs) {
     warnings.push(
-      'No housing repairs or maintenance costs found. Consider a home maintenance reserve.',
+      'No housing repairs or maintenance costs found. Consider a home maintenance reserve.'
     )
   }
 
-  const transportCat = categories.find(c => c.id === 'transport')
+  const transportCat = categories.find((c) => c.id === 'transport')
   const hasTransport =
     transportCat &&
     !transportCat.skipped &&
     ((transportCat.parentAmount && transportCat.parentAmount > 0) ||
-      transportCat.items.some(i => !i.skipped && i.amount > 0))
+      transportCat.items.some((i) => !i.skipped && i.amount > 0))
   const hasVehicleReplacement = transportCat?.items.some(
-    i =>
-      !i.skipped &&
-      i.amount > 0 &&
-      i.name.toLowerCase().includes('replacement'),
+    (i) => !i.skipped && i.amount > 0 && i.name.toLowerCase().includes('replacement')
   )
   if (hasTransport && !hasVehicleReplacement) {
     warnings.push(
-      'Transport expenses found but no vehicle replacement cost. Vehicles need periodic replacement.',
+      'Transport expenses found but no vehicle replacement cost. Vehicles need periodic replacement.'
     )
   }
 
-  const dependents = members.filter(
-    m => m.financiallyDependent && m.id !== 'self',
-  )
+  const dependents = members.filter((m) => m.financiallyDependent && m.id !== 'self')
   if (dependents.length === 0) {
     warnings.push(
-      'No dependents (spouse, children, or elderly parents) were added in Step 3. If you support family members, remember to add them to factor in their healthcare, education, and living costs.',
+      'No dependents (spouse, children, or elderly parents) were added in Step 3. If you support family members, remember to add them to factor in their healthcare, education, and living costs.'
     )
   } else {
-    const familyCat = categories.find(c => c.id === 'family')
-    const hasFamilyWithEnd = familyCat?.items.some(i => i.endYear != null)
+    const familyCat = categories.find((c) => c.id === 'family')
+    const hasFamilyWithEnd = familyCat?.items.some((i) => i.endYear != null)
     if (!hasFamilyWithEnd) {
       warnings.push(
-        'You have dependents but no family expenses with an end year. Education and childcare costs typically stop at a certain age.',
+        'You have dependents but no family expenses with an end year. Education and childcare costs typically stop at a certain age.'
       )
     }
   }

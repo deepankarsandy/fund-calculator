@@ -7,6 +7,7 @@ This document details the automated testing policy, test suites, and validation 
 ## Testing Policy: Pure Financial Logic Focus
 
 The project adheres to a strict **Logic-Only Testing Policy**:
+
 - **Automated Unit Tests**: Focus exclusively on the financial calculation engine (`src/domain/calculations/`).
 - **No Fragile UI/DOM Tests**: We intentionally omit React component render tests, snapshot tests, or simulated DOM clicks. This keeps the test suite fast (under 1 second), deterministic, and immune to UI refactoring churn.
 

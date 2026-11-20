@@ -1,16 +1,29 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { useRouter } from '@/lib/router'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { useHeaderStore } from '@/store/useHeaderStore'
 import { AppHeader } from '@/components/layout/AppHeader'
-import HomePage from '@/pages/HomePage'
-import WizardPage from '@/pages/WizardPage'
-import FeaturesAndLogicPage from '@/pages/FeaturesAndLogicPage'
-import SipCalculatorPage from '@/pages/SipCalculatorPage'
-import InvestmentCalculatorPage from '@/pages/InvestmentCalculatorPage'
-import FdCalculatorPage from '@/pages/FdCalculatorPage'
-import LoanEmiCalculatorPage from '@/pages/LoanEmiCalculatorPage'
-import ProfilePage from '@/pages/ProfilePage'
+
+// Dynamic lazy loaded pages for route-based chunk splitting
+const HomePage = lazy(() => import('@/pages/HomePage'))
+const WizardPage = lazy(() => import('@/pages/WizardPage'))
+const FeaturesAndLogicPage = lazy(() => import('@/pages/FeaturesAndLogicPage'))
+const SipCalculatorPage = lazy(() => import('@/pages/SipCalculatorPage'))
+const InvestmentCalculatorPage = lazy(() => import('@/pages/InvestmentCalculatorPage'))
+const FdCalculatorPage = lazy(() => import('@/pages/FdCalculatorPage'))
+const LoanEmiCalculatorPage = lazy(() => import('@/pages/LoanEmiCalculatorPage'))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'))
+
+function PageFallback() {
+  return (
+    <div className="flex-1 flex items-center justify-center min-h-[60vh] py-16">
+      <div className="flex flex-col items-center gap-3 text-muted-foreground animate-pulse">
+        <div className="w-10 h-10 border-3 border-primary/30 border-t-primary rounded-full animate-spin" />
+        <p className="text-sm font-medium tracking-wide">Loading page...</p>
+      </div>
+    </div>
+  )
+}
 
 export default function App() {
   const {
@@ -81,12 +94,7 @@ export default function App() {
           />
         )
       case 'calculator':
-        return (
-          <WizardPage
-            onBackToHome={navigateToHome}
-            onViewLogic={navigateToLogic}
-          />
-        )
+        return <WizardPage onBackToHome={navigateToHome} onViewLogic={navigateToLogic} />
       case 'home':
       default:
         return (
@@ -106,7 +114,7 @@ export default function App() {
         onSelectCalculator={handleSelectCalculator}
         onViewLogic={navigateToLogic}
       />
-      {renderPage()}
+      <Suspense fallback={<PageFallback />}>{renderPage()}</Suspense>
     </div>
   )
 }

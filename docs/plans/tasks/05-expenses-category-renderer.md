@@ -26,6 +26,7 @@
    - Display default inflation rate for the category (e.g. Healthcare 7%, Tech 3%, General 5%).
 
 ## Acceptance Criteria
+
 - [ ] Switching between Parent mode and Sub-items mode is smooth and preserves data.
 - [ ] Category totals automatically aggregate to the top-level annual expense banner.
 - [ ] Fully responsive on small mobile viewports.

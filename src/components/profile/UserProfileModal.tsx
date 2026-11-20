@@ -39,17 +39,72 @@ const SECTOR_METADATA: {
   description: string
   suggested: number
 }[] = [
-  { key: 'healthcare', label: 'Healthcare & Insurance', description: 'Medical inflation historically trends high in India', suggested: 7.0 },
-  { key: 'family', label: 'Education & Dependents', description: 'Tuitions, schooling and higher education support', suggested: 7.0 },
-  { key: 'food', label: 'Food & Groceries', description: 'Staples, dairy, vegetables, household consumables', suggested: 5.0 },
-  { key: 'housing', label: 'Housing & Property', description: 'Maintenance, society charges, home upkeep', suggested: 5.0 },
-  { key: 'transport', label: 'Transport & Commute', description: 'Fuel, vehicle maintenance, transit tickets', suggested: 5.0 },
-  { key: 'utilities', label: 'Utilities & Digital', description: 'Electricity, water, mobile bills, broadband', suggested: 5.0 },
-  { key: 'personal', label: 'Personal & Lifestyle', description: 'Apparel, vacations, festivals, dining out', suggested: 5.0 },
-  { key: 'technology', label: 'Technology & Gadgets', description: 'Phones, laptops (tends to deflate or inflate lower)', suggested: 3.0 },
-  { key: 'financial', label: 'Financial & Admin', description: 'Bank charges, tax filing, legal services', suggested: 5.0 },
-  { key: 'emergency', label: 'Contingency & Reserves', description: 'Emergency buffers and unexpected provisions', suggested: 5.0 },
-  { key: 'custom', label: 'Custom Commitments', description: 'Any other ongoing personal commitments', suggested: 5.0 },
+  {
+    key: 'healthcare',
+    label: 'Healthcare & Insurance',
+    description: 'Medical inflation historically trends high in India',
+    suggested: 7.0,
+  },
+  {
+    key: 'family',
+    label: 'Education & Dependents',
+    description: 'Tuitions, schooling and higher education support',
+    suggested: 7.0,
+  },
+  {
+    key: 'food',
+    label: 'Food & Groceries',
+    description: 'Staples, dairy, vegetables, household consumables',
+    suggested: 5.0,
+  },
+  {
+    key: 'housing',
+    label: 'Housing & Property',
+    description: 'Maintenance, society charges, home upkeep',
+    suggested: 5.0,
+  },
+  {
+    key: 'transport',
+    label: 'Transport & Commute',
+    description: 'Fuel, vehicle maintenance, transit tickets',
+    suggested: 5.0,
+  },
+  {
+    key: 'utilities',
+    label: 'Utilities & Digital',
+    description: 'Electricity, water, mobile bills, broadband',
+    suggested: 5.0,
+  },
+  {
+    key: 'personal',
+    label: 'Personal & Lifestyle',
+    description: 'Apparel, vacations, festivals, dining out',
+    suggested: 5.0,
+  },
+  {
+    key: 'technology',
+    label: 'Technology & Gadgets',
+    description: 'Phones, laptops (tends to deflate or inflate lower)',
+    suggested: 3.0,
+  },
+  {
+    key: 'financial',
+    label: 'Financial & Admin',
+    description: 'Bank charges, tax filing, legal services',
+    suggested: 5.0,
+  },
+  {
+    key: 'emergency',
+    label: 'Contingency & Reserves',
+    description: 'Emergency buffers and unexpected provisions',
+    suggested: 5.0,
+  },
+  {
+    key: 'custom',
+    label: 'Custom Commitments',
+    description: 'Any other ongoing personal commitments',
+    suggested: 5.0,
+  },
 ]
 
 export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
@@ -147,7 +202,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 id="user-profile-title" className="text-base sm:text-lg font-black text-foreground tracking-tight">
+                <h2
+                  id="user-profile-title"
+                  className="text-base sm:text-lg font-black text-foreground tracking-tight"
+                >
                   User Profile & Calculator Defaults
                 </h2>
                 <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hidden sm:inline-flex items-center gap-1">
@@ -179,7 +237,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               'px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer',
               activeTab === 'personal'
                 ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <User className="w-3.5 h-3.5" />
@@ -193,7 +251,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               'px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer',
               activeTab === 'inflation'
                 ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <TrendingUp className="w-3.5 h-3.5" />
@@ -207,7 +265,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               'px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer',
               activeTab === 'income_tax'
                 ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <Wallet className="w-3.5 h-3.5" />
@@ -221,7 +279,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               'px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer',
               activeTab === 'returns'
                 ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
-                : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
             )}
           >
             <BadgePercent className="w-3.5 h-3.5" />
@@ -237,9 +295,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Name */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">
-                    Your Name (Optional)
-                  </label>
+                  <label className="text-xs font-bold text-foreground">Your Name (Optional)</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -284,9 +340,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
-                      Date of Birth (DOB)
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Date of Birth (DOB)</label>
                     <input
                       type="date"
                       value={formData.dob}
@@ -299,9 +353,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
-                      Current Age (Years)
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Current Age (Years)</label>
                     <div className="flex items-center gap-2">
                       <input
                         type="number"
@@ -368,7 +420,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     onChange={(e) =>
                       setFormData((p) => ({
                         ...p,
-                        targetAge: Math.max(formData.retirementAge + 1, parseInt(e.target.value, 10) || 85),
+                        targetAge: Math.max(
+                          formData.retirementAge + 1,
+                          parseInt(e.target.value, 10) || 85
+                        ),
                       }))
                     }
                     className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500"
@@ -399,9 +454,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">
-                    Location / Area Type
-                  </label>
+                  <label className="text-xs font-bold text-foreground">Location / Area Type</label>
                   <div className="relative">
                     <select
                       value={formData.locationType}
@@ -422,9 +475,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
               {/* Lifestyle Baseline */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-foreground">
-                  Lifestyle Baseline
-                </label>
+                <label className="text-xs font-bold text-foreground">Lifestyle Baseline</label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
                     { id: 'bare_minimum', label: 'Bare Minimum', desc: 'Survival essentials only' },
@@ -445,7 +496,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         'p-2.5 rounded-xl border text-left transition-all cursor-pointer',
                         formData.lifestyleBaseline === lvl.id
                           ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-bold shadow-xs'
-                          : 'border-border hover:bg-muted text-foreground',
+                          : 'border-border hover:bg-muted text-foreground'
                       )}
                     >
                       <div className="text-xs font-bold">{lvl.label}</div>
@@ -463,11 +514,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
               {/* Mode Toggle with Sector-Wise as default active */}
               <div className="p-4 rounded-xl border border-border bg-muted/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
-                  <h4 className="text-xs font-bold text-foreground">
-                    Inflation Mode Preference
-                  </h4>
+                  <h4 className="text-xs font-bold text-foreground">Inflation Mode Preference</h4>
                   <p className="text-[11px] text-muted-foreground">
-                    Sector-Wise is recommended for realistic financial modeling. Single rate applies a uniform blanket inflation.
+                    Sector-Wise is recommended for realistic financial modeling. Single rate applies
+                    a uniform blanket inflation.
                   </p>
                 </div>
                 <div className="inline-flex rounded-xl border border-border bg-background p-1 text-xs">
@@ -478,7 +528,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       'px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer',
                       formData.inflationMode === 'sector'
                         ? 'bg-blue-600 text-white shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground',
+                        : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
                     Sector-Wise (Recommended)
@@ -490,7 +540,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       'px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer',
                       formData.inflationMode === 'overall'
                         ? 'bg-blue-600 text-white shadow-xs'
-                        : 'text-muted-foreground hover:text-foreground',
+                        : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
                     Single Overall Rate
@@ -507,7 +557,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         Overall Blanket Inflation Rate (%)
                       </label>
                       <p className="text-[11px] text-muted-foreground">
-                        Used by SIP, FD, and Loan EMI calculators, and as default for overall projections.
+                        Used by SIP, FD, and Loan EMI calculators, and as default for overall
+                        projections.
                       </p>
                     </div>
                     <span className="text-base font-black text-blue-600 dark:text-blue-400">
@@ -571,7 +622,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {SECTOR_METADATA.map((sector) => {
-                      const currentRate = formData.sectorInflationRates[sector.key] ?? sector.suggested
+                      const currentRate =
+                        formData.sectorInflationRates[sector.key] ?? sector.suggested
                       return (
                         <div
                           key={sector.key}
@@ -602,7 +654,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                               onChange={(e) =>
                                 handleSectorInflationChange(
                                   sector.key,
-                                  parseFloat(e.target.value) || 0,
+                                  parseFloat(e.target.value) || 0
                                 )
                               }
                               className="w-16 px-2 py-1 text-xs bg-background border border-input rounded-lg font-bold text-right"
@@ -703,7 +755,10 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         onChange={(e) =>
                           setFormData((p) => ({
                             ...p,
-                            existingInvestableCorpus: Math.max(0, parseInt(e.target.value, 10) || 0),
+                            existingInvestableCorpus: Math.max(
+                              0,
+                              parseInt(e.target.value, 10) || 0
+                            ),
                           }))
                         }
                         className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
@@ -810,9 +865,7 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
-                      Income Tax Bracket
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Income Tax Bracket</label>
                     <div className="relative">
                       <select
                         value={formData.incomeTaxBracket}
@@ -926,7 +979,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       className="w-full accent-blue-600 cursor-pointer"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Used as baseline in SIP and multi-asset equity projections (Nifty 50 long-term avg ~12%).
+                      Used as baseline in SIP and multi-asset equity projections (Nifty 50 long-term
+                      avg ~12%).
                     </p>
                   </div>
 
@@ -984,7 +1038,8 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       className="w-full accent-blue-600 cursor-pointer"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Pre-filled baseline in Bank FD calculator (typical SBI/HDFC/post-office range).
+                      Pre-filled baseline in Bank FD calculator (typical SBI/HDFC/post-office
+                      range).
                     </p>
                   </div>
 

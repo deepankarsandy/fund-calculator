@@ -4,14 +4,7 @@ import { WIZARD_STEPS_CONFIG } from '@/config/formFields'
 import { DynamicStepRenderer } from '@/components/wizard/DynamicStepRenderer'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings } from '@/lib/settingsStorage'
-import {
-  ChevronLeft,
-  ChevronRight,
-  Calculator,
-  RotateCcw,
-  Sparkles,
-  ArrowLeft,
-} from 'lucide-react'
+import { ChevronLeft, ChevronRight, Calculator, RotateCcw, Sparkles, ArrowLeft } from 'lucide-react'
 
 interface WizardPageProps {
   onBackToHome?: () => void
@@ -46,7 +39,17 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
       const computed = runScenarios({ profile, members, categories, assumptions, assets })
       setResults(computed)
     }
-  }, [currentStep, totalSteps, results, profile, members, categories, assumptions, assets, setResults])
+  }, [
+    currentStep,
+    totalSteps,
+    results,
+    profile,
+    members,
+    categories,
+    assumptions,
+    assets,
+    setResults,
+  ])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -118,10 +121,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
         </div>
 
         {currentStepConfig && (
-          <DynamicStepRenderer
-            step={currentStepConfig}
-            onViewLogic={onViewLogic}
-          />
+          <DynamicStepRenderer step={currentStepConfig} onViewLogic={onViewLogic} />
         )}
       </main>
 

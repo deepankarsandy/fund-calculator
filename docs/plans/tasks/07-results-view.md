@@ -37,6 +37,7 @@
    - Plain-language financial disclaimers emphasizing that results are planning estimates rather than investment guarantees.
 
 ## Acceptance Criteria
+
 - [ ] Switching scenarios updates all cards, charts, and tables instantly.
 - [ ] Charts scale responsively to mobile and desktop widths.
 - [ ] Disclaimers are prominently visible.

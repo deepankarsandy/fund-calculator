@@ -1,9 +1,4 @@
-export type FdCompoundingFrequency =
-  | 'quarterly'
-  | 'monthly'
-  | 'half_yearly'
-  | 'annually'
-  | 'simple'
+export type FdCompoundingFrequency = 'quarterly' | 'monthly' | 'half_yearly' | 'annually' | 'simple'
 
 export type FdPayoutType = 'cumulative' | 'monthly' | 'quarterly'
 
@@ -94,23 +89,17 @@ export function calculateFd(inputs: Partial<FdCalculationInputs> = {}): FdCalcul
       maturityAmount = Math.round(principal * (1 + (effectiveRate / 100) * totalYears))
       effectiveYieldPercent = effectiveRate
     } else {
-      const ratePerPeriod = (effectiveRate / 100) / n
+      const ratePerPeriod = effectiveRate / 100 / n
       const totalPeriods = n * totalYears
       maturityAmount = Math.round(principal * Math.pow(1 + ratePerPeriod, totalPeriods))
-      effectiveYieldPercent = Number(
-        ((Math.pow(1 + ratePerPeriod, n) - 1) * 100).toFixed(2)
-      )
+      effectiveYieldPercent = Number(((Math.pow(1 + ratePerPeriod, n) - 1) * 100).toFixed(2))
     }
     totalInterestEarned = Math.max(0, maturityAmount - principal)
   } else {
     // Non-cumulative periodic payouts
     const periodsPerYear = payoutType === 'monthly' ? 12 : 4
-    periodicPayoutAmount = Math.round(
-      (principal * (effectiveRate / 100)) / periodsPerYear
-    )
-    totalInterestEarned = Math.round(
-      principal * (effectiveRate / 100) * totalYears
-    )
+    periodicPayoutAmount = Math.round((principal * (effectiveRate / 100)) / periodsPerYear)
+    totalInterestEarned = Math.round(principal * (effectiveRate / 100) * totalYears)
     maturityAmount = principal
     effectiveYieldPercent = effectiveRate
   }
@@ -120,12 +109,10 @@ export function calculateFd(inputs: Partial<FdCalculationInputs> = {}): FdCalcul
   const tdsThreshold = merged.isSeniorCitizen ? 50000 : 40000
   let estimatedTds = 0
   if (enableTax && !hasForm15G && annualInterest > tdsThreshold) {
-    estimatedTds = Math.round(totalInterestEarned * 0.10)
+    estimatedTds = Math.round(totalInterestEarned * 0.1)
   }
 
-  const estimatedTaxLiability = enableTax
-    ? Math.round(totalInterestEarned * (slabRate / 100))
-    : 0
+  const estimatedTaxLiability = enableTax ? Math.round(totalInterestEarned * (slabRate / 100)) : 0
 
   const netPostTaxMaturity =
     payoutType === 'cumulative'
@@ -149,7 +136,7 @@ export function calculateFd(inputs: Partial<FdCalculationInputs> = {}): FdCalcul
       if (compoundingFreq === 'simple') {
         yearBalance = Math.round(principal * (1 + (effectiveRate / 100) * elapsed))
       } else {
-        const ratePerPeriod = (effectiveRate / 100) / n
+        const ratePerPeriod = effectiveRate / 100 / n
         const periods = n * elapsed
         yearBalance = Math.round(principal * Math.pow(1 + ratePerPeriod, periods))
       }

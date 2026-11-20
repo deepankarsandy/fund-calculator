@@ -89,7 +89,7 @@ export const useScenarioStore = create<ScenarioState>()(
       categories: buildCategoriesForProfile(
         DEFAULT_PROFILE.areaType,
         DEFAULT_PROFILE.lifestyleScenario,
-        [initialSelf],
+        [initialSelf]
       ),
       assumptions: DEFAULT_ASSUMPTIONS,
       assets: DEFAULT_ASSETS,
@@ -98,129 +98,125 @@ export const useScenarioStore = create<ScenarioState>()(
       totalSteps: 6,
 
       setStepFieldValue: (stepKey, fieldId, value) => {
-        if (stepKey === "profile") {
+        if (stepKey === 'profile') {
           set((s) => {
-            const updatedProfile = { ...s.profile, [fieldId]: value };
+            const updatedProfile = { ...s.profile, [fieldId]: value }
             // Auto update member age if currentAge changes
-            let updatedMembers = s.members;
-            if (fieldId === "currentAge") {
+            let updatedMembers = s.members
+            if (fieldId === 'currentAge') {
               updatedMembers = s.members.map((m) =>
-                m.id === "self" ? { ...m, age: Number(value) } : m,
-              );
+                m.id === 'self' ? { ...m, age: Number(value) } : m
+              )
             }
 
             // Auto calibrate categories if areaType or lifestyleScenario changes
-            let updatedCategories = s.categories;
-            if (fieldId === "areaType" || fieldId === "lifestyleScenario") {
+            let updatedCategories = s.categories
+            if (fieldId === 'areaType' || fieldId === 'lifestyleScenario') {
               updatedCategories = buildCategoriesForProfile(
                 updatedProfile.areaType,
                 updatedProfile.lifestyleScenario,
-                updatedMembers,
-              );
+                updatedMembers
+              )
             }
 
             return {
               profile: updatedProfile,
               members: updatedMembers,
               categories: updatedCategories,
-            };
-          });
-        } else if (stepKey === "household") {
-          if (fieldId === "members") {
-            const newMembers = value as HouseholdMember[];
-            const { profile } = get();
+            }
+          })
+        } else if (stepKey === 'household') {
+          if (fieldId === 'members') {
+            const newMembers = value as HouseholdMember[]
+            const { profile } = get()
             set({
               members: newMembers,
               categories: buildCategoriesForProfile(
                 profile.areaType,
                 profile.lifestyleScenario,
-                newMembers,
+                newMembers
               ),
-            });
+            })
           }
-        } else if (stepKey === "assumptions") {
-          set((s) => ({ assumptions: { ...s.assumptions, [fieldId]: value } }));
-        } else if (stepKey === "assets") {
-          set((s) => ({ assets: { ...s.assets, [fieldId]: value } }));
+        } else if (stepKey === 'assumptions') {
+          set((s) => ({ assumptions: { ...s.assumptions, [fieldId]: value } }))
+        } else if (stepKey === 'assets') {
+          set((s) => ({ assets: { ...s.assets, [fieldId]: value } }))
         }
       },
 
       setProfile: (p) =>
         set((s) => {
-          const updatedProfile = { ...s.profile, ...p };
-          let updatedCategories = s.categories;
+          const updatedProfile = { ...s.profile, ...p }
+          let updatedCategories = s.categories
           if (p.areaType || p.lifestyleScenario) {
             updatedCategories = buildCategoriesForProfile(
               updatedProfile.areaType,
               updatedProfile.lifestyleScenario,
-              s.members,
-            );
+              s.members
+            )
           }
-          return { profile: updatedProfile, categories: updatedCategories };
+          return { profile: updatedProfile, categories: updatedCategories }
         }),
 
       recalibrateCategories: () => {
-        const { profile, members } = get();
+        const { profile, members } = get()
         set({
           categories: buildCategoriesForProfile(
             profile.areaType,
             profile.lifestyleScenario,
-            members,
+            members
           ),
-        });
+        })
       },
 
       addMember: (m) =>
         set((s) => {
-          const nextMembers = [...s.members, m];
+          const nextMembers = [...s.members, m]
           return {
             members: nextMembers,
             categories: buildCategoriesForProfile(
               s.profile.areaType,
               s.profile.lifestyleScenario,
-              nextMembers,
+              nextMembers
             ),
-          };
+          }
         }),
 
       updateMember: (id, patch) =>
         set((s) => {
-          const nextMembers = s.members.map((m) =>
-            m.id === id ? { ...m, ...patch } : m,
-          );
+          const nextMembers = s.members.map((m) => (m.id === id ? { ...m, ...patch } : m))
           return {
             members: nextMembers,
             categories: buildCategoriesForProfile(
               s.profile.areaType,
               s.profile.lifestyleScenario,
-              nextMembers,
+              nextMembers
             ),
-          };
+          }
         }),
 
       removeMember: (id) =>
         set((s) => {
-          const nextMembers = s.members.filter((m) => m.id !== id);
+          const nextMembers = s.members.filter((m) => m.id !== id)
           return {
             members: nextMembers,
             categories: buildCategoriesForProfile(
               s.profile.areaType,
               s.profile.lifestyleScenario,
-              nextMembers,
+              nextMembers
             ),
-          };
+          }
         }),
 
       updateCategory: (id, patch) =>
         set((s) => ({
-          categories: s.categories.map((c) =>
-            c.id === id ? { ...c, ...patch } : c,
-          ),
+          categories: s.categories.map((c) => (c.id === id ? { ...c, ...patch } : c)),
         })),
       addExpenseItem: (categoryId, item) =>
         set((s) => ({
           categories: s.categories.map((c) =>
-            c.id === categoryId ? { ...c, items: [...c.items, item] } : c,
+            c.id === categoryId ? { ...c, items: [...c.items, item] } : c
           ),
         })),
       updateExpenseItem: (categoryId, itemId, patch) =>
@@ -229,24 +225,19 @@ export const useScenarioStore = create<ScenarioState>()(
             c.id === categoryId
               ? {
                   ...c,
-                  items: c.items.map((i) =>
-                    i.id === itemId ? { ...i, ...patch } : i,
-                  ),
+                  items: c.items.map((i) => (i.id === itemId ? { ...i, ...patch } : i)),
                 }
-              : c,
+              : c
           ),
         })),
       removeExpenseItem: (categoryId, itemId) =>
         set((s) => ({
           categories: s.categories.map((c) =>
-            c.id === categoryId
-              ? { ...c, items: c.items.filter((i) => i.id !== itemId) }
-              : c,
+            c.id === categoryId ? { ...c, items: c.items.filter((i) => i.id !== itemId) } : c
           ),
         })),
 
-      setAssumptions: (a) =>
-        set((s) => ({ assumptions: { ...s.assumptions, ...a } })),
+      setAssumptions: (a) => set((s) => ({ assumptions: { ...s.assumptions, ...a } })),
       setAssets: (a) => set((s) => ({ assets: { ...s.assets, ...a } })),
       addOtherIncome: (income) =>
         set((s) => ({
@@ -259,9 +250,7 @@ export const useScenarioStore = create<ScenarioState>()(
         set((s) => ({
           assets: {
             ...s.assets,
-            otherIncome: s.assets.otherIncome.map((i) =>
-              i.id === id ? { ...i, ...patch } : i,
-            ),
+            otherIncome: s.assets.otherIncome.map((i) => (i.id === id ? { ...i, ...patch } : i)),
           },
         })),
       removeOtherIncome: (id) =>
@@ -283,7 +272,7 @@ export const useScenarioStore = create<ScenarioState>()(
           assets: {
             ...s.assets,
             futureContributions: s.assets.futureContributions.map((l) =>
-              l.id === id ? { ...l, ...patch } : l,
+              l.id === id ? { ...l, ...patch } : l
             ),
           },
         })),
@@ -291,69 +280,61 @@ export const useScenarioStore = create<ScenarioState>()(
         set((s) => ({
           assets: {
             ...s.assets,
-            futureContributions: s.assets.futureContributions.filter(
-              (l) => l.id !== id,
-            ),
+            futureContributions: s.assets.futureContributions.filter((l) => l.id !== id),
           },
         })),
 
       setResults: (r) => set({ results: r }),
 
       selectLifestylePlan: (lifestyle) => {
-        const { profile, members, categories, assumptions, assets } = get();
+        const { profile, members, categories, assumptions, assets } = get()
         const updatedProfile: Profile = {
           ...profile,
           lifestyleScenario: lifestyle,
-        };
+        }
 
         // Derive updated categories for this lifestyle
-        let updatedCategories: ExpenseCategory[];
+        let updatedCategories: ExpenseCategory[]
         const comfortableDefaults = buildCategoriesForProfile(
           profile.areaType,
-          "comfortable",
-          members,
-        );
+          'comfortable',
+          members
+        )
 
-        if (lifestyle === "bare_minimum") {
+        if (lifestyle === 'bare_minimum') {
           // Keep essentials, reduce discretionary to 0 (skipped)
           updatedCategories = categories.map((cat) => {
             if (cat.parentAmount != null && cat.parentFrequency) {
               return {
                 ...cat,
                 parentAmount: Math.round(cat.parentAmount * 0.65),
-              };
+              }
             }
             return {
               ...cat,
               items: cat.items.map((it) =>
-                it.essential ? it : { ...it, amount: 0, skipped: true },
+                it.essential ? it : { ...it, amount: 0, skipped: true }
               ),
-            };
-          });
-        } else if (lifestyle === "luxury") {
+            }
+          })
+        } else if (lifestyle === 'luxury') {
           // Derive from comfortable baseline
-          let baseCategories = categories;
-          if (profile.lifestyleScenario === "bare_minimum") {
+          let baseCategories = categories
+          if (profile.lifestyleScenario === 'bare_minimum') {
             baseCategories = comfortableDefaults.map((cat) => {
-              const currentCat = categories.find((c) => c.id === cat.id);
-              if (!currentCat) return cat;
+              const currentCat = categories.find((c) => c.id === cat.id)
+              if (!currentCat) return cat
               return {
                 ...cat,
                 items: cat.items.map((defItem) => {
-                  const currentItem = currentCat.items.find(
-                    (ci) => ci.name === defItem.name,
-                  );
-                  if (
-                    currentItem &&
-                    currentItem.essential &&
-                    currentItem.amount > 0
-                  ) {
-                    return { ...defItem, amount: currentItem.amount };
+                  const currentItem = currentCat.items.find((ci) => ci.name === defItem.name)
+                  if (currentItem && currentItem.essential && currentItem.amount > 0) {
+                    return { ...defItem, amount: currentItem.amount }
                   }
-                  return defItem;
+                  return defItem
                 }),
-              };
-            });
+              }
+            })
           }
 
           updatedCategories = baseCategories.map((cat) => {
@@ -361,73 +342,60 @@ export const useScenarioStore = create<ScenarioState>()(
               return {
                 ...cat,
                 parentAmount: Math.round(cat.parentAmount * 1.4),
-              };
+              }
             }
             return {
               ...cat,
               items: cat.items.map((it) => ({
                 ...it,
                 skipped: false,
-                amount: it.essential
-                  ? Math.round(it.amount * 1.15)
-                  : Math.round(it.amount * 1.5),
+                amount: it.essential ? Math.round(it.amount * 1.15) : Math.round(it.amount * 1.5),
               })),
-            };
-          });
+            }
+          })
         } else {
           // 'comfortable'
-          if (profile.lifestyleScenario === "bare_minimum") {
+          if (profile.lifestyleScenario === 'bare_minimum') {
             // Restore comfortable defaults for non-essential items while preserving any user-entered essentials
             updatedCategories = comfortableDefaults.map((cat) => {
-              const currentCat = categories.find((c) => c.id === cat.id);
-              if (!currentCat) return cat;
-              if (
-                currentCat.parentAmount != null &&
-                currentCat.parentFrequency
-              ) {
+              const currentCat = categories.find((c) => c.id === cat.id)
+              if (!currentCat) return cat
+              if (currentCat.parentAmount != null && currentCat.parentFrequency) {
                 return {
                   ...cat,
                   parentAmount: Math.round(currentCat.parentAmount / 0.65),
-                };
+                }
               }
               return {
                 ...cat,
                 items: cat.items.map((defItem) => {
-                  const currentItem = currentCat.items.find(
-                    (ci) => ci.name === defItem.name,
-                  );
-                  if (
-                    currentItem &&
-                    currentItem.essential &&
-                    currentItem.amount > 0
-                  ) {
-                    return { ...defItem, amount: currentItem.amount };
+                  const currentItem = currentCat.items.find((ci) => ci.name === defItem.name)
+                  if (currentItem && currentItem.essential && currentItem.amount > 0) {
+                    return { ...defItem, amount: currentItem.amount }
                   }
-                  return { ...defItem, skipped: false };
+                  return { ...defItem, skipped: false }
                 }),
-              };
-            });
-          } else if (profile.lifestyleScenario === "luxury") {
+              }
+            })
+          } else if (profile.lifestyleScenario === 'luxury') {
             // Unscale back to comfortable
             updatedCategories = categories.map((cat) => {
               if (cat.parentAmount != null && cat.parentFrequency) {
                 return {
                   ...cat,
                   parentAmount: Math.round(cat.parentAmount / 1.4),
-                };
+                }
               }
               return {
                 ...cat,
                 items: cat.items.map((it) => ({
                   ...it,
-                  amount: it.essential
-                    ? Math.round(it.amount / 1.15)
-                    : Math.round(it.amount / 1.5),
+                  amount: it.essential ? Math.round(it.amount / 1.15) : Math.round(it.amount / 1.5),
                 })),
-              };
-            });
+              }
+            })
           } else {
-            updatedCategories = categories;
+            updatedCategories = categories
           }
         }
 
@@ -438,24 +406,24 @@ export const useScenarioStore = create<ScenarioState>()(
           categories: updatedCategories,
           assumptions,
           assets,
-        });
+        })
 
         set({
           profile: updatedProfile,
           categories: updatedCategories,
           results: newResults,
-        });
+        })
       },
 
       applyShortfallRemedy: (type, value) => {
-        const { profile, members, categories, assumptions, assets } = get();
-        let updatedAssets = { ...assets };
-        if (type === "savings") {
-          updatedAssets = { ...updatedAssets, existingInvestableCorpus: value };
-        } else if (type === "salary") {
-          updatedAssets = { ...updatedAssets, monthlyIncome: value };
-        } else if (type === "retirement_age") {
-          updatedAssets = { ...updatedAssets, incomeEndAge: value };
+        const { profile, members, categories, assumptions, assets } = get()
+        let updatedAssets = { ...assets }
+        if (type === 'savings') {
+          updatedAssets = { ...updatedAssets, existingInvestableCorpus: value }
+        } else if (type === 'salary') {
+          updatedAssets = { ...updatedAssets, monthlyIncome: value }
+        } else if (type === 'retirement_age') {
+          updatedAssets = { ...updatedAssets, incomeEndAge: value }
         }
         const newResults = runScenarios({
           profile,
@@ -463,34 +431,34 @@ export const useScenarioStore = create<ScenarioState>()(
           categories,
           assumptions,
           assets: updatedAssets,
-        });
+        })
         set({
           assets: updatedAssets,
           results: newResults,
-        });
+        })
       },
 
       applyProfileDefaults: (customProfile) => {
-        const p = customProfile || getUserProfile();
+        const p = customProfile || getUserProfile()
         const selfMember: HouseholdMember = {
-          id: "self",
-          label: p.name ? `${p.name} (Self)` : "Self",
-          relationship: "self",
+          id: 'self',
+          label: p.name ? `${p.name} (Self)` : 'Self',
+          relationship: 'self',
           age: p.currentAge,
           financiallyDependent: true,
           hasHealthInsurance: false,
-        };
+        }
 
         const updatedProfile: Profile = {
           country: p.country,
-          region: get().profile.region || "Odisha",
-          city: get().profile.city || "",
+          region: get().profile.region || 'Odisha',
+          city: get().profile.city || '',
           currency: p.currency,
           currentAge: p.currentAge,
           targetAge: p.targetAge,
           areaType: p.locationType,
           lifestyleScenario: p.lifestyleBaseline,
-        };
+        }
 
         const updatedAssets: Assets = {
           ...get().assets,
@@ -498,21 +466,23 @@ export const useScenarioStore = create<ScenarioState>()(
           incomeEndAge: p.retirementAge,
           incomeGrowthRate: p.annualIncomeGrowthRate / 100,
           existingInvestableCorpus: p.existingInvestableCorpus,
-        };
+        }
 
         const updatedAssumptions: Assumptions = {
           ...get().assumptions,
           globalInflationRate: p.overallInflationRate / 100,
-          inflationMode: p.inflationMode === "sector" ? "category" : "simple",
+          inflationMode: p.inflationMode === 'sector' ? 'category' : 'simple',
           annualInvestmentReturn: p.expectedDebtReturn / 100,
-        };
+        }
 
         const updatedCategories = buildCategoriesForProfile(
           p.locationType,
           p.lifestyleBaseline,
           [selfMember],
-          p.inflationMode === "sector" ? (p.sectorInflationRates as unknown as Record<string, number>) : undefined,
-        );
+          p.inflationMode === 'sector'
+            ? (p.sectorInflationRates as unknown as Record<string, number>)
+            : undefined
+        )
 
         set({
           profile: updatedProfile,
@@ -521,57 +491,57 @@ export const useScenarioStore = create<ScenarioState>()(
           assumptions: updatedAssumptions,
           assets: updatedAssets,
           results: null,
-        });
+        })
       },
 
       goToStep: (step) => {
-        const { totalSteps } = get();
+        const { totalSteps } = get()
         if (step >= 1 && step <= totalSteps) {
-          updateStoredSettings({ currentStep: step });
-          set({ currentStep: step });
-          syncStepToUrl(step);
+          updateStoredSettings({ currentStep: step })
+          set({ currentStep: step })
+          syncStepToUrl(step)
         }
       },
       nextStep: () => {
-        const { currentStep, totalSteps } = get();
+        const { currentStep, totalSteps } = get()
         if (currentStep < totalSteps) {
-          const next = currentStep + 1;
-          updateStoredSettings({ currentStep: next });
-          set({ currentStep: next });
-          syncStepToUrl(next);
+          const next = currentStep + 1
+          updateStoredSettings({ currentStep: next })
+          set({ currentStep: next })
+          syncStepToUrl(next)
         }
       },
       prevStep: () => {
-        const { currentStep } = get();
+        const { currentStep } = get()
         if (currentStep > 1) {
-          const prev = currentStep - 1;
-          updateStoredSettings({ currentStep: prev });
-          set({ currentStep: prev });
-          syncStepToUrl(prev);
+          const prev = currentStep - 1
+          updateStoredSettings({ currentStep: prev })
+          set({ currentStep: prev })
+          syncStepToUrl(prev)
         }
       },
 
       reset: () => {
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("corpus-calc-v1");
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('corpus-calc-v1')
         }
-        clearStoredSettings();
+        clearStoredSettings()
         set({
           profile: DEFAULT_PROFILE,
           members: [{ ...initialSelf, age: DEFAULT_PROFILE.currentAge }],
           categories: buildCategoriesForProfile(
             DEFAULT_PROFILE.areaType,
             DEFAULT_PROFILE.lifestyleScenario,
-            [initialSelf],
+            [initialSelf]
           ),
           assumptions: DEFAULT_ASSUMPTIONS,
           assets: DEFAULT_ASSETS,
           results: null,
           currentStep: 1,
-        });
-        syncStepToUrl(1, { replace: true });
+        })
+        syncStepToUrl(1, { replace: true })
       },
     }),
-    { name: "corpus-calc-v2" },
-  ),
-);
+    { name: 'corpus-calc-v2' }
+  )
+)

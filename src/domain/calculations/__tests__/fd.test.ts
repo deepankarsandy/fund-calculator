@@ -53,7 +53,7 @@ describe('calculateFd', () => {
     })
 
     expect(res.estimatedTds).toBeGreaterThan(0)
-    expect(res.estimatedTaxLiability).toBe(Math.round(res.totalInterestEarned * 0.20))
+    expect(res.estimatedTaxLiability).toBe(Math.round(res.totalInterestEarned * 0.2))
   })
 
   it('exempts TDS when Form 15G/15H is submitted', () => {

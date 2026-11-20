@@ -52,7 +52,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
           value={currentValue ?? ''}
           placeholder={field.placeholder}
           onFocus={handleFocus}
-          onChange={e => {
+          onChange={(e) => {
             setLastFilled(field.id)
             onChange(e.target.value)
           }}
@@ -77,14 +77,14 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               value={currentValue ?? ''}
               placeholder={field.placeholder}
               onFocus={handleFocus}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(field.id)
                 onChange(e.target.value === '' ? '' : Number(e.target.value))
               }}
               className={cn(
                 'w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
                 field.prefix ? 'pl-8' : 'pl-3.5',
-                field.suffix ? 'pr-16' : 'pr-3.5',
+                field.suffix ? 'pr-16' : 'pr-3.5'
               )}
             />
             {field.suffix && (
@@ -107,13 +107,13 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
             id={field.id}
             value={currentValue ?? ''}
             onFocus={handleFocus}
-            onChange={e => {
+            onChange={(e) => {
               setLastFilled(field.id)
               onChange(e.target.value)
             }}
             className="w-full h-11 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-xl pl-3.5 pr-10 text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 cursor-pointer"
           >
-            {field.options?.map(opt => (
+            {field.options?.map((opt) => (
               <option key={String(opt.value)} value={opt.value}>
                 {opt.label}
               </option>
@@ -134,7 +134,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
               step={field.step ?? 0.01}
               value={currentValue ?? field.defaultValue}
               onFocus={handleFocus}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(field.id)
                 onChange(Number(e.target.value))
               }}
@@ -153,7 +153,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
 
       {field.type === 'radio' && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1" id={field.id}>
-          {field.options?.map(opt => {
+          {field.options?.map((opt) => {
             const isSelected = currentValue === opt.value
             return (
               <button
@@ -167,7 +167,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
                   'text-left p-3.5 rounded-xl border-2 transition-all duration-150 cursor-pointer shadow-xs',
                   isSelected
                     ? 'border-blue-600 dark:border-blue-500 bg-blue-50/70 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 ring-2 ring-blue-500/10'
-                    : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100',
+                    : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100'
                 )}
               >
                 <div className="font-bold text-sm">{opt.label}</div>
@@ -189,7 +189,7 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
             type="checkbox"
             checked={Boolean(currentValue)}
             onFocus={handleFocus}
-            onChange={e => {
+            onChange={(e) => {
               setLastFilled(field.id)
               onChange(e.target.checked)
             }}
@@ -225,7 +225,7 @@ function ArrayField({
     const newItem: Record<string, any> = {
       id: Math.random().toString(36).slice(2, 9),
     }
-    field.subFields?.forEach(sub => {
+    field.subFields?.forEach((sub) => {
       newItem[sub.id] = sub.defaultValue
     })
     const updated = [...items, newItem]
@@ -269,12 +269,12 @@ function ArrayField({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
-            {field.subFields?.map(sub => (
+            {field.subFields?.map((sub) => (
               <DynamicField
                 key={sub.id}
                 field={{ ...sub, id: `${field.id}_${idx}_${sub.id}` }}
                 value={item[sub.id]}
-                onChange={val => updateItem(idx, sub.id, val)}
+                onChange={(val) => updateItem(idx, sub.id, val)}
               />
             ))}
           </div>

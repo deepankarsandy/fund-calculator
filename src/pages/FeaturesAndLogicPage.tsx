@@ -46,13 +46,13 @@ export default function FeaturesAndLogicPage({
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tight leading-tight">
             How The Calculator Works: <br />
-            <span className="text-blue-600 dark:text-blue-400">
-              Formulas, Calibrations & Logic
-            </span>
+            <span className="text-blue-600 dark:text-blue-400">Formulas, Calibrations & Logic</span>
           </h2>
 
           <p className="text-xs sm:text-sm text-muted-foreground font-medium leading-relaxed max-w-2xl mx-auto">
-            Retirement planning in India requires precision: standard Western heuristics like the 25x or 4% rule break down under 6–7% inflation and 10%+ healthcare escalations. Here is the exact mathematical and algorithmic foundation behind every number.
+            Retirement planning in India requires precision: standard Western heuristics like the
+            25x or 4% rule break down under 6–7% inflation and 10%+ healthcare escalations. Here is
+            the exact mathematical and algorithmic foundation behind every number.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 pt-2">
@@ -61,8 +61,8 @@ export default function FeaturesAndLogicPage({
               Convention A Growing Annuity
             </span>
             <span className="px-3 py-1 rounded-lg border border-border bg-card text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-              4 Indian Area Tiers
+              <MapPin className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />4 Indian Area
+              Tiers
             </span>
             <span className="px-3 py-1 rounded-lg border border-border bg-card text-xs font-semibold text-muted-foreground flex items-center gap-1.5">
               <Layers className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
@@ -136,7 +136,12 @@ export default function FeaturesAndLogicPage({
                 <span>Why the standard "25x Rule" (4% SWR) is dangerous in India</span>
               </div>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                The popular 25x rule originates from the 1998 US Trinity Study, assuming long-term inflation of 2–3% and portfolio returns of 7–8% (a healthy real return spread of 4–5%). In India, long-term consumer inflation averages 5–7%, and healthcare inflation surpasses 10–12%. A static 25x corpus can lead to premature portfolio depletion in under 18 years. Our engine replaces flat rules with exact <strong>Growing Annuity Formulations (Convention A)</strong>.
+                The popular 25x rule originates from the 1998 US Trinity Study, assuming long-term
+                inflation of 2–3% and portfolio returns of 7–8% (a healthy real return spread of
+                4–5%). In India, long-term consumer inflation averages 5–7%, and healthcare
+                inflation surpasses 10–12%. A static 25x corpus can lead to premature portfolio
+                depletion in under 18 years. Our engine replaces flat rules with exact{' '}
+                <strong>Growing Annuity Formulations (Convention A)</strong>.
               </p>
             </div>
 
@@ -157,7 +162,12 @@ export default function FeaturesAndLogicPage({
               </div>
 
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                To fund an initial annual retirement living expenditure <code className="font-mono text-xs">E₀</code> that inflates annually at rate <code className="font-mono text-xs">g</code> over <code className="font-mono text-xs">n</code> years of retirement, with a post-retirement portfolio compounding at annual rate <code className="font-mono text-xs">r</code>:
+                To fund an initial annual retirement living expenditure{' '}
+                <code className="font-mono text-xs">E₀</code> that inflates annually at rate{' '}
+                <code className="font-mono text-xs">g</code> over{' '}
+                <code className="font-mono text-xs">n</code> years of retirement, with a
+                post-retirement portfolio compounding at annual rate{' '}
+                <code className="font-mono text-xs">r</code>:
               </p>
 
               {/* Mathematical Display Boxes */}
@@ -181,7 +191,9 @@ export default function FeaturesAndLogicPage({
                   </div>
 
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    The beginning-of-year multiplier factor <code className="font-mono">(1 + r)</code> ensures expenses can be drawn at the start of each year without requiring mid-year capital liquidation.
+                    The beginning-of-year multiplier factor{' '}
+                    <code className="font-mono">(1 + r)</code> ensures expenses can be drawn at the
+                    start of each year without requiring mid-year capital liquidation.
                   </p>
                 </div>
 
@@ -204,7 +216,9 @@ export default function FeaturesAndLogicPage({
                   </div>
 
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    When investment returns exactly match inflation rate, compound real growth is zero. The required capital simplifies cleanly to total nominal lifetime expenditure.
+                    When investment returns exactly match inflation rate, compound real growth is
+                    zero. The required capital simplifies cleanly to total nominal lifetime
+                    expenditure.
                   </p>
                 </div>
               </div>
@@ -248,48 +262,66 @@ export default function FeaturesAndLogicPage({
                   Active Career Income Escalation & Surplus Compounding
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Implemented in <code className="font-mono text-xs">src/domain/calculations/runScenarios.ts</code> and <code className="font-mono text-xs">projectCashflows.ts</code>
+                  Implemented in{' '}
+                  <code className="font-mono text-xs">src/domain/calculations/runScenarios.ts</code>{' '}
+                  and <code className="font-mono text-xs">projectCashflows.ts</code>
                 </p>
               </div>
 
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-1.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Step 1</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                      Step 1
+                    </span>
                     <h4 className="font-bold text-xs text-foreground">Annual Salary Escalation</h4>
                     <div className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 py-1">
                       I(t) = I₀ × (1 + g_salary)ᵗ
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Take-home income escalates annually using your expected salary hike percentage.
+                      Take-home income escalates annually using your expected salary hike
+                      percentage.
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-1.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Step 2</span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                      Step 2
+                    </span>
                     <h4 className="font-bold text-xs text-foreground">Investable Annual Surplus</h4>
                     <div className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 py-1">
                       S(t) = max(0, I(t) - E(t) - L(t))
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Living expenses E(t) and annual liabilities L(t) are deducted from take-home pay.
+                      Living expenses E(t) and annual liabilities L(t) are deducted from take-home
+                      pay.
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-1.5">
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase">Step 3</span>
-                    <h4 className="font-bold text-xs text-foreground">Accumulation Recursive Step</h4>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                      Step 3
+                    </span>
+                    <h4 className="font-bold text-xs text-foreground">
+                      Accumulation Recursive Step
+                    </h4>
                     <div className="font-mono text-xs font-bold text-emerald-600 dark:text-emerald-400 py-1">
                       P(t) = (P(t-1) + S(t)) × (1 + r)
                     </div>
                     <p className="text-[11px] text-muted-foreground">
-                      Starting capital plus annual surplus compounds at your expected rate of return r.
+                      Starting capital plus annual surplus compounds at your expected rate of return
+                      r.
                     </p>
                   </div>
                 </div>
 
                 <div className="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 text-xs text-muted-foreground leading-relaxed">
-                  <strong className="text-foreground">Peak Wealth at Retirement:</strong> At retirement age <code className="font-mono">A_ret</code>, the portfolio reaches <code className="font-mono">P_R = P(A_ret)</code>. If your accumulated career savings <code className="font-mono">P_R</code> exceed or equal the target required corpus <code className="font-mono">C_R</code>, your retirement is <strong>100% Self-Funded (₹0 Extra Capital Required Today)</strong>.
+                  <strong className="text-foreground">Peak Wealth at Retirement:</strong> At
+                  retirement age <code className="font-mono">A_ret</code>, the portfolio reaches{' '}
+                  <code className="font-mono">P_R = P(A_ret)</code>. If your accumulated career
+                  savings <code className="font-mono">P_R</code> exceed or equal the target required
+                  corpus <code className="font-mono">C_R</code>, your retirement is{' '}
+                  <strong>100% Self-Funded (₹0 Extra Capital Required Today)</strong>.
                 </div>
               </div>
             </div>
@@ -304,18 +336,25 @@ export default function FeaturesAndLogicPage({
                   Post-Retirement Drawdown & Depletion Detection
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Implemented in <code className="font-mono text-xs">src/domain/calculations/simulatePortfolio.ts</code>
+                  Implemented in{' '}
+                  <code className="font-mono text-xs">
+                    src/domain/calculations/simulatePortfolio.ts
+                  </code>
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-border bg-card space-y-2">
-                  <h4 className="text-xs font-bold text-foreground">Annual Net Deficit Withdrawal</h4>
+                  <h4 className="text-xs font-bold text-foreground">
+                    Annual Net Deficit Withdrawal
+                  </h4>
                   <div className="font-mono text-xs font-bold text-purple-600 dark:text-purple-400 py-1">
                     W(t) = max(0, E(t) - O(t))
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Where <code className="font-mono">O(t)</code> represents guaranteed recurring post-retirement passive income (pension, annuities, or rental yields). The portfolio only needs to bridge the deficit.
+                    Where <code className="font-mono">O(t)</code> represents guaranteed recurring
+                    post-retirement passive income (pension, annuities, or rental yields). The
+                    portfolio only needs to bridge the deficit.
                   </p>
                 </div>
 
@@ -325,29 +364,49 @@ export default function FeaturesAndLogicPage({
                     B(t) = (B(t-1) - W(t)) × (1 + r)
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
-                    Living expenses are withdrawn at beginning-of-year, and remaining portfolio assets continue compounding at return rate <code className="font-mono">r</code>. If <code className="font-mono">B(t) &lt; 0</code>, the exact depletion year is flagged.
+                    Living expenses are withdrawn at beginning-of-year, and remaining portfolio
+                    assets continue compounding at return rate <code className="font-mono">r</code>.
+                    If <code className="font-mono">B(t) &lt; 0</code>, the exact depletion year is
+                    flagged.
                   </p>
                 </div>
               </div>
 
               {/* Readiness Score Breakdown */}
               <div className="p-4 rounded-xl border border-border bg-muted/30 space-y-3">
-                <h4 className="text-xs font-bold text-foreground">Retirement Readiness Score Metric</h4>
+                <h4 className="text-xs font-bold text-foreground">
+                  Retirement Readiness Score Metric
+                </h4>
                 <div className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">
-                  Readiness Score (%) = (Projected Accumulated Corpus P_R / Target Needed Corpus C_R) × 100%
+                  Readiness Score (%) = (Projected Accumulated Corpus P_R / Target Needed Corpus
+                  C_R) × 100%
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
                   <div className="p-3 rounded-lg border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-[11px] space-y-0.5">
-                    <span className="font-bold text-emerald-800 dark:text-emerald-300">≥ 100% · Fully Funded</span>
-                    <p className="text-muted-foreground">Portfolio lasts your entire lifespan with surplus safety buffer.</p>
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300">
+                      ≥ 100% · Fully Funded
+                    </span>
+                    <p className="text-muted-foreground">
+                      Portfolio lasts your entire lifespan with surplus safety buffer.
+                    </p>
                   </div>
                   <div className="p-3 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-[11px] space-y-0.5">
-                    <span className="font-bold text-amber-800 dark:text-amber-300">70% – 99% · Moderate Gap</span>
-                    <p className="text-muted-foreground">Minor shortfall; manageable with small spending adjustments or 2–3% higher savings.</p>
+                    <span className="font-bold text-amber-800 dark:text-amber-300">
+                      70% – 99% · Moderate Gap
+                    </span>
+                    <p className="text-muted-foreground">
+                      Minor shortfall; manageable with small spending adjustments or 2–3% higher
+                      savings.
+                    </p>
                   </div>
                   <div className="p-3 rounded-lg border border-rose-200 dark:border-rose-800 bg-rose-50 dark:bg-rose-950/40 text-[11px] space-y-0.5">
-                    <span className="font-bold text-rose-800 dark:text-rose-300">&lt; 70% · Critical Gap</span>
-                    <p className="text-muted-foreground">Portfolio depletes before target age. Requires additional starting capital or delayed retirement.</p>
+                    <span className="font-bold text-rose-800 dark:text-rose-300">
+                      &lt; 70% · Critical Gap
+                    </span>
+                    <p className="text-muted-foreground">
+                      Portfolio depletes before target age. Requires additional starting capital or
+                      delayed retirement.
+                    </p>
                   </div>
                 </div>
               </div>
@@ -363,7 +422,8 @@ export default function FeaturesAndLogicPage({
                   Expense Annualisation & Frequency Normalization Matrix
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
-                  Implemented in <code className="font-mono text-xs">src/domain/calculations/annualise.ts</code>
+                  Implemented in{' '}
+                  <code className="font-mono text-xs">src/domain/calculations/annualise.ts</code>
                 </p>
               </div>
 
@@ -382,37 +442,53 @@ export default function FeaturesAndLogicPage({
                       <td className="py-2.5 px-3 font-mono font-bold text-foreground">monthly</td>
                       <td className="py-2.5 px-3 font-mono">× 12</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount × 12</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">Rent, groceries, utility bills</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        Rent, groceries, utility bills
+                      </td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-3 font-mono font-bold text-foreground">quarterly</td>
                       <td className="py-2.5 px-3 font-mono">× 4</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount × 4</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">School term fees, water bills</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        School term fees, water bills
+                      </td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-3 font-mono font-bold text-foreground">half_yearly</td>
+                      <td className="py-2.5 px-3 font-mono font-bold text-foreground">
+                        half_yearly
+                      </td>
                       <td className="py-2.5 px-3 font-mono">× 2</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount × 2</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">Vehicle insurance, semi-annual taxes</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        Vehicle insurance, semi-annual taxes
+                      </td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-3 font-mono font-bold text-foreground">yearly</td>
                       <td className="py-2.5 px-3 font-mono">× 1</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount × 1</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">Annual family vacation, term insurance</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        Annual family vacation, term insurance
+                      </td>
                     </tr>
                     <tr>
                       <td className="py-2.5 px-3 font-mono font-bold text-foreground">weekly</td>
                       <td className="py-2.5 px-3 font-mono">× 52</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount × 52</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">Weekly fresh farmer market, fuel</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        Weekly fresh farmer market, fuel
+                      </td>
                     </tr>
                     <tr>
-                      <td className="py-2.5 px-3 font-mono font-bold text-foreground">every_n_years</td>
+                      <td className="py-2.5 px-3 font-mono font-bold text-foreground">
+                        every_n_years
+                      </td>
                       <td className="py-2.5 px-3 font-mono">× (1 / N)</td>
                       <td className="py-2.5 px-3 font-mono text-muted-foreground">Amount ÷ N</td>
-                      <td className="py-2.5 px-3 text-muted-foreground">Vehicle replacement (every 7 yrs), laptop</td>
+                      <td className="py-2.5 px-3 text-muted-foreground">
+                        Vehicle replacement (every 7 yrs), laptop
+                      </td>
                     </tr>
                   </tbody>
                 </table>
@@ -434,7 +510,9 @@ export default function FeaturesAndLogicPage({
                   India Geographic Cost Tiers & Multipliers
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Living in a Tier 1 Metro like Mumbai or Bengaluru costs vastly more than a rural village or small town. The calculator dynamically scales suggested baseline expenses to your chosen geography.
+                  Living in a Tier 1 Metro like Mumbai or Bengaluru costs vastly more than a rural
+                  village or small town. The calculator dynamically scales suggested baseline
+                  expenses to your chosen geography.
                 </p>
               </div>
 
@@ -490,7 +568,8 @@ export default function FeaturesAndLogicPage({
                   Category-Specific Area Sensitivity Factors (CATEGORY_AREA_FACTORS)
                 </h4>
                 <p className="text-xs text-muted-foreground">
-                  Real estate rent exhibits an 8× disparity between a rural village and Mumbai, whereas groceries vary by only ~2×. We apply granular category sensitivity curves:
+                  Real estate rent exhibits an 8× disparity between a rural village and Mumbai,
+                  whereas groceries vary by only ~2×. We apply granular category sensitivity curves:
                 </p>
 
                 <div className="overflow-x-auto">
@@ -511,48 +590,72 @@ export default function FeaturesAndLogicPage({
                         <td className="py-2 px-3 font-mono">0.4×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.8×</td>
-                        <td className="py-2 px-3 font-mono font-bold text-blue-600 dark:text-blue-400">3.2×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">8.0× (Widest disparity)</td>
+                        <td className="py-2 px-3 font-mono font-bold text-blue-600 dark:text-blue-400">
+                          3.2×
+                        </td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          8.0× (Widest disparity)
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-2 px-3 font-semibold text-foreground">Personal Care & Lifestyle</td>
+                        <td className="py-2 px-3 font-semibold text-foreground">
+                          Personal Care & Lifestyle
+                        </td>
                         <td className="py-2 px-3 font-mono">0.5×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.6×</td>
                         <td className="py-2 px-3 font-mono">2.5×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">5.0× disparity</td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          5.0× disparity
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-2 px-3 font-semibold text-foreground">Transportation & Commuting</td>
+                        <td className="py-2 px-3 font-semibold text-foreground">
+                          Transportation & Commuting
+                        </td>
                         <td className="py-2 px-3 font-mono">0.6×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.5×</td>
                         <td className="py-2 px-3 font-mono">2.2×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">3.7× disparity</td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          3.7× disparity
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-2 px-3 font-semibold text-foreground">Healthcare & Diagnostics</td>
+                        <td className="py-2 px-3 font-semibold text-foreground">
+                          Healthcare & Diagnostics
+                        </td>
                         <td className="py-2 px-3 font-mono">0.8×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.4×</td>
                         <td className="py-2 px-3 font-mono">2.0×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">2.5× disparity</td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          2.5× disparity
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-2 px-3 font-semibold text-foreground">Food & Groceries</td>
+                        <td className="py-2 px-3 font-semibold text-foreground">
+                          Food & Groceries
+                        </td>
                         <td className="py-2 px-3 font-mono">0.7×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.4×</td>
                         <td className="py-2 px-3 font-mono">1.9×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">2.7× disparity</td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          2.7× disparity
+                        </td>
                       </tr>
                       <tr>
-                        <td className="py-2 px-3 font-semibold text-foreground">Technology & Broadband</td>
+                        <td className="py-2 px-3 font-semibold text-foreground">
+                          Technology & Broadband
+                        </td>
                         <td className="py-2 px-3 font-mono">0.9×</td>
                         <td className="py-2 px-3 font-mono font-bold">1.0×</td>
                         <td className="py-2 px-3 font-mono">1.1×</td>
                         <td className="py-2 px-3 font-mono">1.2×</td>
-                        <td className="py-2 px-3 text-[11px] text-muted-foreground">1.3× (Nationwide standardized)</td>
+                        <td className="py-2 px-3 text-[11px] text-muted-foreground">
+                          1.3× (Nationwide standardized)
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -570,7 +673,8 @@ export default function FeaturesAndLogicPage({
                   Non-Linear Household Scaling & Lifecycle Windows
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  A family of four does not cost 4× a single person. Shared fixed costs (housing, kitchen, utilities) create significant economies of scale.
+                  A family of four does not cost 4× a single person. Shared fixed costs (housing,
+                  kitchen, utilities) create significant economies of scale.
                 </p>
               </div>
 
@@ -580,36 +684,57 @@ export default function FeaturesAndLogicPage({
                   Member Multiplier = 1 + (N_members - 1) × S_category
                 </div>
                 <p className="text-[11px] text-muted-foreground">
-                  Where <code className="font-mono text-xs">S_category</code> represents the category-specific marginal cost expansion factor.
+                  Where <code className="font-mono text-xs">S_category</code> represents the
+                  category-specific marginal cost expansion factor.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                 <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
                   <span className="font-bold text-foreground">Housing</span>
-                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">+25% / member</div>
-                  <p className="text-[11px] text-muted-foreground">Upgrades from 1BHK to 2BHK/3BHK rather than linear duplication.</p>
+                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">
+                    +25% / member
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Upgrades from 1BHK to 2BHK/3BHK rather than linear duplication.
+                  </p>
                 </div>
                 <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
                   <span className="font-bold text-foreground">Food & Groceries</span>
-                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">+65% / member</div>
-                  <p className="text-[11px] text-muted-foreground">Shared kitchen bulk staples, higher per-person perishables.</p>
+                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">
+                    +65% / member
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Shared kitchen bulk staples, higher per-person perishables.
+                  </p>
                 </div>
                 <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
                   <span className="font-bold text-foreground">Utilities & Transit</span>
-                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">+35% / member</div>
-                  <p className="text-[11px] text-muted-foreground">Shared vehicle usage, power base load.</p>
+                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">
+                    +35% / member
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Shared vehicle usage, power base load.
+                  </p>
                 </div>
                 <div className="p-3.5 rounded-xl border border-border bg-card space-y-1">
                   <span className="font-bold text-foreground">Tech & Connectivity</span>
-                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">+10% / member</div>
-                  <p className="text-[11px] text-muted-foreground">Shared Wi-Fi and OTT accounts, minor mobile recharge cost.</p>
+                  <div className="text-blue-600 dark:text-blue-400 font-mono font-bold">
+                    +10% / member
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Shared Wi-Fi and OTT accounts, minor mobile recharge cost.
+                  </p>
                 </div>
               </div>
 
               {/* Lifecycle Support Windows */}
               <div className="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20 text-xs space-y-1.5">
-                <strong className="text-foreground">Lifecycle Support Windows:</strong> Children and elderly parents have discrete lifecycle intervals. Child support ceases when they graduate (e.g. age 22–24), and parental medical allowance ceases at projected parental lifespan. The cashflow engine automatically amortizes these costs only for their active dependent duration.
+                <strong className="text-foreground">Lifecycle Support Windows:</strong> Children and
+                elderly parents have discrete lifecycle intervals. Child support ceases when they
+                graduate (e.g. age 22–24), and parental medical allowance ceases at projected
+                parental lifespan. The cashflow engine automatically amortizes these costs only for
+                their active dependent duration.
               </div>
             </div>
           </div>
@@ -628,20 +753,26 @@ export default function FeaturesAndLogicPage({
                   The Three Lifestyle Tiers (1-Click Real-Time Plan Switching)
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Retirement readiness is flexible. Compare survival essentials versus comfortable or luxury standards, and switch your active plan with one click without losing entered data.
+                  Retirement readiness is flexible. Compare survival essentials versus comfortable
+                  or luxury standards, and switch your active plan with one click without losing
+                  entered data.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-foreground">Tier 1: Bare Minimum</span>
+                    <span className="text-xs font-extrabold text-foreground">
+                      Tier 1: Bare Minimum
+                    </span>
                     <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded bg-muted text-muted-foreground">
                       0.65×
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Survival essentials only: shelter, groceries, municipal utilities, and vital healthcare. Discretionary categories (vacations, luxury dining, hobbies) are zeroed out.
+                    Survival essentials only: shelter, groceries, municipal utilities, and vital
+                    healthcare. Discretionary categories (vacations, luxury dining, hobbies) are
+                    zeroed out.
                   </p>
                   <div className="text-[11px] text-muted-foreground border-t border-border pt-2">
                     <strong>Rule:</strong> Discretionary = ₹0, Parent Lump Sums = 0.65×
@@ -658,7 +789,8 @@ export default function FeaturesAndLogicPage({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Balanced middle-class standard: comfortable housing, dining out twice monthly, domestic holidays, modern gadgets, and reliable medical insurance.
+                    Balanced middle-class standard: comfortable housing, dining out twice monthly,
+                    domestic holidays, modern gadgets, and reliable medical insurance.
                   </p>
                   <div className="text-[11px] text-muted-foreground border-t border-blue-200 dark:border-blue-800 pt-2">
                     <strong>Rule:</strong> Full baseline values (1.0×)
@@ -675,7 +807,8 @@ export default function FeaturesAndLogicPage({
                     </span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    Elevated lifestyle: upscale gated community housing, international vacations, private luxury healthcare, premium vehicles, and expansive contingency buffers.
+                    Elevated lifestyle: upscale gated community housing, international vacations,
+                    private luxury healthcare, premium vehicles, and expansive contingency buffers.
                   </p>
                   <div className="text-[11px] text-muted-foreground border-t border-purple-200 dark:border-purple-800 pt-2">
                     <strong>Rule:</strong> Discretionary = 1.5×, Core = 1.15×, Parents = 1.4×
@@ -694,14 +827,17 @@ export default function FeaturesAndLogicPage({
                   Simultaneous Multi-Scenario Stress Testing
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  The calculation engine evaluates three macroeconomic scenarios in parallel on every state change:
+                  The calculation engine evaluates three macroeconomic scenarios in parallel on
+                  every state change:
                 </p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                 <div className="p-4 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/30 dark:bg-emerald-950/20 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-emerald-800 dark:text-emerald-300">Optimistic Preset</span>
+                    <span className="font-bold text-emerald-800 dark:text-emerald-300">
+                      Optimistic Preset
+                    </span>
                     <span className="text-[10px] font-mono font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded">
                       High Growth
                     </span>
@@ -710,13 +846,16 @@ export default function FeaturesAndLogicPage({
                     Inflation (g): 5.0% | Return (r): 12.0%
                   </div>
                   <p className="text-muted-foreground leading-snug">
-                    Real return spread of +7.0%. High equity outperformance and subdued inflation drag.
+                    Real return spread of +7.0%. High equity outperformance and subdued inflation
+                    drag.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/30 dark:bg-blue-950/20 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-blue-800 dark:text-blue-300">Base Scenario</span>
+                    <span className="font-bold text-blue-800 dark:text-blue-300">
+                      Base Scenario
+                    </span>
                     <span className="text-[10px] font-mono font-bold bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded">
                       Realistic Default
                     </span>
@@ -725,13 +864,16 @@ export default function FeaturesAndLogicPage({
                     Inflation (g): 6.0% | Return (r): 10.0%
                   </div>
                   <p className="text-muted-foreground leading-snug">
-                    Real return spread of +4.0%. Aligned with historic diversified Indian equity + debt portfolios.
+                    Real return spread of +4.0%. Aligned with historic diversified Indian equity +
+                    debt portfolios.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/30 dark:bg-rose-950/20 space-y-2">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-rose-800 dark:text-rose-300">Conservative Preset</span>
+                    <span className="font-bold text-rose-800 dark:text-rose-300">
+                      Conservative Preset
+                    </span>
                     <span className="text-[10px] font-mono font-bold bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 px-2 py-0.5 rounded">
                       Stress Test
                     </span>
@@ -740,7 +882,8 @@ export default function FeaturesAndLogicPage({
                     Inflation (g): 7.5% | Return (r): 8.5%
                   </div>
                   <p className="text-muted-foreground leading-snug">
-                    Tight real return spread (+1.0%). Models prolonged inflation and debt-heavy conservative portfolios.
+                    Tight real return spread (+1.0%). Models prolonged inflation and debt-heavy
+                    conservative portfolios.
                   </p>
                 </div>
               </div>
@@ -752,7 +895,10 @@ export default function FeaturesAndLogicPage({
                   <span>Differential Healthcare Inflation Modeling</span>
                 </div>
                 <p className="text-muted-foreground leading-relaxed">
-                  Medical costs historically rise much faster than standard consumer items. Our engine allows specifying a separate <strong>Healthcare Inflation Rate</strong> (default 8.0%, scalable to 12%) applied exclusively to Category D (Healthcare & Medical Diagnostics).
+                  Medical costs historically rise much faster than standard consumer items. Our
+                  engine allows specifying a separate <strong>Healthcare Inflation Rate</strong>{' '}
+                  (default 8.0%, scalable to 12%) applied exclusively to Category D (Healthcare &
+                  Medical Diagnostics).
                 </p>
               </div>
             </div>
@@ -772,25 +918,73 @@ export default function FeaturesAndLogicPage({
                   11 Standardized Expense Categories (Categories A through K)
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Overlooking occasional or irregular living costs is the most common reason financial plans fail. We divide all household costs into 11 standardized buckets:
+                  Overlooking occasional or irregular living costs is the most common reason
+                  financial plans fail. We divide all household costs into 11 standardized buckets:
                 </p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
                 {[
-                  { id: 'A', name: 'Housing', items: 'Rent, Society Maintenance, Painting/Repairs, Property Tax' },
-                  { id: 'B', name: 'Food & Groceries', items: 'Kitchen Staples, Vegetables, Dairy, Dining Out, Order In' },
-                  { id: 'C', name: 'Utilities', items: 'Electricity, LPG Piped Gas, Water Tankers' },
-                  { id: 'D', name: 'Healthcare', items: 'Routine Medicines, Doctor Visits, Health Insurance Premiums' },
-                  { id: 'E', name: 'Transportation', items: 'Fuel (Petrol/Diesel), Vehicle Servicing, Transit, FASTag' },
-                  { id: 'F', name: 'Personal & Lifestyle', items: 'Clothing, Salons, Hobbies, Domestic Vacations' },
-                  { id: 'G', name: 'Technology & Bills', items: 'Mobile Recharges, Home Broadband, OTT Subscriptions' },
-                  { id: 'H', name: 'Family & Dependents', items: 'School Tuition, Higher Education Funds, Parental Support' },
-                  { id: 'I', name: 'Financial & Insurance', items: 'Term Insurance, Bank Account Fees, CA / Tax Prep' },
-                  { id: 'J', name: 'Emergency Buffer', items: 'Unplanned Appliance Breakdown, Medical Incidentals' },
-                  { id: 'K', name: 'Custom Expenses', items: 'Pet Care, Farming / Land Lease, Philanthropy' },
+                  {
+                    id: 'A',
+                    name: 'Housing',
+                    items: 'Rent, Society Maintenance, Painting/Repairs, Property Tax',
+                  },
+                  {
+                    id: 'B',
+                    name: 'Food & Groceries',
+                    items: 'Kitchen Staples, Vegetables, Dairy, Dining Out, Order In',
+                  },
+                  {
+                    id: 'C',
+                    name: 'Utilities',
+                    items: 'Electricity, LPG Piped Gas, Water Tankers',
+                  },
+                  {
+                    id: 'D',
+                    name: 'Healthcare',
+                    items: 'Routine Medicines, Doctor Visits, Health Insurance Premiums',
+                  },
+                  {
+                    id: 'E',
+                    name: 'Transportation',
+                    items: 'Fuel (Petrol/Diesel), Vehicle Servicing, Transit, FASTag',
+                  },
+                  {
+                    id: 'F',
+                    name: 'Personal & Lifestyle',
+                    items: 'Clothing, Salons, Hobbies, Domestic Vacations',
+                  },
+                  {
+                    id: 'G',
+                    name: 'Technology & Bills',
+                    items: 'Mobile Recharges, Home Broadband, OTT Subscriptions',
+                  },
+                  {
+                    id: 'H',
+                    name: 'Family & Dependents',
+                    items: 'School Tuition, Higher Education Funds, Parental Support',
+                  },
+                  {
+                    id: 'I',
+                    name: 'Financial & Insurance',
+                    items: 'Term Insurance, Bank Account Fees, CA / Tax Prep',
+                  },
+                  {
+                    id: 'J',
+                    name: 'Emergency Buffer',
+                    items: 'Unplanned Appliance Breakdown, Medical Incidentals',
+                  },
+                  {
+                    id: 'K',
+                    name: 'Custom Expenses',
+                    items: 'Pet Care, Farming / Land Lease, Philanthropy',
+                  },
                 ].map((cat) => (
-                  <div key={cat.id} className="p-3.5 rounded-xl border border-border bg-muted/20 space-y-1">
+                  <div
+                    key={cat.id}
+                    className="p-3.5 rounded-xl border border-border bg-muted/20 space-y-1"
+                  >
                     <div className="flex items-center gap-2">
                       <span className="w-5 h-5 rounded-md bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 font-bold flex items-center justify-center text-[11px]">
                         {cat.id}
@@ -805,7 +999,10 @@ export default function FeaturesAndLogicPage({
               <div className="p-4 rounded-xl border border-border bg-card space-y-1.5 text-xs">
                 <span className="font-bold text-foreground">Dual Entry Modes:</span>
                 <p className="text-muted-foreground leading-relaxed">
-                  Users in a hurry can enter simple category lump-sum totals. Advanced users can expand any category into itemized line items with custom frequencies (monthly, weekly, every N years). The system auto-synchronizes lump-sums and itemized totals bi-directionally.
+                  Users in a hurry can enter simple category lump-sum totals. Advanced users can
+                  expand any category into itemized line items with custom frequencies (monthly,
+                  weekly, every N years). The system auto-synchronizes lump-sums and itemized totals
+                  bi-directionally.
                 </p>
               </div>
             </div>
@@ -818,7 +1015,8 @@ export default function FeaturesAndLogicPage({
                 </div>
                 <h4 className="font-bold text-sm text-foreground">Guided 6-Step Wizard</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Progressive flow from profile to income, dependents, expenses, and assumptions. Non-essential steps feature one-click skipping with smart defaults.
+                  Progressive flow from profile to income, dependents, expenses, and assumptions.
+                  Non-essential steps feature one-click skipping with smart defaults.
                 </p>
               </div>
 
@@ -826,9 +1024,12 @@ export default function FeaturesAndLogicPage({
                 <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
                   <PieChart className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-sm text-foreground">Interactive Visual Projections</h4>
+                <h4 className="font-bold text-sm text-foreground">
+                  Interactive Visual Projections
+                </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Recharts-powered interactive graphs: Lifetime Portfolio Trajectory (accumulation and depletion curves), category pie breakdown, and net annual cashflows.
+                  Recharts-powered interactive graphs: Lifetime Portfolio Trajectory (accumulation
+                  and depletion curves), category pie breakdown, and net annual cashflows.
                 </p>
               </div>
 
@@ -836,9 +1037,12 @@ export default function FeaturesAndLogicPage({
                 <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 text-amber-600 dark:text-amber-400 flex items-center justify-center">
                   <TableIcon className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-sm text-foreground">Cashflow Reconciliation Ledger</h4>
+                <h4 className="font-bold text-sm text-foreground">
+                  Cashflow Reconciliation Ledger
+                </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Full year-by-year financial schedule from your current age to target lifespan. Shows salary, living expenses, investable surplus, and ending balances.
+                  Full year-by-year financial schedule from your current age to target lifespan.
+                  Shows salary, living expenses, investable surplus, and ending balances.
                 </p>
               </div>
 
@@ -846,9 +1050,12 @@ export default function FeaturesAndLogicPage({
                 <div className="w-8 h-8 rounded-lg bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800 text-purple-600 dark:text-purple-400 flex items-center justify-center">
                   <Download className="w-4 h-4" />
                 </div>
-                <h4 className="font-bold text-sm text-foreground">1-Click Client-Side PDF Export</h4>
+                <h4 className="font-bold text-sm text-foreground">
+                  1-Click Client-Side PDF Export
+                </h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Export an executive multi-page PDF generated via jsPDF directly in the browser with high-resolution vector layout, charts, and summary cards.
+                  Export an executive multi-page PDF generated via jsPDF directly in the browser
+                  with high-resolution vector layout, charts, and summary cards.
                 </p>
               </div>
 
@@ -858,7 +1065,9 @@ export default function FeaturesAndLogicPage({
                 </div>
                 <h4 className="font-bold text-sm text-foreground">100% Client-Side Private</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Zero cloud servers, zero analytics tracking, zero database storage. All numbers stay in your device browser <code className="text-[11px] font-mono">localStorage</code>.
+                  Zero cloud servers, zero analytics tracking, zero database storage. All numbers
+                  stay in your device browser{' '}
+                  <code className="text-[11px] font-mono">localStorage</code>.
                 </p>
               </div>
 
@@ -868,7 +1077,8 @@ export default function FeaturesAndLogicPage({
                 </div>
                 <h4 className="font-bold text-sm text-foreground">Light, Dark & System Theming</h4>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  Built with CSS variables and Tailwind CSS. Seamlessly matches your operating system preference or lets you choose manual Light or Dark mode.
+                  Built with CSS variables and Tailwind CSS. Seamlessly matches your operating
+                  system preference or lets you choose manual Light or Dark mode.
                 </p>
               </div>
             </div>
@@ -888,7 +1098,8 @@ export default function FeaturesAndLogicPage({
                   System Architecture & Separation of Concerns
                 </h3>
                 <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                  Engineered with strict separation of pure financial domain logic from the React user interface.
+                  Engineered with strict separation of pure financial domain logic from the React
+                  user interface.
                 </p>
               </div>
 
@@ -896,28 +1107,48 @@ export default function FeaturesAndLogicPage({
                 <div className="p-4 rounded-xl border border-border bg-card space-y-2">
                   <h4 className="font-bold text-foreground">1. Pure Domain Layer (src/domain/)</h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    Zero React, zero DOM, and zero UI library dependencies. All calculations (<code className="font-mono">annualise</code>, <code className="font-mono">corpusFormula</code>, <code className="font-mono">simulatePortfolio</code>, <code className="font-mono">runScenarios</code>) are pure TypeScript functions taking plain inputs and producing deterministic outputs.
+                    Zero React, zero DOM, and zero UI library dependencies. All calculations (
+                    <code className="font-mono">annualise</code>,{' '}
+                    <code className="font-mono">corpusFormula</code>,{' '}
+                    <code className="font-mono">simulatePortfolio</code>,{' '}
+                    <code className="font-mono">runScenarios</code>) are pure TypeScript functions
+                    taking plain inputs and producing deterministic outputs.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-2">
-                  <h4 className="font-bold text-foreground">2. Config-Driven Engine (src/config/)</h4>
+                  <h4 className="font-bold text-foreground">
+                    2. Config-Driven Engine (src/config/)
+                  </h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    Step definitions, field validation boundaries, default values, and help text reside in declarative configuration files (<code className="font-mono">formFields.ts</code>). Adding or modifying fields requires no JSX alterations.
+                    Step definitions, field validation boundaries, default values, and help text
+                    reside in declarative configuration files (
+                    <code className="font-mono">formFields.ts</code>). Adding or modifying fields
+                    requires no JSX alterations.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-2">
-                  <h4 className="font-bold text-foreground">3. Reactive State Store (src/store/)</h4>
+                  <h4 className="font-bold text-foreground">
+                    3. Reactive State Store (src/store/)
+                  </h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    Centralized Zustand store with synchronized <code className="font-mono">localStorage</code> persistence. Dispatches granular actions and ensures reactive UI updates across all wizard steps.
+                    Centralized Zustand store with synchronized{' '}
+                    <code className="font-mono">localStorage</code> persistence. Dispatches granular
+                    actions and ensures reactive UI updates across all wizard steps.
                   </p>
                 </div>
 
                 <div className="p-4 rounded-xl border border-border bg-card space-y-2">
-                  <h4 className="font-bold text-foreground">4. Automated Testing Policy (Vitest)</h4>
+                  <h4 className="font-bold text-foreground">
+                    4. Automated Testing Policy (Vitest)
+                  </h4>
                   <p className="text-muted-foreground leading-relaxed">
-                    Strict logic-only automated testing policy. Fast, deterministic unit tests in <code className="font-mono">src/domain/calculations/__tests__/</code> verify mathematical precision, edge case invariance (<code className="font-mono">r = g</code>), and annualisation rules under all scenarios.
+                    Strict logic-only automated testing policy. Fast, deterministic unit tests in{' '}
+                    <code className="font-mono">src/domain/calculations/__tests__/</code> verify
+                    mathematical precision, edge case invariance (
+                    <code className="font-mono">r = g</code>), and annualisation rules under all
+                    scenarios.
                   </p>
                 </div>
               </div>
@@ -938,19 +1169,27 @@ export default function FeaturesAndLogicPage({
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                 <div className="p-3 bg-card border border-border rounded-lg space-y-1">
                   <span className="font-mono font-bold text-foreground">corpusFormula.test</span>
-                  <p className="text-muted-foreground text-[11px]">Growing annuity precision, r ≠ g, r = g edge case.</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    Growing annuity precision, r ≠ g, r = g edge case.
+                  </p>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg space-y-1">
                   <span className="font-mono font-bold text-foreground">annualise.test</span>
-                  <p className="text-muted-foreground text-[11px]">Frequency conversion invariance (monthly, weekly, N-year).</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    Frequency conversion invariance (monthly, weekly, N-year).
+                  </p>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg space-y-1">
                   <span className="font-mono font-bold text-foreground">areaDefaults.test</span>
-                  <p className="text-muted-foreground text-[11px]">Geographic cost multipliers and non-linear member scaling.</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    Geographic cost multipliers and non-linear member scaling.
+                  </p>
                 </div>
                 <div className="p-3 bg-card border border-border rounded-lg space-y-1">
                   <span className="font-mono font-bold text-foreground">activeIncome.test</span>
-                  <p className="text-muted-foreground text-[11px]">Salary escalation, surplus compounding, peak wealth.</p>
+                  <p className="text-muted-foreground text-[11px]">
+                    Salary escalation, surplus compounding, peak wealth.
+                  </p>
                 </div>
               </div>
             </div>
@@ -963,7 +1202,8 @@ export default function FeaturesAndLogicPage({
             Explore Features & Methodologies
           </h3>
           <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto font-medium">
-            Use the top navigation dropdown to switch to the Fund Calculator or explore upcoming financial calculators.
+            Use the top navigation dropdown to switch to the Fund Calculator or explore upcoming
+            financial calculators.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-1">
             <button
@@ -992,7 +1232,9 @@ export default function FeaturesAndLogicPage({
           Fund Calculator · Calculation Logic & Open Source Financial Planning Suite
         </p>
         <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
-          <strong>Disclaimer:</strong> This application is an estimation and scenario planning tool. It is not regulated financial advice, investment advisory, or a guarantee of safe withdrawal rates.
+          <strong>Disclaimer:</strong> This application is an estimation and scenario planning tool.
+          It is not regulated financial advice, investment advisory, or a guarantee of safe
+          withdrawal rates.
         </p>
       </footer>
     </div>

@@ -18,7 +18,13 @@ function useExpandedCategories(categories: ExpenseCategory[]) {
     // If there is a last filled item, ensure its category is expanded
     if (settings.lastFilledId) {
       for (const cat of categories) {
-        if (cat.items.some(i => `expense-item-${i.id}` === settings.lastFilledId || i.id === settings.lastFilledId) || `category-${cat.id}` === settings.lastFilledId) {
+        if (
+          cat.items.some(
+            (i) =>
+              `expense-item-${i.id}` === settings.lastFilledId || i.id === settings.lastFilledId
+          ) ||
+          `category-${cat.id}` === settings.lastFilledId
+        ) {
           initial.add(cat.id)
         }
       }
@@ -27,7 +33,7 @@ function useExpandedCategories(categories: ExpenseCategory[]) {
   })
 
   function toggle(id: string) {
-    setOpenIds(prev => {
+    setOpenIds((prev) => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)
       updateStoredSettings({ expandedCategories: [...next] })
@@ -56,9 +62,7 @@ function categoryTotal(cat: ExpenseCategory): number {
     const mult = FREQUENCY_MULTIPLIERS[cat.parentFrequency] || 1
     return cat.parentAmount * mult
   }
-  return cat.items
-    .filter(i => !i.skipped)
-    .reduce((sum, item) => sum + annualiseExpense(item), 0)
+  return cat.items.filter((i) => !i.skipped).reduce((sum, item) => sum + annualiseExpense(item), 0)
 }
 
 function StatusBadge({ cat }: { cat: ExpenseCategory }) {
@@ -87,7 +91,7 @@ function StatusBadge({ cat }: { cat: ExpenseCategory }) {
 // ─── Dependent expense banner ───────────────────────────────────────────────
 
 function DependentExpenseBanner({ members }: { members: HouseholdMember[] }) {
-  const dependents = members.filter(m => m.id !== 'self' && m.financiallyDependent)
+  const dependents = members.filter((m) => m.id !== 'self' && m.financiallyDependent)
   if (dependents.length === 0) return null
 
   return (
@@ -100,8 +104,8 @@ function DependentExpenseBanner({ members }: { members: HouseholdMember[] }) {
         <p className="text-xs mt-1 text-amber-700 dark:text-amber-300">
           Enter all amounts in <strong>today's money</strong>. For expenses that start in future
           years (like children's education), we automatically inflate them from their start year —
-          so your ₹10,000/yr school fee today becomes{' '}
-          ₹{Math.round(10000 * Math.pow(1.07, 5)).toLocaleString('en-IN')}/yr when it kicks in 5
+          so your ₹10,000/yr school fee today becomes ₹
+          {Math.round(10000 * Math.pow(1.07, 5)).toLocaleString('en-IN')}/yr when it kicks in 5
           years later. Set the active period for each expense below.
         </p>
       </div>
@@ -114,15 +118,18 @@ function DependentExpenseBanner({ members }: { members: HouseholdMember[] }) {
 function getWindowSuggestions(
   item: ExpenseItem,
   members: HouseholdMember[],
-  _userCurrentAge: number,
+  _userCurrentAge: number
 ): Array<{ label: string; startYear: number; endYear?: number }> {
   const rel = item.linkedMemberRelationship
   const suggestions: Array<{ label: string; startYear: number; endYear?: number }> = []
 
-  const childMembers = members.filter(m => m.relationship === 'child' && m.financiallyDependent)
-  const parentMembers = members.filter(m => m.relationship === 'parent' && m.financiallyDependent)
+  const childMembers = members.filter((m) => m.relationship === 'child' && m.financiallyDependent)
+  const parentMembers = members.filter((m) => m.relationship === 'parent' && m.financiallyDependent)
 
-  if (rel === 'child' || (rel === undefined && childMembers.length > 0 && item.categoryId === 'family')) {
+  if (
+    rel === 'child' ||
+    (rel === undefined && childMembers.length > 0 && item.categoryId === 'family')
+  ) {
     const child = childMembers[0]
     if (child) {
       const schoolStartYear = Math.max(1, 5 - child.age)
@@ -183,7 +190,10 @@ function getWindowSuggestions(
     }
   }
 
-  if (rel === 'parent' || (rel === undefined && parentMembers.length > 0 && item.categoryId === 'family')) {
+  if (
+    rel === 'parent' ||
+    (rel === undefined && parentMembers.length > 0 && item.categoryId === 'family')
+  ) {
     const parent = parentMembers[0]
     if (parent) {
       const supportEnd = parent.supportUntilAge
@@ -271,7 +281,7 @@ function ExpenseWindowPanel({
             min={1}
             value={item.startYear}
             onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-            onChange={e => {
+            onChange={(e) => {
               setLastFilled(`expense-item-${item.id}`, 4)
               onUpdate({ startYear: Math.max(1, Number(e.target.value)) })
             }}
@@ -289,7 +299,7 @@ function ExpenseWindowPanel({
             value={item.endYear ?? ''}
             placeholder="Lifelong"
             onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-            onChange={e => {
+            onChange={(e) => {
               setLastFilled(`expense-item-${item.id}`, 4)
               onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
             }}
@@ -364,7 +374,7 @@ function SubItemRow({
       id={`expense-item-${item.id}`}
       className={cn(
         'border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2 text-sm bg-white dark:bg-zinc-900 shadow-xs transition-colors',
-        item.skipped && 'opacity-40',
+        item.skipped && 'opacity-40'
       )}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
@@ -372,7 +382,7 @@ function SubItemRow({
           type="text"
           value={item.name}
           onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-          onChange={e => {
+          onChange={(e) => {
             setLastFilled(`expense-item-${item.id}`, 4)
             onUpdate({ name: e.target.value })
           }}
@@ -381,14 +391,16 @@ function SubItemRow({
 
         <div className="flex items-center gap-1.5 shrink-0">
           <div className="relative flex items-center">
-            <span className="absolute left-2.5 text-xs font-bold text-zinc-500 pointer-events-none">₹</span>
+            <span className="absolute left-2.5 text-xs font-bold text-zinc-500 pointer-events-none">
+              ₹
+            </span>
             <input
               type="number"
               min={0}
               value={item.amount || ''}
               placeholder="0"
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })
               }}
@@ -400,7 +412,7 @@ function SubItemRow({
             <select
               value={item.frequency}
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ frequency: e.target.value as Frequency })
               }}
@@ -417,20 +429,24 @@ function SubItemRow({
 
           {item.frequency === 'every_n_years' && (
             <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
-              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">Every</span>
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
+                Every
+              </span>
               <input
                 type="number"
                 min={1}
                 max={30}
                 value={item.everyNYears ?? 5}
                 onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-                onChange={e => {
+                onChange={(e) => {
                   setLastFilled(`expense-item-${item.id}`, 4)
                   onUpdate({ everyNYears: Number(e.target.value) })
                 }}
                 className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">yrs</span>
+              <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
+                yrs
+              </span>
             </div>
           )}
 
@@ -438,7 +454,7 @@ function SubItemRow({
           {!showWindowPanel && (
             <button
               type="button"
-              onClick={() => setShowDetails(x => !x)}
+              onClick={() => setShowDetails((x) => !x)}
               className="text-blue-600 dark:text-blue-400 hover:underline p-1 text-xs font-medium ml-1 cursor-pointer"
             >
               {showDetails ? 'Less' : 'More'}
@@ -488,7 +504,7 @@ function SubItemRow({
             <input
               type="checkbox"
               checked={item.essential}
-              onChange={e => onUpdate({ essential: e.target.checked })}
+              onChange={(e) => onUpdate({ essential: e.target.checked })}
               className="w-4 h-4 text-blue-600 rounded"
             />
             <span>Essential Expense</span>
@@ -501,7 +517,7 @@ function SubItemRow({
               min={1}
               value={item.startYear}
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ startYear: Number(e.target.value) })
               }}
@@ -517,7 +533,7 @@ function SubItemRow({
               value={item.endYear ?? ''}
               placeholder="Lifelong"
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={e => {
+              onChange={(e) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
               }}
@@ -545,14 +561,15 @@ function CategoryPanel({
   totalCovered: number
   dependentsCount: number
 }) {
-  const { updateCategory, addExpenseItem, updateExpenseItem, removeExpenseItem } = useScenarioStore()
+  const { updateCategory, addExpenseItem, updateExpenseItem, removeExpenseItem } =
+    useScenarioStore()
   const isFamilyCategory = cat.id === 'family'
   const isParentMode = cat.parentAmount !== undefined
 
   function setMode(mode: 'parent' | 'subitems') {
     if (mode === 'parent') {
       const currentSubtotal = cat.items
-        .filter(i => !i.skipped)
+        .filter((i) => !i.skipped)
         .reduce((sum, item) => sum + annualiseExpense(item), 0)
       const monthlyEquiv = Math.round(currentSubtotal / 12)
 
@@ -603,13 +620,17 @@ function CategoryPanel({
   }
 
   return (
-    <div className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl" id={`category-${cat.id}`}>
+    <div
+      className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl"
+      id={`category-${cat.id}`}
+    >
       <div className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
         <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
           <p className="font-medium">{cat.description}</p>
           <p className="mt-1 text-[11px] font-bold text-zinc-900 dark:text-zinc-200">
-            Default inflation rate for this category: {(cat.defaultInflationRate * 100).toFixed(0)}% per year.
+            Default inflation rate for this category: {(cat.defaultInflationRate * 100).toFixed(0)}%
+            per year.
           </p>
         </div>
       </div>
@@ -620,24 +641,34 @@ function CategoryPanel({
           <div className="flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
             <span>👶</span>
             <span>
-              Time-windowed dependent support for <strong>{dependentsCount} dependent{dependentsCount > 1 ? 's' : ''}</strong>: School, college, and parental support run only for specific phases. All values entered in today's rates are inflated automatically.
+              Time-windowed dependent support for{' '}
+              <strong>
+                {dependentsCount} dependent{dependentsCount > 1 ? 's' : ''}
+              </strong>
+              : School, college, and parental support run only for specific phases. All values
+              entered in today's rates are inflated automatically.
             </span>
           </div>
         ) : (
           <div className="flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
             <span>ℹ️</span>
             <span>
-              No dependents added in Step 3. Child education and parental care expenses activate when you add dependents in Step 3 (Household Members).
+              No dependents added in Step 3. Child education and parental care expenses activate
+              when you add dependents in Step 3 (Household Members).
             </span>
           </div>
         )
-      ) : totalCovered > 1 && (
-        <div className="flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
-          <span>👥</span>
-          <span>
-            Covers all <strong>{totalCovered} household members</strong> (Self + {dependentsCount} dependent{dependentsCount > 1 ? 's' : ''}): Please enter the combined total expense for all {totalCovered} members, not per-person.
-          </span>
-        </div>
+      ) : (
+        totalCovered > 1 && (
+          <div className="flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
+            <span>👥</span>
+            <span>
+              Covers all <strong>{totalCovered} household members</strong> (Self + {dependentsCount}{' '}
+              dependent{dependentsCount > 1 ? 's' : ''}): Please enter the combined total expense
+              for all {totalCovered} members, not per-person.
+            </span>
+          </div>
+        )
       )}
 
       {/* Mode Switcher */}
@@ -650,7 +681,7 @@ function CategoryPanel({
               'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
               isParentMode
                 ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             )}
           >
             Enter Category Total
@@ -662,7 +693,7 @@ function CategoryPanel({
               'px-3.5 py-1.5 text-xs font-bold rounded-md transition-all cursor-pointer',
               !isParentMode
                 ? 'bg-blue-600 text-white shadow-xs'
-                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100',
+                : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'
             )}
           >
             Fill Sub-items ({cat.items.length})
@@ -703,7 +734,7 @@ function CategoryPanel({
                   value={cat.parentAmount ?? ''}
                   placeholder="0"
                   onFocus={() => setLastFilled(`category-${cat.id}`, 4)}
-                  onChange={e => {
+                  onChange={(e) => {
                     setLastFilled(`category-${cat.id}`, 4)
                     updateCategory(cat.id, { parentAmount: Number(e.target.value) })
                   }}
@@ -715,7 +746,7 @@ function CategoryPanel({
                 <select
                   value={cat.parentFrequency || 'monthly'}
                   onFocus={() => setLastFilled(`category-${cat.id}`, 4)}
-                  onChange={e => {
+                  onChange={(e) => {
                     setLastFilled(`category-${cat.id}`, 4)
                     updateCategory(cat.id, { parentFrequency: e.target.value as Frequency })
                   }}
@@ -753,7 +784,7 @@ function CategoryPanel({
             </div>
 
             <div className="space-y-1.5 opacity-60 pointer-events-none select-none">
-              {cat.items.map(item => (
+              {cat.items.map((item) => (
                 <div
                   key={item.id}
                   className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
@@ -761,7 +792,8 @@ function CategoryPanel({
                   <span className="font-medium text-zinc-800 dark:text-zinc-200">{item.name}</span>
                   <div className="flex items-center gap-3">
                     <span className="font-bold text-zinc-700 dark:text-zinc-300">
-                      ₹{item.amount.toLocaleString('en-IN')} {FREQUENCY_LABELS[item.frequency] || item.frequency}
+                      ₹{item.amount.toLocaleString('en-IN')}{' '}
+                      {FREQUENCY_LABELS[item.frequency] || item.frequency}
                     </span>
                     <span className="text-[10px] text-zinc-400">
                       (≈ {formatCrore(annualiseExpense(item))}/yr)
@@ -775,11 +807,11 @@ function CategoryPanel({
       ) : (
         /* Sub-items Mode */
         <div className="space-y-2.5">
-          {cat.items.map(item => (
+          {cat.items.map((item) => (
             <SubItemRow
               key={item.id}
               item={item}
-              onUpdate={patch => updateExpenseItem(cat.id, item.id, patch)}
+              onUpdate={(patch) => updateExpenseItem(cat.id, item.id, patch)}
               onRemove={() => removeExpenseItem(cat.id, item.id)}
               isFamilyCategory={isFamilyCategory}
               members={members}
@@ -809,8 +841,8 @@ export function DynamicExpensesRenderer() {
   const { openIds, toggle, expandAll, collapseAll } = useExpandedCategories(categories)
 
   const userCurrentAge = profile.currentAge
-  const totalCovered = members.filter(m => m.financiallyDependent).length || 1
-  const dependentsCount = members.filter(m => m.id !== 'self' && m.financiallyDependent).length
+  const totalCovered = members.filter((m) => m.financiallyDependent).length || 1
+  const dependentsCount = members.filter((m) => m.id !== 'self' && m.financiallyDependent).length
 
   // Scroll to last filled expense item or category if present
   useEffect(() => {
@@ -838,12 +870,14 @@ export function DynamicExpensesRenderer() {
               Baseline Expenses
             </span>
             <span className="text-xs text-blue-100">
-              Calibrated for: <strong className="capitalize">{profile.areaType.replace('_', ' ')}</strong> ·{' '}
+              Calibrated for:{' '}
+              <strong className="capitalize">{profile.areaType.replace('_', ' ')}</strong> ·{' '}
               <strong className="capitalize">{profile.lifestyleScenario.replace('_', ' ')}</strong>
             </span>
           </div>
           <p className="text-3xl font-extrabold text-white mt-1 tracking-tight">
-            {formatCrore(grandTotal)} <span className="text-sm font-semibold text-blue-100">/ year</span>
+            {formatCrore(grandTotal)}{' '}
+            <span className="text-sm font-semibold text-blue-100">/ year</span>
           </p>
           <p className="text-xs text-blue-100/90 mt-0.5">
             ≈ {formatCrore(grandTotal / 12)} / month in today's purchasing power
@@ -862,7 +896,7 @@ export function DynamicExpensesRenderer() {
           <div className="flex items-center gap-2 text-xs text-white/90">
             <button
               type="button"
-              onClick={() => expandAll(categories.map(c => c.id))}
+              onClick={() => expandAll(categories.map((c) => c.id))}
               className="hover:underline font-medium cursor-pointer"
             >
               Expand All
@@ -884,7 +918,7 @@ export function DynamicExpensesRenderer() {
 
       {/* Category Accordion */}
       <div className="space-y-2.5">
-        {categories.map(cat => {
+        {categories.map((cat) => {
           const isOpen = openIds.has(cat.id)
 
           return (
@@ -894,7 +928,7 @@ export function DynamicExpensesRenderer() {
                 'border rounded-xl transition-all duration-200 shadow-xs bg-white dark:bg-zinc-900',
                 isOpen
                   ? 'border-blue-500/50 dark:border-blue-500/40 ring-1 ring-blue-500/10'
-                  : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700',
+                  : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
               )}
             >
               <button

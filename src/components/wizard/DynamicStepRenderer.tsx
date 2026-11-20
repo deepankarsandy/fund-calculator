@@ -30,9 +30,7 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
               </button>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-            {step.subtitle}
-          </p>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">{step.subtitle}</p>
         </div>
         <DynamicExpensesRenderer />
       </div>
@@ -68,14 +66,12 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
             </button>
           )}
         </div>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-          {step.subtitle}
-        </p>
+        <p className="text-xs sm:text-sm text-muted-foreground mt-1">{step.subtitle}</p>
       </div>
 
       {/* Fields Grid / Loop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">
-        {step.fields.map(field => {
+        {step.fields.map((field) => {
           const isWide =
             field.type === 'array' ||
             field.type === 'radio' ||
@@ -84,14 +80,11 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
             field.id === 'futureContributions'
 
           return (
-            <div
-              key={field.id}
-              className={isWide ? 'md:col-span-2' : 'md:col-span-1'}
-            >
+            <div key={field.id} className={isWide ? 'md:col-span-2' : 'md:col-span-1'}>
               <DynamicField
                 field={field}
                 value={currentSlice[field.id]}
-                onChange={val => setStepFieldValue(step.key, field.id, val)}
+                onChange={(val) => setStepFieldValue(step.key, field.id, val)}
               />
             </div>
           )

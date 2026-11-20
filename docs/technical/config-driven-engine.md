@@ -13,7 +13,7 @@ Every step, group, field, validation boundary, option, and tooltip in the applic
 ```ts
 export interface StepConfig {
   id: number
-  key: string               // 'profile' | 'assets' | 'household' | 'expenses' | 'assumptions' | 'results'
+  key: string // 'profile' | 'assets' | 'household' | 'expenses' | 'assumptions' | 'results'
   title: string
   subtitle: string
   skippable?: boolean
@@ -36,10 +36,10 @@ export interface FieldConfig {
   min?: number
   max?: number
   step?: number
-  prefix?: string            // e.g. '₹'
-  suffix?: string            // e.g. '%' or 'years'
+  prefix?: string // e.g. '₹'
+  suffix?: string // e.g. '%' or 'years'
   skippable?: boolean
-  subFields?: FieldConfig[]  // For repeating arrays (e.g. household members, lump sums)
+  subFields?: FieldConfig[] // For repeating arrays (e.g. household members, lump sums)
 }
 ```
 
@@ -48,12 +48,14 @@ export interface FieldConfig {
 ## Dynamic Renderers
 
 ### 1. `DynamicStepRenderer`
+
 - Located in `src/components/wizard/DynamicStepRenderer.tsx`.
 - Reads the active `StepConfig` by ID.
 - Iterates over `fields` and delegates to `DynamicField` or specialized sub-renderers.
 - Handles step navigation actions (`handleNext`, `handlePrev`, `handleSkip`).
 
 ### 2. `DynamicField`
+
 - Located in `src/components/form/DynamicField.tsx`.
 - A polymorphic form control that inspects `field.type` and renders:
   - `number`: Formatted input with removed browser arrows and prefix/suffix chips.
@@ -63,6 +65,7 @@ export interface FieldConfig {
   - `array`: Repeatable list manager (used for household members and lump sum cashflows).
 
 ### 3. `DynamicExpensesRenderer`
+
 - Located in `src/components/expenses/DynamicExpensesRenderer.tsx`.
 - Special renderer for Step 4 (Categories A to K).
 - Manages dual entry modes (Category lump-sum total vs itemized line items).

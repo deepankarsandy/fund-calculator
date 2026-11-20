@@ -49,7 +49,7 @@ export function WizardProgress() {
                 className={cn(
                   'flex flex-col items-center gap-1 group',
                   isDone && 'cursor-pointer',
-                  !isDone && 'cursor-default',
+                  !isDone && 'cursor-default'
                 )}
                 aria-label={`${isDone ? 'Go to' : ''} Step ${step.id}: ${step.label}`}
               >
@@ -59,7 +59,7 @@ export function WizardProgress() {
                     isDone && 'bg-primary border-primary text-primary-foreground',
                     isActive && 'bg-primary/10 border-primary text-primary',
                     !isDone && !isActive && 'bg-muted border-border text-muted-foreground',
-                    isDone && 'group-hover:opacity-80',
+                    isDone && 'group-hover:opacity-80'
                   )}
                 >
                   {isDone ? <Check className="w-4 h-4" /> : <Icon className="w-4 h-4" />}
@@ -69,7 +69,7 @@ export function WizardProgress() {
                     'text-xs font-medium whitespace-nowrap',
                     isActive && 'text-primary',
                     isDone && 'text-primary',
-                    !isDone && !isActive && 'text-muted-foreground',
+                    !isDone && !isActive && 'text-muted-foreground'
                   )}
                 >
                   {step.label}
@@ -80,7 +80,7 @@ export function WizardProgress() {
                 <div
                   className={cn(
                     'h-0.5 w-12 mx-1 mt-[-18px] transition-colors duration-200',
-                    currentStep > step.id ? 'bg-primary' : 'bg-border',
+                    currentStep > step.id ? 'bg-primary' : 'bg-border'
                   )}
                 />
               )}

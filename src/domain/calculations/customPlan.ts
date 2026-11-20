@@ -128,7 +128,8 @@ export const PLAN_PRESETS: PlanPreset[] = [
   {
     id: 'guaranteed_income',
     name: 'Guaranteed Income Plan (10-Pay, 26-Yr Income)',
-    description: 'Pay ₹1L/yr for 10 years, wait till Yr 15, receive ₹1.2L/yr till Yr 40 + ₹10L Return of Premium.',
+    description:
+      'Pay ₹1L/yr for 10 years, wait till Yr 15, receive ₹1.2L/yr till Yr 40 + ₹10L Return of Premium.',
     badge: 'Popular Insurance Policy',
     inputs: {
       planName: 'Guaranteed Income Life Plan',
@@ -150,7 +151,8 @@ export const PLAN_PRESETS: PlanPreset[] = [
   {
     id: 'endowment_lumpsum',
     name: 'Endowment Policy (10-Pay, Maturity at Yr 20)',
-    description: 'Pay ₹1.5L/yr for 10 years, wait 10 years, receive a single maturity lump sum of ₹36 Lakhs.',
+    description:
+      'Pay ₹1.5L/yr for 10 years, wait 10 years, receive a single maturity lump sum of ₹36 Lakhs.',
     badge: 'Traditional Endowment',
     inputs: {
       planName: 'Endowment Maturity Plan',
@@ -172,7 +174,8 @@ export const PLAN_PRESETS: PlanPreset[] = [
   {
     id: 'deferred_annuity',
     name: 'Deferred Pension Annuity (15-Pay, 20-Yr Pension)',
-    description: 'Pay ₹2L/yr during working years (Yrs 1–15), receive ₹4.2L/yr retirement annuity for 20 years.',
+    description:
+      'Pay ₹2L/yr during working years (Yrs 1–15), receive ₹4.2L/yr retirement annuity for 20 years.',
     badge: 'Retirement Annuity',
     inputs: {
       planName: 'Deferred Retirement Annuity',
@@ -194,7 +197,8 @@ export const PLAN_PRESETS: PlanPreset[] = [
   {
     id: 'money_back',
     name: 'Money-Back Insurance (Every 5 Years + Maturity)',
-    description: 'Pay ₹1L/yr for 15 years with survival payouts at Yr 5, 10, 15 and maturity at Yr 20.',
+    description:
+      'Pay ₹1L/yr for 15 years with survival payouts at Yr 5, 10, 15 and maturity at Yr 20.',
     badge: 'Money-Back Policy',
     inputs: {
       planName: 'Money-Back 20-Year Plan',
@@ -314,9 +318,7 @@ export function buildScheduleFromInputs(inputs: CustomPlanInputs): CustomYearCas
  * High-precision IRR / XIRR calculation with Newton-Raphson & robust Bisection fallback.
  * Solves: sum( cashFlow[t] / (1 + r)^t ) = 0
  */
-export function calculateAnnualIRR(
-  cashFlows: { t: number; amount: number }[]
-): number | null {
+export function calculateAnnualIRR(cashFlows: { t: number; amount: number }[]): number | null {
   const valid = cashFlows.filter((cf) => cf.amount !== 0)
   if (valid.length < 2) return null
 
@@ -467,9 +469,7 @@ function calculateBenchmarkGrowth(
 /**
  * Evaluates the policy and produces the final comprehensive report
  */
-export function calculateCustomPlan(
-  inputs: Partial<CustomPlanInputs> = {}
-): CustomPlanResult {
+export function calculateCustomPlan(inputs: Partial<CustomPlanInputs> = {}): CustomPlanResult {
   const merged: CustomPlanInputs = {
     ...DEFAULT_CUSTOM_PLAN_INPUTS,
     ...inputs,
@@ -512,9 +512,7 @@ export function calculateCustomPlan(
 
   // Real Return (Fisher Equation: (1 + r) / (1 + i) - 1)
   const realReturnRate =
-    rawIrr !== null
-      ? ((1 + rawIrr) / (1 + inflDecimal) - 1) * 100
-      : -inflationRate
+    rawIrr !== null ? ((1 + rawIrr) / (1 + inflDecimal) - 1) * 100 : -inflationRate
   const realXirrPercent = Number(realReturnRate.toFixed(2))
 
   // 3. Compute Totals, Inflation Discounting, and Schedule
@@ -529,7 +527,11 @@ export function calculateCustomPlan(
   const customBenchmarkRate = Math.max(0, merged.benchmarkReturnRatePercent ?? 12.0)
   const ppfBenchmark = calculateBenchmarkGrowth(rawSchedule, 7.1, merged.investmentTiming)
   const equityBenchmark = calculateBenchmarkGrowth(rawSchedule, 12.0, merged.investmentTiming)
-  const customBenchmark = calculateBenchmarkGrowth(rawSchedule, customBenchmarkRate, merged.investmentTiming)
+  const customBenchmark = calculateBenchmarkGrowth(
+    rawSchedule,
+    customBenchmarkRate,
+    merged.investmentTiming
+  )
 
   const schedule: CustomPlanYearBreakdown[] = []
 
@@ -546,7 +548,11 @@ export function calculateCustomPlan(
     totalInvested += invested
     totalReceived += received
 
-    if (breakEvenYear === undefined && cumulativeReceived >= cumulativeInvested && cumulativeInvested > 0) {
+    if (
+      breakEvenYear === undefined &&
+      cumulativeReceived >= cumulativeInvested &&
+      cumulativeInvested > 0
+    ) {
       breakEvenYear = y
     }
 
@@ -572,8 +578,7 @@ export function calculateCustomPlan(
   }
 
   const netProfit = totalReceived - totalInvested
-  const gainMultiplier =
-    totalInvested > 0 ? Number((totalReceived / totalInvested).toFixed(2)) : 0
+  const gainMultiplier = totalInvested > 0 ? Number((totalReceived / totalInvested).toFixed(2)) : 0
 
   const purchasingPowerLossPercent =
     totalReceived > 0

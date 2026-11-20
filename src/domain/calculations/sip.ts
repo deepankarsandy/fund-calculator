@@ -59,7 +59,7 @@ export function calculateSip(inputs: Partial<SipCalculationInputs> = {}): SipCal
   const taxExemption = Math.max(0, merged.taxExemptionAmount ?? 125000)
   const inflationRate = Math.max(0, merged.inflationRatePercent ?? 6.0)
 
-  const monthlyRate = annualReturnRate > 0 ? (annualReturnRate / 100) / 12 : 0
+  const monthlyRate = annualReturnRate > 0 ? annualReturnRate / 100 / 12 : 0
 
   const yearlySchedule: SipYearlyBreakdown[] = []
   let balance = 0
@@ -82,7 +82,7 @@ export function calculateSip(inputs: Partial<SipCalculationInputs> = {}): SipCal
     cumulativeInvested += yearlyInvestmentSum
     const endBalance = balance
     const cumulativeInterest = endBalance - cumulativeInvested
-    const interestEarnedYear = (endBalance - prevYearEndBalance) - yearlyInvestmentSum
+    const interestEarnedYear = endBalance - prevYearEndBalance - yearlyInvestmentSum
 
     yearlySchedule.push({
       year,
@@ -199,7 +199,7 @@ export function calculateSwp(inputs: Partial<SwpCalculationInputs> = {}): SwpCal
   const taxExemption = Math.max(0, merged.taxExemptionAmount ?? 125000)
   const inflationRate = Math.max(0, merged.inflationRatePercent ?? 6.0)
 
-  const monthlyRate = annualReturnRate > 0 ? (annualReturnRate / 100) / 12 : 0
+  const monthlyRate = annualReturnRate > 0 ? annualReturnRate / 100 / 12 : 0
   const totalMonths = years * 12
 
   let balance = P
@@ -403,7 +403,7 @@ function simulateSwpInternal(
   enableStepUp: boolean,
   stepUpPercent: number
 ): { finalBalance: number; isDepleted: boolean; depletionMonth: number | null } {
-  const monthlyRate = annualReturnRate > 0 ? (annualReturnRate / 100) / 12 : 0
+  const monthlyRate = annualReturnRate > 0 ? annualReturnRate / 100 / 12 : 0
   const totalMonths = years * 12
   let balance = Math.max(0, initialCorpus)
   let isDepleted = false
@@ -454,7 +454,7 @@ function simulateSipInternal(
   enableStepUp: boolean,
   stepUpPercent: number
 ): { grossCorpus: number; totalInvested: number } {
-  const monthlyRate = annualReturnRate > 0 ? (annualReturnRate / 100) / 12 : 0
+  const monthlyRate = annualReturnRate > 0 ? annualReturnRate / 100 / 12 : 0
   let balance = 0
   let totalInvested = 0
 
@@ -480,7 +480,10 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
   }
 
   const currentAge = Math.max(18, Math.min(80, Math.round(merged.currentAge || 30)))
-  const retirementAge = Math.max(currentAge + 1, Math.min(85, Math.round(merged.retirementAge || 60)))
+  const retirementAge = Math.max(
+    currentAge + 1,
+    Math.min(85, Math.round(merged.retirementAge || 60))
+  )
   const targetAge = Math.max(retirementAge + 1, Math.min(100, Math.round(merged.targetAge || 90)))
 
   const sipYears = retirementAge - currentAge
@@ -502,8 +505,8 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
   const taxExemption = Math.max(0, merged.taxExemptionAmount ?? 125000)
   const inflationRate = Math.max(0, merged.inflationRatePercent ?? 6.0)
 
-  const sipMonthlyRate = sipReturnRate > 0 ? (sipReturnRate / 100) / 12 : 0
-  const swpMonthlyRate = swpReturnRate > 0 ? (swpReturnRate / 100) / 12 : 0
+  const sipMonthlyRate = sipReturnRate > 0 ? sipReturnRate / 100 / 12 : 0
+  const swpMonthlyRate = swpReturnRate > 0 ? swpReturnRate / 100 / 12 : 0
 
   const yearlySchedule: SipToSwpYearlyBreakdown[] = []
 
@@ -531,7 +534,7 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
     cumulativeInvested += yearlyInvestmentSum
     const endBalance = balance
     const cumulativeInterest = endBalance - cumulativeInvested
-    const interestEarnedYear = (endBalance - prevYearEndBalance) - yearlyInvestmentSum
+    const interestEarnedYear = endBalance - prevYearEndBalance - yearlyInvestmentSum
 
     yearlySchedule.push({
       year,
@@ -640,7 +643,8 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
   const finalRemainingBalance = Math.round(balance)
   const isEnough = !isDepleted && finalRemainingBalance >= 0
   const depletionAge = depletionYearOfSwp !== null ? retirementAge + depletionYearOfSwp - 1 : null
-  const unfundedYears = isDepleted && depletionAge !== null ? Math.max(0, targetAge - depletionAge) : 0
+  const unfundedYears =
+    isDepleted && depletionAge !== null ? Math.max(0, targetAge - depletionAge) : 0
 
   // Real purchasing power remaining at targetAge
   const inflationDiscount = Math.pow(1 + inflationRate / 100, totalYears)
@@ -653,12 +657,29 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
   if (sipAccumulatedCorpus > 0) {
     let low = 0
     let high = Math.max(100000, sipAccumulatedCorpus)
-    while (!simulateSwpInternal(sipAccumulatedCorpus, high, swpReturnRate, swpYears, enableSwpStepUp, swpStepUpPercent).isDepleted && high < 1e9) {
+    while (
+      !simulateSwpInternal(
+        sipAccumulatedCorpus,
+        high,
+        swpReturnRate,
+        swpYears,
+        enableSwpStepUp,
+        swpStepUpPercent
+      ).isDepleted &&
+      high < 1e9
+    ) {
       high *= 2
     }
     for (let i = 0; i < 35; i++) {
       const mid = (low + high) / 2
-      const sim = simulateSwpInternal(sipAccumulatedCorpus, mid, swpReturnRate, swpYears, enableSwpStepUp, swpStepUpPercent)
+      const sim = simulateSwpInternal(
+        sipAccumulatedCorpus,
+        mid,
+        swpReturnRate,
+        swpYears,
+        enableSwpStepUp,
+        swpStepUpPercent
+      )
       if (sim.isDepleted) {
         high = mid
       } else {
@@ -675,12 +696,29 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
   if (monthlySwp > 0) {
     let cLow = 0
     let cHigh = Math.max(1000000, monthlySwp * swpYears * 12 * 2)
-    while (simulateSwpInternal(cHigh, monthlySwp, swpReturnRate, swpYears, enableSwpStepUp, swpStepUpPercent).isDepleted && cHigh < 1e11) {
+    while (
+      simulateSwpInternal(
+        cHigh,
+        monthlySwp,
+        swpReturnRate,
+        swpYears,
+        enableSwpStepUp,
+        swpStepUpPercent
+      ).isDepleted &&
+      cHigh < 1e11
+    ) {
       cHigh *= 2
     }
     for (let i = 0; i < 35; i++) {
       const mid = (cLow + cHigh) / 2
-      const sim = simulateSwpInternal(mid, monthlySwp, swpReturnRate, swpYears, enableSwpStepUp, swpStepUpPercent)
+      const sim = simulateSwpInternal(
+        mid,
+        monthlySwp,
+        swpReturnRate,
+        swpYears,
+        enableSwpStepUp,
+        swpStepUpPercent
+      )
       if (sim.isDepleted) {
         cLow = mid
       } else {
@@ -691,12 +729,22 @@ export function calculateSipToSwp(inputs: Partial<SipToSwpInputs> = {}): SipToSw
 
     let sLow = 0
     let sHigh = Math.max(10000, requiredRetirementCorpus / (sipYears * 12))
-    while (simulateSipInternal(sHigh, sipReturnRate, sipYears, enableSipStepUp, sipStepUpPercent).grossCorpus < requiredRetirementCorpus && sHigh < 1e9) {
+    while (
+      simulateSipInternal(sHigh, sipReturnRate, sipYears, enableSipStepUp, sipStepUpPercent)
+        .grossCorpus < requiredRetirementCorpus &&
+      sHigh < 1e9
+    ) {
       sHigh *= 2
     }
     for (let i = 0; i < 35; i++) {
       const mid = (sLow + sHigh) / 2
-      const sim = simulateSipInternal(mid, sipReturnRate, sipYears, enableSipStepUp, sipStepUpPercent)
+      const sim = simulateSipInternal(
+        mid,
+        sipReturnRate,
+        sipYears,
+        enableSipStepUp,
+        sipStepUpPercent
+      )
       if (sim.grossCorpus < requiredRetirementCorpus) {
         sLow = mid
       } else {

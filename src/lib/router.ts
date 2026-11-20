@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { getStoredSettings } from '@/lib/settingsStorage'
 
-export type PageRoute = 'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd' | 'interest' | 'profile'
+export type PageRoute =
+  'home' | 'logic' | 'calculator' | 'sip' | 'investment' | 'fd' | 'interest' | 'profile'
 
 export interface AppRoute {
   page: PageRoute
@@ -54,7 +55,11 @@ export function buildUrl(page: PageRoute, step?: number): string {
 /**
  * Parses the current window.location or provided location object into an AppRoute.
  */
-export function parseRoute(locationObj?: { pathname: string; search: string; hash: string }): AppRoute {
+export function parseRoute(locationObj?: {
+  pathname: string
+  search: string
+  hash: string
+}): AppRoute {
   if (typeof window === 'undefined' && !locationObj) {
     return { page: 'home' }
   }
@@ -113,7 +118,12 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
       if (lower === 'fd' || lower === 'fd-calculator' || lower === 'fixed-deposit') {
         return { page: 'fd' }
       }
-      if (lower === 'interest' || lower === 'loan-emi' || lower === 'emi-calculator' || lower === 'emi') {
+      if (
+        lower === 'interest' ||
+        lower === 'loan-emi' ||
+        lower === 'emi-calculator' ||
+        lower === 'emi'
+      ) {
         return { page: 'interest' }
       }
       if (lower === 'profile' || lower === 'user-profile' || lower === 'my-profile') {
@@ -154,7 +164,11 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
     return { page: 'investment' }
   }
 
-  if (normalizedPath === 'fd' || normalizedPath === 'fd-calculator' || normalizedPath === 'fixed-deposit') {
+  if (
+    normalizedPath === 'fd' ||
+    normalizedPath === 'fd-calculator' ||
+    normalizedPath === 'fixed-deposit'
+  ) {
     return { page: 'fd' }
   }
 
@@ -167,7 +181,11 @@ export function parseRoute(locationObj?: { pathname: string; search: string; has
     return { page: 'interest' }
   }
 
-  if (normalizedPath === 'profile' || normalizedPath === 'user-profile' || normalizedPath === 'my-profile') {
+  if (
+    normalizedPath === 'profile' ||
+    normalizedPath === 'user-profile' ||
+    normalizedPath === 'my-profile'
+  ) {
     return { page: 'profile' }
   }
 
@@ -198,7 +216,7 @@ export function getCurrentRoute(): AppRoute {
 
 export function notifyRouteListeners(): void {
   const current = getCurrentRoute()
-  listeners.forEach(fn => fn(current))
+  listeners.forEach((fn) => fn(current))
 }
 
 /**
@@ -347,7 +365,7 @@ export function useRouter() {
     window.addEventListener('popstate', handlePopState)
 
     // Set up internal listener for navigateTo calls
-    const listener: RouteListener = newRoute => {
+    const listener: RouteListener = (newRoute) => {
       setRoute(newRoute)
     }
     listeners.add(listener)

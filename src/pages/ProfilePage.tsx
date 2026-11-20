@@ -37,22 +37,75 @@ const SECTOR_METADATA: {
   description: string
   suggested: number
 }[] = [
-  { key: 'healthcare', label: 'Healthcare & Insurance', description: 'Medical inflation historically trends high in India (~7-10%)', suggested: 7.0 },
-  { key: 'family', label: 'Education & Dependents', description: 'Tuitions, schooling and higher education support', suggested: 7.0 },
-  { key: 'food', label: 'Food & Groceries', description: 'Staples, dairy, vegetables, household consumables', suggested: 5.0 },
-  { key: 'housing', label: 'Housing & Property', description: 'Maintenance, society charges, home upkeep', suggested: 5.0 },
-  { key: 'transport', label: 'Transport & Commute', description: 'Fuel, vehicle maintenance, transit tickets', suggested: 5.0 },
-  { key: 'utilities', label: 'Utilities & Digital', description: 'Electricity, water, mobile bills, broadband', suggested: 5.0 },
-  { key: 'personal', label: 'Personal & Lifestyle', description: 'Apparel, vacations, festivals, dining out', suggested: 5.0 },
-  { key: 'technology', label: 'Technology & Gadgets', description: 'Phones, laptops (tends to deflate or inflate lower)', suggested: 3.0 },
-  { key: 'financial', label: 'Financial & Admin', description: 'Bank charges, tax filing, legal services', suggested: 5.0 },
-  { key: 'emergency', label: 'Contingency & Reserves', description: 'Emergency buffers and unexpected provisions', suggested: 5.0 },
-  { key: 'custom', label: 'Custom Commitments', description: 'Any other ongoing personal commitments', suggested: 5.0 },
+  {
+    key: 'healthcare',
+    label: 'Healthcare & Insurance',
+    description: 'Medical inflation historically trends high in India (~7-10%)',
+    suggested: 7.0,
+  },
+  {
+    key: 'family',
+    label: 'Education & Dependents',
+    description: 'Tuitions, schooling and higher education support',
+    suggested: 7.0,
+  },
+  {
+    key: 'food',
+    label: 'Food & Groceries',
+    description: 'Staples, dairy, vegetables, household consumables',
+    suggested: 5.0,
+  },
+  {
+    key: 'housing',
+    label: 'Housing & Property',
+    description: 'Maintenance, society charges, home upkeep',
+    suggested: 5.0,
+  },
+  {
+    key: 'transport',
+    label: 'Transport & Commute',
+    description: 'Fuel, vehicle maintenance, transit tickets',
+    suggested: 5.0,
+  },
+  {
+    key: 'utilities',
+    label: 'Utilities & Digital',
+    description: 'Electricity, water, mobile bills, broadband',
+    suggested: 5.0,
+  },
+  {
+    key: 'personal',
+    label: 'Personal & Lifestyle',
+    description: 'Apparel, vacations, festivals, dining out',
+    suggested: 5.0,
+  },
+  {
+    key: 'technology',
+    label: 'Technology & Gadgets',
+    description: 'Phones, laptops (tends to deflate or inflate lower)',
+    suggested: 3.0,
+  },
+  {
+    key: 'financial',
+    label: 'Financial & Admin',
+    description: 'Bank charges, tax filing, legal services',
+    suggested: 5.0,
+  },
+  {
+    key: 'emergency',
+    label: 'Contingency & Reserves',
+    description: 'Emergency buffers and unexpected provisions',
+    suggested: 5.0,
+  },
+  {
+    key: 'custom',
+    label: 'Custom Commitments',
+    description: 'Any other ongoing personal commitments',
+    suggested: 5.0,
+  },
 ]
 
-export default function ProfilePage({
-  onBackToHome,
-}: ProfilePageProps) {
+export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
   const { profile: storedProfile, updateProfile, resetProfile } = useUserProfile()
   const applyProfileDefaultsToWizard = useScenarioStore((s) => s.applyProfileDefaults)
 
@@ -158,9 +211,8 @@ export default function ProfilePage({
                 Your Financial Profile & Defaults
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-                Set your personal baseline once. All 5 calculators auto-fill
-                without asking each time, while still letting you tweak values
-                individually.
+                Set your personal baseline once. All 5 calculators auto-fill without asking each
+                time, while still letting you tweak values individually.
               </p>
             </div>
           </div>
@@ -172,12 +224,12 @@ export default function ProfilePage({
           <div className="flex items-center gap-1 px-4 py-2.5 border-b border-border bg-muted/30 overflow-x-auto text-xs font-semibold">
             <button
               type="button"
-              onClick={() => setActiveTab("personal")}
+              onClick={() => setActiveTab('personal')}
               className={cn(
-                "px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer",
-                activeTab === "personal"
-                  ? "bg-blue-600 text-white font-bold shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                activeTab === 'personal'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <User className="w-4 h-4" />
@@ -186,12 +238,12 @@ export default function ProfilePage({
 
             <button
               type="button"
-              onClick={() => setActiveTab("inflation")}
+              onClick={() => setActiveTab('inflation')}
               className={cn(
-                "px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer",
-                activeTab === "inflation"
-                  ? "bg-blue-600 text-white font-bold shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                activeTab === 'inflation'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <TrendingUp className="w-4 h-4" />
@@ -200,12 +252,12 @@ export default function ProfilePage({
 
             <button
               type="button"
-              onClick={() => setActiveTab("income_tax")}
+              onClick={() => setActiveTab('income_tax')}
               className={cn(
-                "px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer",
-                activeTab === "income_tax"
-                  ? "bg-blue-600 text-white font-bold shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                activeTab === 'income_tax'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <Wallet className="w-4 h-4" />
@@ -214,12 +266,12 @@ export default function ProfilePage({
 
             <button
               type="button"
-              onClick={() => setActiveTab("returns")}
+              onClick={() => setActiveTab('returns')}
               className={cn(
-                "px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer",
-                activeTab === "returns"
-                  ? "bg-blue-600 text-white font-bold shadow-xs"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                activeTab === 'returns'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
               )}
             >
               <BadgePercent className="w-4 h-4" />
@@ -230,7 +282,7 @@ export default function ProfilePage({
           {/* Form Content */}
           <div className="p-5 sm:p-7 space-y-6">
             {/* TAB 1: PERSONAL & HORIZON */}
-            {activeTab === "personal" && (
+            {activeTab === 'personal' && (
               <div className="space-y-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {/* Name */}
@@ -241,9 +293,7 @@ export default function ProfilePage({
                     <input
                       type="text"
                       value={formData.name}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, name: e.target.value }))
-                      }
+                      onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                       placeholder="e.g. Rahul Sharma"
                       className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                     />
@@ -254,9 +304,7 @@ export default function ProfilePage({
 
                   {/* Country Dropdown */}
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
-                      Country
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Country</label>
                     <div className="relative">
                       <select
                         value={formData.country}
@@ -315,9 +363,7 @@ export default function ProfilePage({
                           min={1}
                           max={110}
                           value={formData.currentAge}
-                          onChange={(e) =>
-                            handleAgeChange(parseInt(e.target.value, 10))
-                          }
+                          onChange={(e) => handleAgeChange(parseInt(e.target.value, 10))}
                           className="w-full h-11 border border-border rounded-xl px-3.5 text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                         />
                         <span className="text-xs font-semibold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
@@ -325,8 +371,7 @@ export default function ProfilePage({
                         </span>
                       </div>
                       <p className="text-[11px] text-muted-foreground">
-                        Age baseline for timeline simulations and seniority
-                        benefits.
+                        Age baseline for timeline simulations and seniority benefits.
                       </p>
                     </div>
                   </div>
@@ -351,10 +396,7 @@ export default function ProfilePage({
                       onChange={(e) =>
                         setFormData((p) => ({
                           ...p,
-                          retirementAge: Math.max(
-                            18,
-                            parseInt(e.target.value, 10) || 60,
-                          ),
+                          retirementAge: Math.max(18, parseInt(e.target.value, 10) || 60),
                         }))
                       }
                       className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -383,15 +425,14 @@ export default function ProfilePage({
                           ...p,
                           targetAge: Math.max(
                             formData.retirementAge + 1,
-                            parseInt(e.target.value, 10) || 85,
+                            parseInt(e.target.value, 10) || 85
                           ),
                         }))
                       }
                       className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Corpus lasts up to this age (85–90 safeguards against
-                      longevity risk).
+                      Corpus lasts up to this age (85–90 safeguards against longevity risk).
                     </p>
                   </div>
                 </div>
@@ -399,9 +440,7 @@ export default function ProfilePage({
                 {/* Currency & Location Type Dropdowns */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
-                      Currency
-                    </label>
+                    <label className="text-xs font-bold text-foreground">Currency</label>
                     <div className="relative">
                       <select
                         value={formData.currency}
@@ -437,18 +476,10 @@ export default function ProfilePage({
                         }
                         className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
                       >
-                        <option value="village">
-                          Village / Rural (~50% of metro cost)
-                        </option>
-                        <option value="small_town">
-                          Small Town Tier 3 (Baseline benchmark)
-                        </option>
-                        <option value="city">
-                          City Tier 2 (~1.6x of small town)
-                        </option>
-                        <option value="tier1_metro">
-                          Metro Tier 1 (~2.5x of small town)
-                        </option>
+                        <option value="village">Village / Rural (~50% of metro cost)</option>
+                        <option value="small_town">Small Town Tier 3 (Baseline benchmark)</option>
+                        <option value="city">City Tier 2 (~1.6x of small town)</option>
+                        <option value="tier1_metro">Metro Tier 1 (~2.5x of small town)</option>
                       </select>
                       <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
                     </div>
@@ -457,30 +488,28 @@ export default function ProfilePage({
 
                 {/* Lifestyle Baseline */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">
-                    Lifestyle Baseline
-                  </label>
+                  <label className="text-xs font-bold text-foreground">Lifestyle Baseline</label>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {[
                       {
-                        id: "bare_minimum",
-                        label: "Bare Minimum",
-                        desc: "Survival essentials only",
+                        id: 'bare_minimum',
+                        label: 'Bare Minimum',
+                        desc: 'Survival essentials only',
                       },
                       {
-                        id: "comfortable",
-                        label: "Comfortable",
-                        desc: "Leisure, outings & buffer",
+                        id: 'comfortable',
+                        label: 'Comfortable',
+                        desc: 'Leisure, outings & buffer',
                       },
                       {
-                        id: "luxury",
-                        label: "Luxury",
-                        desc: "Premium lifestyle & higher buffer",
+                        id: 'luxury',
+                        label: 'Luxury',
+                        desc: 'Premium lifestyle & higher buffer',
                       },
                       {
-                        id: "custom",
-                        label: "Custom",
-                        desc: "Manually itemized",
+                        id: 'custom',
+                        label: 'Custom',
+                        desc: 'Manually itemized',
                       },
                     ].map((lvl) => (
                       <button
@@ -493,16 +522,14 @@ export default function ProfilePage({
                           }))
                         }
                         className={cn(
-                          "p-3 rounded-xl border text-left transition-all cursor-pointer",
+                          'p-3 rounded-xl border text-left transition-all cursor-pointer',
                           formData.lifestyleBaseline === lvl.id
-                            ? "border-blue-500 bg-blue-50/80 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-bold shadow-xs"
-                            : "border-border hover:bg-muted text-foreground",
+                            ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-bold shadow-xs'
+                            : 'border-border hover:bg-muted text-foreground'
                         )}
                       >
                         <div className="text-xs font-bold">{lvl.label}</div>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">
-                          {lvl.desc}
-                        </div>
+                        <div className="text-[10px] text-muted-foreground mt-0.5">{lvl.desc}</div>
                       </button>
                     ))}
                   </div>
@@ -511,44 +538,38 @@ export default function ProfilePage({
             )}
 
             {/* TAB 2: INFLATION DEFAULTS */}
-            {activeTab === "inflation" && (
+            {activeTab === 'inflation' && (
               <div className="space-y-5">
                 {/* Mode Toggle with Sector-Wise as default active */}
                 <div className="p-4 rounded-xl border border-border bg-muted/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <h4 className="text-xs font-bold text-foreground">
-                      Inflation Mode Preference
-                    </h4>
+                    <h4 className="text-xs font-bold text-foreground">Inflation Mode Preference</h4>
                     <p className="text-[11px] text-muted-foreground">
-                      Sector-Wise is recommended for realistic financial
-                      modeling. Single rate applies a uniform blanket inflation.
+                      Sector-Wise is recommended for realistic financial modeling. Single rate
+                      applies a uniform blanket inflation.
                     </p>
                   </div>
                   <div className="inline-flex rounded-xl border border-border bg-background p-1 text-xs">
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData((p) => ({ ...p, inflationMode: "sector" }))
-                      }
+                      onClick={() => setFormData((p) => ({ ...p, inflationMode: 'sector' }))}
                       className={cn(
-                        "px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer",
-                        formData.inflationMode === "sector"
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "text-muted-foreground hover:text-foreground",
+                        'px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer',
+                        formData.inflationMode === 'sector'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
                       Sector-Wise (Recommended)
                     </button>
                     <button
                       type="button"
-                      onClick={() =>
-                        setFormData((p) => ({ ...p, inflationMode: "overall" }))
-                      }
+                      onClick={() => setFormData((p) => ({ ...p, inflationMode: 'overall' }))}
                       className={cn(
-                        "px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer",
-                        formData.inflationMode === "overall"
-                          ? "bg-blue-600 text-white shadow-xs"
-                          : "text-muted-foreground hover:text-foreground",
+                        'px-3.5 py-1.5 rounded-lg font-bold transition-all cursor-pointer',
+                        formData.inflationMode === 'overall'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-muted-foreground hover:text-foreground'
                       )}
                     >
                       Single Overall Rate
@@ -557,7 +578,7 @@ export default function ProfilePage({
                 </div>
 
                 {/* When Single Rate is selected: show only single blanket rate */}
-                {formData.inflationMode === "overall" && (
+                {formData.inflationMode === 'overall' && (
                   <div className="p-5 rounded-2xl border border-border bg-card space-y-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -565,8 +586,8 @@ export default function ProfilePage({
                           Single Overall Inflation Rate (%)
                         </label>
                         <p className="text-[11px] text-muted-foreground">
-                          Blanket inflation rate applied uniformly across all
-                          calculators and living expense categories.
+                          Blanket inflation rate applied uniformly across all calculators and living
+                          expense categories.
                         </p>
                       </div>
                       <span className="text-lg font-black text-blue-600 dark:text-blue-400">
@@ -598,10 +619,7 @@ export default function ProfilePage({
                         onChange={(e) =>
                           setFormData((p) => ({
                             ...p,
-                            overallInflationRate: Math.max(
-                              0,
-                              parseFloat(e.target.value) || 0,
-                            ),
+                            overallInflationRate: Math.max(0, parseFloat(e.target.value) || 0),
                           }))
                         }
                         className="w-24 h-11 px-3 text-sm bg-background border border-border rounded-xl font-bold text-center"
@@ -611,7 +629,7 @@ export default function ProfilePage({
                 )}
 
                 {/* When Sector-Wise is selected: show sector-specific breakdown */}
-                {formData.inflationMode === "sector" && (
+                {formData.inflationMode === 'sector' && (
                   <div className="space-y-4">
                     <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div>
@@ -620,8 +638,8 @@ export default function ProfilePage({
                           <span>Sector-Specific Inflation Rates</span>
                         </div>
                         <p className="text-[11px] text-muted-foreground">
-                          In India, Healthcare & Education typically inflate at
-                          7–10%, whereas technology deflates (~3%).
+                          In India, Healthcare & Education typically inflate at 7–10%, whereas
+                          technology deflates (~3%).
                         </p>
                       </div>
                       <button
@@ -643,8 +661,7 @@ export default function ProfilePage({
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       {SECTOR_METADATA.map((sector) => {
                         const currentRate =
-                          formData.sectorInflationRates[sector.key] ??
-                          sector.suggested;
+                          formData.sectorInflationRates[sector.key] ?? sector.suggested
                         return (
                           <div
                             key={sector.key}
@@ -655,8 +672,7 @@ export default function ProfilePage({
                                 <span className="text-xs font-bold text-foreground truncate">
                                   {sector.label}
                                 </span>
-                                {sector.key === "healthcare" ||
-                                sector.key === "family" ? (
+                                {sector.key === 'healthcare' || sector.key === 'family' ? (
                                   <span className="text-[9px] px-1.5 py-0.2 rounded-sm bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-extrabold">
                                     High
                                   </span>
@@ -676,17 +692,15 @@ export default function ProfilePage({
                                 onChange={(e) =>
                                   handleSectorInflationChange(
                                     sector.key,
-                                    parseFloat(e.target.value) || 0,
+                                    parseFloat(e.target.value) || 0
                                   )
                                 }
                                 className="w-18 h-9 px-2 text-xs bg-background border border-border rounded-lg font-bold text-right"
                               />
-                              <span className="text-xs font-bold text-muted-foreground">
-                                %
-                              </span>
+                              <span className="text-xs font-bold text-muted-foreground">%</span>
                             </div>
                           </div>
-                        );
+                        )
                       })}
                     </div>
                   </div>
@@ -695,7 +709,7 @@ export default function ProfilePage({
             )}
 
             {/* TAB 3: INCOME, SAVINGS & TAX */}
-            {activeTab === "income_tax" && (
+            {activeTab === 'income_tax' && (
               <div className="space-y-5">
                 {/* Active Income Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -715,10 +729,7 @@ export default function ProfilePage({
                         onChange={(e) =>
                           setFormData((p) => ({
                             ...p,
-                            monthlyIncome: Math.max(
-                              0,
-                              parseInt(e.target.value, 10) || 0,
-                            ),
+                            monthlyIncome: Math.max(0, parseInt(e.target.value, 10) || 0),
                           }))
                         }
                         className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -743,10 +754,7 @@ export default function ProfilePage({
                         onChange={(e) =>
                           setFormData((p) => ({
                             ...p,
-                            annualIncomeGrowthRate: Math.max(
-                              0,
-                              parseFloat(e.target.value) || 0,
-                            ),
+                            annualIncomeGrowthRate: Math.max(0, parseFloat(e.target.value) || 0),
                           }))
                         }
                         className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -787,7 +795,7 @@ export default function ProfilePage({
                               ...p,
                               existingInvestableCorpus: Math.max(
                                 0,
-                                parseInt(e.target.value, 10) || 0,
+                                parseInt(e.target.value, 10) || 0
                               ),
                             }))
                           }
@@ -795,8 +803,7 @@ export default function ProfilePage({
                         />
                       </div>
                       <p className="text-[11px] text-muted-foreground">
-                        Liquid mutual funds, FDs, savings (excluding primary
-                        home).
+                        Liquid mutual funds, FDs, savings (excluding primary home).
                       </p>
                     </div>
 
@@ -816,10 +823,7 @@ export default function ProfilePage({
                           onChange={(e) =>
                             setFormData((p) => ({
                               ...p,
-                              monthlySipInvestment: Math.max(
-                                0,
-                                parseInt(e.target.value, 10) || 0,
-                              ),
+                              monthlySipInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
                             }))
                           }
                           className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -849,10 +853,7 @@ export default function ProfilePage({
                           onChange={(e) =>
                             setFormData((p) => ({
                               ...p,
-                              monthlyPfInvestment: Math.max(
-                                0,
-                                parseInt(e.target.value, 10) || 0,
-                              ),
+                              monthlyPfInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
                             }))
                           }
                           className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -880,10 +881,7 @@ export default function ProfilePage({
                           onChange={(e) =>
                             setFormData((p) => ({
                               ...p,
-                              monthlyNpsInvestment: Math.max(
-                                0,
-                                parseInt(e.target.value, 10) || 0,
-                              ),
+                              monthlyNpsInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
                             }))
                           }
                           className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
@@ -900,9 +898,7 @@ export default function ProfilePage({
                 <div className="p-4 sm:p-5 rounded-2xl border border-amber-200 dark:border-amber-900 bg-amber-50/40 dark:bg-amber-950/20 space-y-4">
                   <h4 className="text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center gap-1.5">
                     <BadgePercent className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                    <span>
-                      Tax Slabs & Capital Gains (Budget 2024 Defaults)
-                    </span>
+                    <span>Tax Slabs & Capital Gains (Budget 2024 Defaults)</span>
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -936,24 +932,20 @@ export default function ProfilePage({
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">
-                        Tax Regime
-                      </label>
+                      <label className="text-xs font-bold text-foreground">Tax Regime</label>
                       <div className="relative">
                         <select
                           value={formData.taxRegime}
                           onChange={(e) =>
                             setFormData((p) => ({
                               ...p,
-                              taxRegime: e.target.value as "new" | "old",
+                              taxRegime: e.target.value as 'new' | 'old',
                             }))
                           }
                           className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
                         >
                           <option value="new">New Tax Regime</option>
-                          <option value="old">
-                            Old Tax Regime (Sec 80C & 24b)
-                          </option>
+                          <option value="old">Old Tax Regime (Sec 80C & 24b)</option>
                         </select>
                         <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
                       </div>
@@ -976,10 +968,7 @@ export default function ProfilePage({
                           onChange={(e) =>
                             setFormData((p) => ({
                               ...p,
-                              ltcgTaxRate: Math.max(
-                                0,
-                                parseFloat(e.target.value) || 0,
-                              ),
+                              ltcgTaxRate: Math.max(0, parseFloat(e.target.value) || 0),
                             }))
                           }
                           className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs"
@@ -998,14 +987,12 @@ export default function ProfilePage({
             )}
 
             {/* TAB 4: RETURNS & INTEREST */}
-            {activeTab === "returns" && (
+            {activeTab === 'returns' && (
               <div className="space-y-5">
                 <div className="p-4 sm:p-5 rounded-2xl border border-border bg-card space-y-4">
                   <h4 className="text-xs font-bold text-foreground flex items-center gap-1.5">
                     <Landmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <span>
-                      Default Expected Return Rates & Interest Benchmarks
-                    </span>
+                    <span>Default Expected Return Rates & Interest Benchmarks</span>
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -1034,8 +1021,8 @@ export default function ProfilePage({
                         className="w-full accent-blue-600 cursor-pointer"
                       />
                       <p className="text-[11px] text-muted-foreground">
-                        Used as baseline in SIP and multi-asset equity
-                        projections (Nifty 50 long-term ~12%).
+                        Used as baseline in SIP and multi-asset equity projections (Nifty 50
+                        long-term ~12%).
                       </p>
                     </div>
 
@@ -1064,8 +1051,7 @@ export default function ProfilePage({
                         className="w-full accent-blue-600 cursor-pointer"
                       />
                       <p className="text-[11px] text-muted-foreground">
-                        Used for post-retirement conservative drawdown (SWP) and
-                        debt allocations.
+                        Used for post-retirement conservative drawdown (SWP) and debt allocations.
                       </p>
                     </div>
 
@@ -1094,8 +1080,8 @@ export default function ProfilePage({
                         className="w-full accent-blue-600 cursor-pointer"
                       />
                       <p className="text-[11px] text-muted-foreground">
-                        Pre-filled baseline in Bank FD calculator (typical
-                        SBI/HDFC/post-office range).
+                        Pre-filled baseline in Bank FD calculator (typical SBI/HDFC/post-office
+                        range).
                       </p>
                     </div>
 
@@ -1124,8 +1110,7 @@ export default function ProfilePage({
                         className="w-full accent-blue-600 cursor-pointer"
                       />
                       <p className="text-[11px] text-muted-foreground">
-                        Pre-filled in Loan EMI calculator (typical Indian home
-                        loan rate ~8.5%).
+                        Pre-filled in Loan EMI calculator (typical Indian home loan rate ~8.5%).
                       </p>
                     </div>
                   </div>
@@ -1143,9 +1128,7 @@ export default function ProfilePage({
                 onChange={(e) => setAutoSyncCalculators(e.target.checked)}
                 className="w-4 h-4 rounded-sm text-blue-600 focus:ring-blue-500 cursor-pointer"
               />
-              <span>
-                Auto-apply these defaults to all 5 calculators immediately
-              </span>
+              <span>Auto-apply these defaults to all 5 calculators immediately</span>
             </label>
 
             <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
@@ -1177,11 +1160,10 @@ export default function ProfilePage({
           Fund Calculator · Open Source Personal Financial Planning Suite
         </p>
         <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
-          <strong>100% Local & Private:</strong> All your profile settings are
-          kept strictly in your device browser storage. Nothing is sent to any
-          server.
+          <strong>100% Local & Private:</strong> All your profile settings are kept strictly in your
+          device browser storage. Nothing is sent to any server.
         </p>
       </footer>
     </div>
-  );
+  )
 }

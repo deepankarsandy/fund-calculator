@@ -4,7 +4,10 @@ import type { HouseholdMember } from '@/domain/models/household'
 import { EXPENSE_CATEGORIES_CONFIG } from '@/config/formFields'
 
 // Multipliers for different living costs across India
-export const AREA_MULTIPLIERS: Record<AreaType, { label: string; baseMultiplier: number; description: string }> = {
+export const AREA_MULTIPLIERS: Record<
+  AreaType,
+  { label: string; baseMultiplier: number; description: string }
+> = {
   village: {
     label: 'Village / Rural',
     baseMultiplier: 0.6,
@@ -62,7 +65,7 @@ export function buildCategoriesForProfile(
   areaType: AreaType = 'small_town',
   lifestyle: LifestyleScenario = 'comfortable',
   membersOrCount: number | HouseholdMember[] = 1,
-  sectorInflationRates?: Record<string, number>,
+  sectorInflationRates?: Record<string, number>
 ): ExpenseCategory[] {
   let memberCount = 1
   let membersList: HouseholdMember[] = []
@@ -71,15 +74,20 @@ export function buildCategoriesForProfile(
     memberCount = Math.max(1, membersOrCount)
   } else if (Array.isArray(membersOrCount)) {
     membersList = membersOrCount
-    const dependentCount = membersList.filter(m => m.financiallyDependent).length
+    const dependentCount = membersList.filter((m) => m.financiallyDependent).length
     memberCount = Math.max(1, dependentCount)
   }
 
-  const childMembers = membersList.filter(m => m.relationship === 'child' && m.financiallyDependent)
-  const parentMembers = membersList.filter(m => m.relationship === 'parent' && m.financiallyDependent)
+  const childMembers = membersList.filter(
+    (m) => m.relationship === 'child' && m.financiallyDependent
+  )
+  const parentMembers = membersList.filter(
+    (m) => m.relationship === 'parent' && m.financiallyDependent
+  )
 
-  return EXPENSE_CATEGORIES_CONFIG.map(cat => {
-    const factor = CATEGORY_AREA_FACTORS[cat.id]?.[areaType] ?? AREA_MULTIPLIERS[areaType].baseMultiplier
+  return EXPENSE_CATEGORIES_CONFIG.map((cat) => {
+    const factor =
+      CATEGORY_AREA_FACTORS[cat.id]?.[areaType] ?? AREA_MULTIPLIERS[areaType].baseMultiplier
 
     return {
       id: cat.id as CategoryId,
@@ -99,8 +107,8 @@ export function buildCategoriesForProfile(
           sub.frequency === 'one_time'
             ? 'one_time'
             : sub.frequency === 'every_n_years'
-            ? 'periodic'
-            : 'recurring'
+              ? 'periodic'
+              : 'recurring'
 
         // Scale default amount
         let scaledAmount = Math.round((sub.defaultAmount * factor) / 50) * 50

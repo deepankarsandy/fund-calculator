@@ -27,21 +27,21 @@ export function ProfileHeaderButton({ onClick, className }: ProfileHeaderButtonP
       type="button"
       onClick={handleClick}
       className={cn(
-        "group relative text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 cursor-pointer shadow-xs",
+        'group relative text-xs font-semibold px-2.5 sm:px-3 py-1.5 rounded-xl border transition-all flex items-center gap-1.5 cursor-pointer shadow-xs',
         isProfileActive
-          ? "border-blue-600 bg-blue-600 text-white shadow-xs"
+          ? 'border-blue-600 bg-blue-600 text-white shadow-xs'
           : isConfigured
-            ? "border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 hover:bg-muted"
-            : "border-border hover:bg-muted text-foreground",
-        className,
+            ? 'border-blue-300 dark:border-blue-800 bg-blue-50/50 dark:bg-blue-950/30 text-blue-900 dark:text-blue-100 hover:bg-muted'
+            : 'border-border hover:bg-muted text-foreground',
+        className
       )}
       title="User Profile & Baseline Calculator Defaults (DOB, Retirement, Sector Inflation, Taxes)"
     >
       <div className="relative">
         <User
           className={cn(
-            "w-3.5 h-3.5",
-            isProfileActive ? "text-white" : "text-blue-600 dark:text-blue-400",
+            'w-3.5 h-3.5',
+            isProfileActive ? 'text-white' : 'text-blue-600 dark:text-blue-400'
           )}
         />
         {isConfigured && !isProfileActive && (
@@ -50,5 +50,5 @@ export function ProfileHeaderButton({ onClick, className }: ProfileHeaderButtonP
       </div>
       <span className="hidden sm:inline font-bold">{displayName}</span>
     </button>
-  );
+  )
 }

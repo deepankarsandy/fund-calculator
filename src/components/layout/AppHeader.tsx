@@ -37,9 +37,7 @@ export function AppHeader({ onBackToHome, onSelectCalculator, onViewLogic }: App
               <h1 className="text-sm sm:text-base font-extrabold text-foreground leading-tight tracking-tight">
                 {title}
               </h1>
-              <p className="text-[11px] text-muted-foreground font-medium">
-                {subtitle}
-              </p>
+              <p className="text-[11px] text-muted-foreground font-medium">{subtitle}</p>
             </div>
           </button>
 

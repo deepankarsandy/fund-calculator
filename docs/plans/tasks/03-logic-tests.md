@@ -37,6 +37,7 @@
    - Pension starting Year 10 reduces net withdrawal from Year 10 onward.
 
 ## Acceptance Criteria
+
 - [ ] Run via `npm run test`.
 - [ ] All tests execute quickly without browser/DOM overhead.
 - [ ] 100% of calculation test cases pass.

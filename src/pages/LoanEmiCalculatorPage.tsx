@@ -32,12 +32,8 @@ interface LoanEmiCalculatorPageProps {
   onBackToHome: () => void
 }
 
-export default function LoanEmiCalculatorPage({
-  onBackToHome,
-}: LoanEmiCalculatorPageProps) {
-  const [inputs, setInputs] = useState<LoanEmiCalculationInputs>(() =>
-    getStoredLoanEmiInputs()
-  )
+export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculatorPageProps) {
+  const [inputs, setInputs] = useState<LoanEmiCalculationInputs>(() => getStoredLoanEmiInputs())
   const [showPrepayment, setShowPrepayment] = useState(false)
   const [showTaxDetails, setShowTaxDetails] = useState(false)
   const [showScheduleTable, setShowScheduleTable] = useState(false)
@@ -165,8 +161,8 @@ export default function LoanEmiCalculatorPage({
                 Loan & Interest EMI Calculator
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
-                Calculate monthly EMI, prepayment interest savings, and Section
-                24(b) / 80C tax relief for Indian loans.
+                Calculate monthly EMI, prepayment interest savings, and Section 24(b) / 80C tax
+                relief for Indian loans.
               </p>
             </div>
           </div>
@@ -176,11 +172,11 @@ export default function LoanEmiCalculatorPage({
         <div className="flex flex-wrap items-center gap-2 p-1 bg-muted/60 rounded-xl border border-border max-w-lg">
           <button
             type="button"
-            onClick={() => handleLoanTypePreset("home")}
+            onClick={() => handleLoanTypePreset('home')}
             className={`flex-1 min-w-28 py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              inputs.loanType === "home"
-                ? "bg-card text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground"
+              inputs.loanType === 'home'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Building className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -188,11 +184,11 @@ export default function LoanEmiCalculatorPage({
           </button>
           <button
             type="button"
-            onClick={() => handleLoanTypePreset("car")}
+            onClick={() => handleLoanTypePreset('car')}
             className={`flex-1 min-w-28 py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              inputs.loanType === "car"
-                ? "bg-card text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground"
+              inputs.loanType === 'car'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Car className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -200,11 +196,11 @@ export default function LoanEmiCalculatorPage({
           </button>
           <button
             type="button"
-            onClick={() => handleLoanTypePreset("personal")}
+            onClick={() => handleLoanTypePreset('personal')}
             className={`flex-1 min-w-28 py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              inputs.loanType === "personal"
-                ? "bg-card text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground"
+              inputs.loanType === 'personal'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <UserCheck className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
@@ -255,25 +251,20 @@ export default function LoanEmiCalculatorPage({
 
               {/* Quick preset chips */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {[1000000, 2500000, 4000000, 6000000, 8000000, 10000000].map(
-                  (amt) => (
-                    <button
-                      key={amt}
-                      type="button"
-                      onClick={() => handleAmountChange(amt)}
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                        inputs.loanAmount === amt
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      ₹
-                      {amt >= 10000000
-                        ? `${amt / 10000000} Cr`
-                        : `${amt / 100000} Lakh`}
-                    </button>
-                  ),
-                )}
+                {[1000000, 2500000, 4000000, 6000000, 8000000, 10000000].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    onClick={() => handleAmountChange(amt)}
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+                      inputs.loanAmount === amt
+                        ? 'bg-blue-600 text-white border-blue-600'
+                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    ₹{amt >= 10000000 ? `${amt / 10000000} Cr` : `${amt / 100000} Lakh`}
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -324,8 +315,8 @@ export default function LoanEmiCalculatorPage({
                     onClick={() => handleRateChange(rate)}
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                       inputs.annualInterestRate === rate
-                        ? "bg-emerald-600 text-white border-emerald-600"
-                        : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {rate}%
@@ -337,10 +328,8 @@ export default function LoanEmiCalculatorPage({
             {/* Interest Method Switch: Reducing vs Flat */}
             <div className="space-y-2 pt-2 border-t border-border/60">
               <div className="flex items-center justify-between gap-2">
-                <label className="text-xs font-bold text-foreground">
-                  Interest Method
-                </label>
-                {inputs.interestMethod === "flat" ? (
+                <label className="text-xs font-bold text-foreground">Interest Method</label>
+                {inputs.interestMethod === 'flat' ? (
                   <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/70 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800">
                     Equiv. Reducing APR: ~{results.equivalentReducingApr}%
                   </span>
@@ -357,37 +346,34 @@ export default function LoanEmiCalculatorPage({
                   onClick={() =>
                     setInputs((prev) => ({
                       ...prev,
-                      interestMethod: "reducing",
+                      interestMethod: 'reducing',
                     }))
                   }
                   className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
-                    (inputs.interestMethod || "reducing") === "reducing"
-                      ? "bg-card text-foreground shadow-xs border border-border"
-                      : "text-muted-foreground hover:text-foreground"
+                    (inputs.interestMethod || 'reducing') === 'reducing'
+                      ? 'bg-card text-foreground shadow-xs border border-border'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Reducing Balance
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
-                    setInputs((prev) => ({ ...prev, interestMethod: "flat" }))
-                  }
+                  onClick={() => setInputs((prev) => ({ ...prev, interestMethod: 'flat' }))}
                   className={`flex-1 py-1.5 px-2.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
-                    inputs.interestMethod === "flat"
-                      ? "bg-card text-foreground shadow-xs border border-border"
-                      : "text-muted-foreground hover:text-foreground"
+                    inputs.interestMethod === 'flat'
+                      ? 'bg-card text-foreground shadow-xs border border-border'
+                      : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   Flat Rate
                 </button>
               </div>
 
-              {inputs.interestMethod === "flat" && (
+              {inputs.interestMethod === 'flat' && (
                 <div className="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50/60 dark:bg-amber-950/40 p-2.5 rounded-xl border border-amber-200/80 dark:border-amber-800/80 leading-relaxed">
-                  <strong>Notice on Flat Rate:</strong> Interest is charged on
-                  the initial principal throughout the tenure. A{" "}
-                  {inputs.annualInterestRate}% flat rate corresponds to an
+                  <strong>Notice on Flat Rate:</strong> Interest is charged on the initial principal
+                  throughout the tenure. A {inputs.annualInterestRate}% flat rate corresponds to an
                   effective ~{results.equivalentReducingApr}% reducing APR.
                 </div>
               )}
@@ -440,8 +426,8 @@ export default function LoanEmiCalculatorPage({
                     onClick={() => handleYearsChange(yr)}
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                       inputs.tenureYears === yr
-                        ? "bg-indigo-600 text-white border-indigo-600"
-                        : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                        ? 'bg-indigo-600 text-white border-indigo-600'
+                        : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     {yr} Yr
@@ -525,7 +511,7 @@ export default function LoanEmiCalculatorPage({
             </div>
 
             {/* Indian Tax Deductions Section (Home Loans) */}
-            {inputs.loanType === "home" && (
+            {inputs.loanType === 'home' && (
               <div className="rounded-xl border border-border/80 bg-card">
                 <button
                   type="button"
@@ -561,8 +547,7 @@ export default function LoanEmiCalculatorPage({
                         className="w-4 h-4 rounded text-blue-600 cursor-pointer"
                       />
                       <span className="font-semibold text-foreground">
-                        Calculate Tax Savings on Principal (80C) & Interest
-                        (24b)
+                        Calculate Tax Savings on Principal (80C) & Interest (24b)
                       </span>
                     </label>
 
@@ -577,17 +562,13 @@ export default function LoanEmiCalculatorPage({
                             onChange={(e) =>
                               setInputs((prev) => ({
                                 ...prev,
-                                taxRegime: e.target.value as "old" | "new",
+                                taxRegime: e.target.value as 'old' | 'new',
                               }))
                             }
                             className="w-full px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs font-bold"
                           >
-                            <option value="old">
-                              Old Tax Regime (Eligible)
-                            </option>
-                            <option value="new">
-                              New Tax Regime (No Deductions)
-                            </option>
+                            <option value="old">Old Tax Regime (Eligible)</option>
+                            <option value="new">New Tax Regime (No Deductions)</option>
                           </select>
                         </div>
 
@@ -613,9 +594,8 @@ export default function LoanEmiCalculatorPage({
                     )}
 
                     <div className="text-[11px] text-muted-foreground leading-relaxed pt-1">
-                      Under the Old Regime, claim up to ₹2 Lakh/yr under Sec
-                      24(b) on interest and up to ₹1.5 Lakh/yr under Sec 80C on
-                      principal repayment.
+                      Under the Old Regime, claim up to ₹2 Lakh/yr under Sec 24(b) on interest and
+                      up to ₹1.5 Lakh/yr under Sec 80C on principal repayment.
                     </div>
                   </div>
                 )}
@@ -639,9 +619,7 @@ export default function LoanEmiCalculatorPage({
               <div>
                 <div className="text-3xl sm:text-4xl font-black text-foreground tracking-tight">
                   {formatINR(results.monthlyEmi)}
-                  <span className="text-xs font-semibold text-muted-foreground ml-1">
-                    / month
-                  </span>
+                  <span className="text-xs font-semibold text-muted-foreground ml-1">/ month</span>
                 </div>
                 <div className="text-xs font-semibold text-muted-foreground mt-0.5">
                   Total Repayment: {formatCrore(results.actualTotalPayment)} (
@@ -678,17 +656,11 @@ export default function LoanEmiCalculatorPage({
               {/* Detail Metrics Breakdown */}
               <div className="space-y-2.5 pt-2 border-t border-border/70 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">
-                    Principal Borrowed:
-                  </span>
-                  <span className="font-bold text-foreground">
-                    {formatINR(inputs.loanAmount)}
-                  </span>
+                  <span className="text-muted-foreground font-medium">Principal Borrowed:</span>
+                  <span className="font-bold text-foreground">{formatINR(inputs.loanAmount)}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground font-medium">
-                    Total Interest Payable:
-                  </span>
+                  <span className="text-muted-foreground font-medium">Total Interest Payable:</span>
                   <span className="font-extrabold text-amber-600 dark:text-amber-400">
                     +{formatINR(results.actualTotalInterest)}
                   </span>
@@ -704,7 +676,7 @@ export default function LoanEmiCalculatorPage({
                     <div className="flex items-center justify-between text-[11px]">
                       <span>Tenure Reduced:</span>
                       <span className="font-bold">
-                        {Math.floor(results.tenureMonthsSaved / 12)} Yrs{" "}
+                        {Math.floor(results.tenureMonthsSaved / 12)} Yrs{' '}
                         {results.tenureMonthsSaved % 12} Mos early
                       </span>
                     </div>
@@ -714,19 +686,13 @@ export default function LoanEmiCalculatorPage({
                 {/* Tax Savings Display */}
                 {results.totalTaxSavings > 0 && (
                   <div className="flex items-center justify-between text-indigo-600 dark:text-indigo-400">
-                    <span className="font-medium">
-                      Total Income Tax Relief (24b + 80C):
-                    </span>
-                    <span className="font-bold">
-                      -{formatINR(results.totalTaxSavings)}
-                    </span>
+                    <span className="font-medium">Total Income Tax Relief (24b + 80C):</span>
+                    <span className="font-bold">-{formatINR(results.totalTaxSavings)}</span>
                   </div>
                 )}
 
                 <div className="flex items-center justify-between pt-1 border-t border-border/50">
-                  <span className="font-bold text-foreground">
-                    Net Effective Loan Cost:
-                  </span>
+                  <span className="font-bold text-foreground">Net Effective Loan Cost:</span>
                   <span className="font-black text-blue-600 dark:text-blue-400 text-sm">
                     {formatINR(results.netEffectiveCost)}
                   </span>
@@ -738,8 +704,7 @@ export default function LoanEmiCalculatorPage({
                       Inflation-Adjusted Real Cost
                     </span>
                     <span className="text-[10px] text-muted-foreground">
-                      Today's discounted cash outflows @{" "}
-                      {inputs.inflationRatePercent}%
+                      Today's discounted cash outflows @ {inputs.inflationRatePercent}%
                     </span>
                   </div>
                   <span className="font-extrabold text-foreground text-sm">
@@ -756,8 +721,8 @@ export default function LoanEmiCalculatorPage({
                 <span>100% Local & Private In-Browser</span>
               </div>
               <p className="text-[11px] leading-relaxed">
-                All amortization schedules and loan parameters remain local to
-                your browser. No debt figures are shared or tracked.
+                All amortization schedules and loan parameters remain local to your browser. No debt
+                figures are shared or tracked.
               </p>
             </div>
           </div>
@@ -771,8 +736,7 @@ export default function LoanEmiCalculatorPage({
                 Annual Loan Amortization Schedule
               </h3>
               <p className="text-xs text-muted-foreground">
-                Track annual principal reduction, interest breakdown, and
-                remaining loan balance
+                Track annual principal reduction, interest breakdown, and remaining loan balance
               </p>
             </div>
             <button
@@ -780,9 +744,7 @@ export default function LoanEmiCalculatorPage({
               onClick={() => setShowScheduleTable((prev) => !prev)}
               className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
             >
-              <span>
-                {showScheduleTable ? "Collapse Schedule" : "View Full Schedule"}
-              </span>
+              <span>{showScheduleTable ? 'Collapse Schedule' : 'View Full Schedule'}</span>
               {showScheduleTable ? (
                 <ChevronUp className="w-3.5 h-3.5" />
               ) : (
@@ -806,13 +768,8 @@ export default function LoanEmiCalculatorPage({
                 </thead>
                 <tbody className="divide-y divide-border/60">
                   {results.yearlyAmortization.map((row) => (
-                    <tr
-                      key={row.year}
-                      className="hover:bg-muted/30 transition-colors"
-                    >
-                      <td className="py-2 px-3 font-bold text-foreground">
-                        Year {row.year}
-                      </td>
+                    <tr key={row.year} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-2 px-3 font-bold text-foreground">Year {row.year}</td>
                       <td className="py-2 px-3 text-right font-medium">
                         {formatINR(row.startingBalance)}
                       </td>
@@ -837,5 +794,5 @@ export default function LoanEmiCalculatorPage({
         </div>
       </main>
     </div>
-  );
+  )
 }

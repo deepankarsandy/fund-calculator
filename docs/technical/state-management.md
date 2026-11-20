@@ -79,6 +79,7 @@ setStepFieldValue: (stepKey, fieldId, value) => {
 ## Reactive Plan Switching (`selectLifestylePlan`)
 
 When the user clicks a lifestyle card on the results page:
+
 1. `lifestyleScenario` is updated in the `profile` slice.
 2. `categories` are adjusted:
    - For `bare_minimum`: Discretionary items are zeroed out while preserving essential items.

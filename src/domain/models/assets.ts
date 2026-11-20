@@ -15,9 +15,9 @@ export interface FutureLumpSum {
 }
 
 export interface Assets {
-  monthlyIncome: number          // monthly earned income today (₹)
-  incomeEndAge: number           // age until which earned income continues (e.g. 60)
-  incomeGrowthRate: number       // annual increment rate (e.g. 0.07 for 7%)
+  monthlyIncome: number // monthly earned income today (₹)
+  incomeEndAge: number // age until which earned income continues (e.g. 60)
+  incomeGrowthRate: number // annual increment rate (e.g. 0.07 for 7%)
   existingInvestableCorpus: number
   futureContributions: FutureLumpSum[]
   otherIncome: OtherIncome[]

@@ -20,6 +20,7 @@
    - Clean, friendly explanation box or tooltip below or alongside the label explaining what the field represents in practical financial terms.
 
 ## Acceptance Criteria
+
 - [ ] Changing a field in `formFields.ts` (e.g. modifying min, max, label, options, or help text) instantly updates the rendered UI without changing component code.
 - [ ] Default values from the config are automatically respected.
 - [ ] Responsive layout adapts on mobile (single-column) and tablet/desktop (grid).

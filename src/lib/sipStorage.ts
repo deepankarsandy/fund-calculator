@@ -51,7 +51,8 @@ export function getStoredSipInputs(): StoredSipData {
           combo: DEFAULT_SIP_TO_SWP_INPUTS,
         }
       }
-      const validMode: SipMode = parsed.mode === 'swp' ? 'swp' : parsed.mode === 'combo' ? 'combo' : 'sip'
+      const validMode: SipMode =
+        parsed.mode === 'swp' ? 'swp' : parsed.mode === 'combo' ? 'combo' : 'sip'
       return {
         mode: validMode,
         sip: { ...DEFAULT_SIP_INPUTS, ...(parsed.sip || {}) },

@@ -21,7 +21,9 @@ export function HomePageProfileBanner({ onOpenProfile }: HomePageProfileBannerPr
             <div className="space-y-1 flex-1 min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h3 className="text-sm sm:text-base font-extrabold text-foreground tracking-tight">
-                  {isConfigured && profile.name ? `Welcome back, ${profile.name}!` : 'Personalize Your Financial Profile & Baseline Defaults'}
+                  {isConfigured && profile.name
+                    ? `Welcome back, ${profile.name}!`
+                    : 'Personalize Your Financial Profile & Baseline Defaults'}
                 </h3>
                 <span className="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
                   {isConfigured ? 'Profile Active' : '1-Time Setup'}
@@ -37,23 +39,39 @@ export function HomePageProfileBanner({ onOpenProfile }: HomePageProfileBannerPr
               {/* Active Profile Summary Chips */}
               <div className="flex flex-wrap items-center gap-1.5 pt-1.5 text-[11px] font-semibold text-muted-foreground">
                 <span className="px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                  Age: <strong className="text-blue-600 dark:text-blue-400">{profile.currentAge}</strong>
+                  Age:{' '}
+                  <strong className="text-blue-600 dark:text-blue-400">{profile.currentAge}</strong>
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                  Retire: <strong className="text-blue-600 dark:text-blue-400">{profile.retirementAge}</strong>
+                  Retire:{' '}
+                  <strong className="text-blue-600 dark:text-blue-400">
+                    {profile.retirementAge}
+                  </strong>
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                  Inflation: <strong className="text-blue-600 dark:text-blue-400">{profile.overallInflationRate}%</strong>
+                  Inflation:{' '}
+                  <strong className="text-blue-600 dark:text-blue-400">
+                    {profile.overallInflationRate}%
+                  </strong>
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                  LTCG: <strong className="text-blue-600 dark:text-blue-400">{profile.ltcgTaxRate}%</strong>
+                  LTCG:{' '}
+                  <strong className="text-blue-600 dark:text-blue-400">
+                    {profile.ltcgTaxRate}%
+                  </strong>
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                  Tax Slab: <strong className="text-blue-600 dark:text-blue-400">{profile.incomeTaxBracket}%</strong>
+                  Tax Slab:{' '}
+                  <strong className="text-blue-600 dark:text-blue-400">
+                    {profile.incomeTaxBracket}%
+                  </strong>
                 </span>
                 {profile.monthlyIncome > 0 && (
                   <span className="hidden sm:inline-block px-2 py-0.5 rounded-md bg-card/80 border border-border text-foreground">
-                    Income: <strong className="text-blue-600 dark:text-blue-400">{formatINR(profile.monthlyIncome)}/mo</strong>
+                    Income:{' '}
+                    <strong className="text-blue-600 dark:text-blue-400">
+                      {formatINR(profile.monthlyIncome)}/mo
+                    </strong>
                   </span>
                 )}
               </div>

@@ -20,9 +20,7 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
 
   // Check if scenario has a shortfall
   const hasShortfall =
-    scenario.readinessScore < 100 ||
-    scenario.retirementFundingGap > 0 ||
-    scenario.fundingGap > 0
+    scenario.readinessScore < 100 || scenario.retirementFundingGap > 0 || scenario.fundingGap > 0
 
   const shortfallAmountAtRetirement = scenario.retirementFundingGap
   const discountedShortfallToday = scenario.fundingGap
@@ -92,7 +90,7 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
         rawProjections,
         assets.existingInvestableCorpus,
         scenario.returnRate,
-        assumptions.withdrawalTiming,
+        assumptions.withdrawalTiming
       )
 
       return sim[scenario.workingYears - 1]?.closingCorpus ?? assets.existingInvestableCorpus
@@ -113,7 +111,8 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
 
     if (testSalary(high) < targetCorpus) {
       salaryAchievable = false
-      salaryNote = 'Shortfall is too large to be bridged by salary alone within remaining working years.'
+      salaryNote =
+        'Shortfall is too large to be bridged by salary alone within remaining working years.'
     } else {
       for (let iter = 0; iter < 32; iter++) {
         const mid = (low + high) / 2
@@ -176,7 +175,7 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
         rawProjections,
         assets.existingInvestableCorpus,
         scenario.returnRate,
-        assumptions.withdrawalTiming,
+        assumptions.withdrawalTiming
       )
 
       const candProjectedCorpus =
@@ -188,11 +187,10 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
         const firstRetirementExpense =
           rawProjections[candWorkingYears]?.expenses ??
           scenario.currentAnnualExpense * Math.pow(1 + scenario.inflationRate, candWorkingYears)
-        const firstRetirementOtherIncome =
-          rawProjections[candWorkingYears]?.otherIncome ?? 0
+        const firstRetirementOtherIncome = rawProjections[candWorkingYears]?.otherIncome ?? 0
         const netRetirementAnnualBaseline = Math.max(
           0,
-          firstRetirementExpense - firstRetirementOtherIncome,
+          firstRetirementExpense - firstRetirementOtherIncome
         )
 
         candTargetCorpus = calculateCorpus(
@@ -200,7 +198,7 @@ export function calculateShortfallRemedies(input: ShortfallRemediesInput): Short
           scenario.returnRate,
           scenario.inflationRate,
           candRetirementYears,
-          assumptions.withdrawalTiming,
+          assumptions.withdrawalTiming
         )
       }
 

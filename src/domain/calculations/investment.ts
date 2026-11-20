@@ -231,13 +231,9 @@ export function calculateInvestment(
 
   // Blended compound annual growth rate (CAGR)
   const blendedReturnRate =
-    years > 0 && P > 0
-      ? Number(((Math.pow(grossCorpus / P, 1 / years) - 1) * 100).toFixed(2))
-      : 0
+    years > 0 && P > 0 ? Number(((Math.pow(grossCorpus / P, 1 / years) - 1) * 100).toFixed(2)) : 0
 
-  const realPurchasingPower = Math.round(
-    grossCorpus / Math.pow(1 + inflationRate / 100, years)
-  )
+  const realPurchasingPower = Math.round(grossCorpus / Math.pow(1 + inflationRate / 100, years))
 
   // Generate Year-by-Year schedule
   const yearlySchedule: InvestmentYearlyBreakdown[] = []

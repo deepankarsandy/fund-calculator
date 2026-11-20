@@ -7,11 +7,13 @@ The Investment & Returns Calculator allows investors to model lump-sum compound 
 ## 1. Mathematical Formulas & Logic
 
 ### Compound Interest Growth (Lump-Sum)
+
 For an initial lump-sum investment of principal $P$ compounded annually over $t$ years at an annual expected return rate $r$:
 
 $$A = P \times (1 + r)^t$$
 
 Where:
+
 - $P$ = Initial lump-sum investment (₹)
 - $r$ = Annual nominal rate of return (decimal)
 - $t$ = Investment time horizon (years)
@@ -19,6 +21,7 @@ Where:
 - Gross Capital Gain: $G = A - P$
 
 ### Multi-Asset Portfolio Blending
+
 Investors can allocate their portfolio across four prominent Indian asset classes:
 $$\sum_{k} w_k = 100\%$$
 
@@ -28,6 +31,7 @@ $$\text{Gross Portfolio Corpus } A = \sum_{k} A_k$$
 $$\text{Effective Blended Return } r_{\text{blended}} = \left(\frac{A}{P}\right)^{1/t} - 1$$
 
 ### Inflation Adjustment (Real Purchasing Power)
+
 To calculate purchasing power in today's currency against general inflation $g$:
 
 $$\text{Real Value} = \frac{A}{(1 + g)^t}$$
@@ -37,11 +41,13 @@ $$\text{Real Value} = \frac{A}{(1 + g)^t}$$
 ## 2. Indian Market Defaults & Tax Treatment
 
 ### Default Baseline Parameters (India)
+
 - **Initial Lump-Sum Investment**: ₹5,00,000 (configurable from ₹10,000 to ₹10,00,00,000)
 - **Time Horizon**: 10 Years (configurable from 1 to 40 years)
 - **Assumed General Inflation**: 6.0% p.a.
 
 ### Asset Class Defaults & Budget 2024 Taxation
+
 1. **Domestic Equity (Nifty / Mutual Funds)**:
    - Default Allocation: 50%
    - Expected Return: 12.0% p.a.
@@ -60,6 +66,7 @@ $$\text{Real Value} = \frac{A}{(1 + g)^t}$$
    - Taxation: Taxed at slab rates (default modeled at 20%).
 
 ### Post-Tax Corpus
+
 $$\text{Total Tax} = \sum_{k} \text{Tax}_k$$
 $$\text{Net In-Hand Corpus} = A - \text{Total Tax}$$
 
@@ -70,13 +77,13 @@ Users can toggle between a simple single-rate return model and the multi-asset a
 ## 3. Local Storage Architecture
 
 All user configuration and simulation outputs are saved in the browser:
+
 - **Inputs Key**: `fundcalc_investment_inputs_v1`
   - Stores principal, tenure, mode (simple vs multi-asset), asset allocations, expected returns, tax settings.
 - **Results Key**: `fundcalc_investment_results_v1`
   - Stores total invested, gross returns, gross corpus, tax liabilities, net corpus, purchasing power, and year-by-year schedule.
 
 All calculations execute strictly locally on the client without external network calls.
-
 
 ---
 
@@ -101,9 +108,9 @@ The calculator includes a dedicated **Custom Plan / Policy (XIRR)** tab designed
 3. **Flexible Investment & Return Structures**:
    - **Investment Phase**: Per-year investment or total investment distributed evenly across tenure; customizable duration and payment timing (start of year vs end of year).
    - **Payout Phase**:
-     - *Annual Income + Maturity Lump Sum*: Regular annual income across duration, plus terminal lump sum or Return of Premium (ROP).
-     - *Annual Income Only*: Regular annuity/pension across retirement years.
-     - *Single Lump Sum*: Traditional endowment maturity.
+     - _Annual Income + Maturity Lump Sum_: Regular annual income across duration, plus terminal lump sum or Return of Premium (ROP).
+     - _Annual Income Only_: Regular annuity/pension across retirement years.
+     - _Single Lump Sum_: Traditional endowment maturity.
    - **Custom Cash Flow Table**: Toggle to customize individual years for policies with non-uniform benefits (e.g. survival benefits at Year 5, 10, 15).
 
 4. **Opportunity Cost Benchmarks**:

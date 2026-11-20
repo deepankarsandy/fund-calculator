@@ -44,9 +44,7 @@ interface InvestmentCalculatorPageProps {
   onBackToHome: () => void
 }
 
-export default function InvestmentCalculatorPage({
-  onBackToHome,
-}: InvestmentCalculatorPageProps) {
+export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCalculatorPageProps) {
   const [activeTab, setActiveTab] = useState<InvestmentTab>(() => getStoredInvestmentTab())
   const [inputs, setInputs] = useState<InvestmentCalculationInputs>(() =>
     getStoredInvestmentInputs()
@@ -188,12 +186,12 @@ export default function InvestmentCalculatorPage({
             <div>
               <div
                 className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border text-xs font-bold ${
-                  activeTab === "custom_plan"
-                    ? "bg-purple-50 dark:bg-purple-950/70 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300"
-                    : "bg-blue-50 dark:bg-blue-950/70 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300"
+                  activeTab === 'custom_plan'
+                    ? 'bg-purple-50 dark:bg-purple-950/70 border-purple-200 dark:border-purple-800 text-purple-700 dark:text-purple-300'
+                    : 'bg-blue-50 dark:bg-blue-950/70 border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300'
                 }`}
               >
-                {activeTab === "custom_plan" ? (
+                {activeTab === 'custom_plan' ? (
                   <>
                     <FileSpreadsheet className="w-3.5 h-3.5" />
                     <span>Policy & Custom Cash Flow XIRR</span>
@@ -206,14 +204,14 @@ export default function InvestmentCalculatorPage({
                 )}
               </div>
               <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mt-1">
-                {activeTab === "custom_plan"
-                  ? "Custom Plan & Policy XIRR Calculator"
-                  : "Investment & Returns Calculator"}
+                {activeTab === 'custom_plan'
+                  ? 'Custom Plan & Policy XIRR Calculator'
+                  : 'Investment & Returns Calculator'}
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
-                {activeTab === "custom_plan"
-                  ? "Analyze insurance policies, guaranteed income plans, and deferred annuities. Uncover the real annualized XIRR and inflation-adjusted purchasing power."
-                  : "Simulate lump-sum compounding across equities, debt, gold, and liquid funds with Indian capital gains taxation."}
+                {activeTab === 'custom_plan'
+                  ? 'Analyze insurance policies, guaranteed income plans, and deferred annuities. Uncover the real annualized XIRR and inflation-adjusted purchasing power.'
+                  : 'Simulate lump-sum compounding across equities, debt, gold, and liquid funds with Indian capital gains taxation.'}
               </p>
             </div>
           </div>
@@ -223,11 +221,11 @@ export default function InvestmentCalculatorPage({
         <div className="flex flex-wrap items-center gap-2 p-1 bg-muted/60 rounded-xl border border-border max-w-2xl">
           <button
             type="button"
-            onClick={() => handleTabChange("multi_asset")}
+            onClick={() => handleTabChange('multi_asset')}
             className={`flex-1 min-w-[130px] py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTab === "multi_asset"
-                ? "bg-card text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === 'multi_asset'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Layers className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
@@ -235,11 +233,11 @@ export default function InvestmentCalculatorPage({
           </button>
           <button
             type="button"
-            onClick={() => handleTabChange("simple")}
+            onClick={() => handleTabChange('simple')}
             className={`flex-1 min-w-[120px] py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTab === "simple"
-                ? "bg-card text-foreground shadow-xs border border-border"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === 'simple'
+                ? 'bg-card text-foreground shadow-xs border border-border'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Percent className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -247,11 +245,11 @@ export default function InvestmentCalculatorPage({
           </button>
           <button
             type="button"
-            onClick={() => handleTabChange("custom_plan")}
+            onClick={() => handleTabChange('custom_plan')}
             className={`flex-1 min-w-[170px] py-1.5 px-3 text-xs font-bold rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5 ${
-              activeTab === "custom_plan"
-                ? "bg-card text-purple-700 dark:text-purple-300 shadow-xs border border-purple-500/40"
-                : "text-muted-foreground hover:text-foreground"
+              activeTab === 'custom_plan'
+                ? 'bg-card text-purple-700 dark:text-purple-300 shadow-xs border border-purple-500/40'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
@@ -262,7 +260,7 @@ export default function InvestmentCalculatorPage({
         {/* ========================================================================= */}
         {/* TAB 3: CUSTOM PLAN / POLICY (XIRR)                                        */}
         {/* ========================================================================= */}
-        {activeTab === "custom_plan" ? (
+        {activeTab === 'custom_plan' ? (
           <CustomPlanCalculator
             inputs={customPlanInputs}
             onChange={setCustomPlanInputs}
@@ -295,9 +293,7 @@ export default function InvestmentCalculatorPage({
                       max={5000000}
                       step={10000}
                       value={inputs.initialInvestment}
-                      onChange={(e) =>
-                        handlePrincipalChange(Number(e.target.value))
-                      }
+                      onChange={(e) => handlePrincipalChange(Number(e.target.value))}
                       className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-blue-600"
                     />
                     <div className="relative w-28 sm:w-32 shrink-0">
@@ -309,9 +305,7 @@ export default function InvestmentCalculatorPage({
                         min={1000}
                         step={10000}
                         value={inputs.initialInvestment}
-                        onChange={(e) =>
-                          handlePrincipalChange(Number(e.target.value))
-                        }
+                        onChange={(e) => handlePrincipalChange(Number(e.target.value))}
                         className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -319,25 +313,20 @@ export default function InvestmentCalculatorPage({
 
                   {/* Quick preset chips */}
                   <div className="flex flex-wrap gap-1.5 pt-1">
-                    {[100000, 250000, 500000, 1000000, 2500000, 5000000].map(
-                      (amt) => (
-                        <button
-                          key={amt}
-                          type="button"
-                          onClick={() => handlePrincipalChange(amt)}
-                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
-                            inputs.initialInvestment === amt
-                              ? "bg-blue-600 text-white border-blue-600"
-                              : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
-                          }`}
-                        >
-                          ₹
-                          {amt >= 100000
-                            ? `${amt / 100000} Lakh`
-                            : `${amt / 1000}k`}
-                        </button>
-                      ),
-                    )}
+                    {[100000, 250000, 500000, 1000000, 2500000, 5000000].map((amt) => (
+                      <button
+                        key={amt}
+                        type="button"
+                        onClick={() => handlePrincipalChange(amt)}
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
+                          inputs.initialInvestment === amt
+                            ? 'bg-blue-600 text-white border-blue-600'
+                            : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
+                        }`}
+                      >
+                        ₹{amt >= 100000 ? `${amt / 100000} Lakh` : `${amt / 1000}k`}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
@@ -360,9 +349,7 @@ export default function InvestmentCalculatorPage({
                       max={40}
                       step={1}
                       value={inputs.timeHorizonYears}
-                      onChange={(e) =>
-                        handleYearsChange(Number(e.target.value))
-                      }
+                      onChange={(e) => handleYearsChange(Number(e.target.value))}
                       className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                     />
                     <div className="relative w-28 shrink-0">
@@ -372,9 +359,7 @@ export default function InvestmentCalculatorPage({
                         max={50}
                         step={1}
                         value={inputs.timeHorizonYears}
-                        onChange={(e) =>
-                          handleYearsChange(Number(e.target.value))
-                        }
+                        onChange={(e) => handleYearsChange(Number(e.target.value))}
                         className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
@@ -388,8 +373,8 @@ export default function InvestmentCalculatorPage({
                         onClick={() => handleYearsChange(yr)}
                         className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                           inputs.timeHorizonYears === yr
-                            ? "bg-indigo-600 text-white border-indigo-600"
-                            : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                            ? 'bg-indigo-600 text-white border-indigo-600'
+                            : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
                         }`}
                       >
                         {yr} Yrs
@@ -399,7 +384,7 @@ export default function InvestmentCalculatorPage({
                 </div>
 
                 {/* Mode: Multi-Asset Breakdown */}
-                {inputs.mode === "multi_asset" ? (
+                {inputs.mode === 'multi_asset' ? (
                   <div className="space-y-3 pt-2 border-t border-border/60">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
@@ -407,11 +392,11 @@ export default function InvestmentCalculatorPage({
                         <span>Asset Classes & Return Expectations</span>
                       </span>
                       <span className="text-[11px] text-muted-foreground">
-                        Total:{" "}
+                        Total:{' '}
                         <strong className="text-foreground">
                           {inputs.allocations.reduce(
                             (acc, a) => acc + (a.allocationPercent || 0),
-                            0,
+                            0
                           )}
                           %
                         </strong>
@@ -425,18 +410,16 @@ export default function InvestmentCalculatorPage({
                           className="p-3 rounded-xl border border-border/70 bg-muted/20 space-y-2 text-xs"
                         >
                           <div className="flex items-center justify-between">
-                            <span className="font-bold text-foreground">
-                              {asset.name}
-                            </span>
+                            <span className="font-bold text-foreground">{asset.name}</span>
                             <div className="flex items-center gap-2">
                               <span className="text-muted-foreground font-medium">
-                                Share:{" "}
+                                Share:{' '}
                                 <strong className="text-foreground">
                                   {asset.allocationPercent}%
                                 </strong>
                               </span>
                               <span className="text-muted-foreground font-medium">
-                                Return:{" "}
+                                Return:{' '}
                                 <strong className="text-emerald-600 dark:text-emerald-400">
                                   {asset.expectedReturnRate}%
                                 </strong>
@@ -456,10 +439,7 @@ export default function InvestmentCalculatorPage({
                                 step={5}
                                 value={asset.allocationPercent}
                                 onChange={(e) =>
-                                  handleAssetWeightChange(
-                                    asset.id,
-                                    Number(e.target.value),
-                                  )
+                                  handleAssetWeightChange(asset.id, Number(e.target.value))
                                 }
                                 className="w-full h-1.5 bg-muted rounded appearance-none cursor-pointer accent-blue-600"
                               />
@@ -475,10 +455,7 @@ export default function InvestmentCalculatorPage({
                                 step={0.5}
                                 value={asset.expectedReturnRate}
                                 onChange={(e) =>
-                                  handleAssetReturnChange(
-                                    asset.id,
-                                    Number(e.target.value),
-                                  )
+                                  handleAssetReturnChange(asset.id, Number(e.target.value))
                                 }
                                 className="w-full px-2 py-1 text-xs font-bold bg-background border border-border rounded text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
@@ -508,9 +485,7 @@ export default function InvestmentCalculatorPage({
                         max={30}
                         step={0.5}
                         value={inputs.simpleReturnRate}
-                        onChange={(e) =>
-                          handleSimpleRateChange(Number(e.target.value))
-                        }
+                        onChange={(e) => handleSimpleRateChange(Number(e.target.value))}
                         className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       />
                       <div className="relative w-28 shrink-0">
@@ -520,9 +495,7 @@ export default function InvestmentCalculatorPage({
                           max={40}
                           step={0.5}
                           value={inputs.simpleReturnRate}
-                          onChange={(e) =>
-                            handleSimpleRateChange(Number(e.target.value))
-                          }
+                          onChange={(e) => handleSimpleRateChange(Number(e.target.value))}
                           className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
@@ -536,8 +509,8 @@ export default function InvestmentCalculatorPage({
                           onClick={() => handleSimpleRateChange(rate)}
                           className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border transition-all cursor-pointer ${
                             inputs.simpleReturnRate === rate
-                              ? "bg-emerald-600 text-white border-emerald-600"
-                              : "border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground"
+                              ? 'bg-emerald-600 text-white border-emerald-600'
+                              : 'border-border bg-muted/40 hover:bg-muted text-muted-foreground hover:text-foreground'
                           }`}
                         >
                           {rate}%
@@ -581,8 +554,7 @@ export default function InvestmentCalculatorPage({
                         Apply Indian Capital Gains Taxation
                       </label>
                       <p className="text-[11px] text-muted-foreground">
-                        Includes ₹1.25L equity exemption and 12.5% LTCG / slab
-                        rates
+                        Includes ₹1.25L equity exemption and 12.5% LTCG / slab rates
                       </p>
                     </div>
 
@@ -675,9 +647,7 @@ export default function InvestmentCalculatorPage({
                     {inputs.enableTax !== false && (
                       <>
                         <div className="flex items-center justify-between py-1 text-amber-700 dark:text-amber-400">
-                          <span className="font-medium">
-                            Estimated Capital Gains Tax
-                          </span>
+                          <span className="font-medium">Estimated Capital Gains Tax</span>
                           <span className="font-bold text-sm">
                             -{formatINR(results.estimatedTax)}
                           </span>
@@ -698,8 +668,7 @@ export default function InvestmentCalculatorPage({
                           Inflation-Adjusted Value
                         </span>
                         <span className="text-[10px] text-muted-foreground">
-                          Today's purchasing power @{" "}
-                          {inputs.inflationRatePercent ?? 6}%
+                          Today's purchasing power @ {inputs.inflationRatePercent ?? 6}%
                         </span>
                       </div>
                       <span className="font-extrabold text-foreground text-sm">
@@ -710,7 +679,7 @@ export default function InvestmentCalculatorPage({
                 </div>
 
                 {/* Asset Allocation Breakdown Cards */}
-                {inputs.mode === "multi_asset" && (
+                {inputs.mode === 'multi_asset' && (
                   <div className="p-4 rounded-xl border border-border bg-card space-y-2.5 text-xs">
                     <span className="font-bold text-foreground block">
                       Asset Class Maturity Breakdown
@@ -722,9 +691,7 @@ export default function InvestmentCalculatorPage({
                           className="flex items-center justify-between py-1 border-b border-border/40 last:border-none"
                         >
                           <div>
-                            <div className="font-semibold text-foreground">
-                              {asset.name}
-                            </div>
+                            <div className="font-semibold text-foreground">{asset.name}</div>
                             <div className="text-[10px] text-muted-foreground">
                               Invested: {formatINR(asset.invested)} · Gain: +
                               {formatINR(asset.gains)}
@@ -742,7 +709,7 @@ export default function InvestmentCalculatorPage({
                 {/* Nudge to Custom Plan (XIRR) Mode */}
                 <button
                   type="button"
-                  onClick={() => handleTabChange("custom_plan")}
+                  onClick={() => handleTabChange('custom_plan')}
                   className="w-full p-4 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
@@ -753,9 +720,8 @@ export default function InvestmentCalculatorPage({
                     <ArrowRight className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400" />
                   </div>
                   <p className="text-[11px] text-muted-foreground leading-snug">
-                    Calculate actual annualized XIRR returns and
-                    inflation-adjusted purchasing power for staggered insurance
-                    policies and deferred annuities.
+                    Calculate actual annualized XIRR returns and inflation-adjusted purchasing power
+                    for staggered insurance policies and deferred annuities.
                   </p>
                 </button>
 
@@ -766,8 +732,8 @@ export default function InvestmentCalculatorPage({
                     <span>Automatic Browser Persistence</span>
                   </div>
                   <p className="text-[11px] leading-relaxed">
-                    Your portfolio allocations and projection models are saved
-                    privately in your local browser storage.
+                    Your portfolio allocations and projection models are saved privately in your
+                    local browser storage.
                   </p>
                 </div>
               </div>
@@ -781,8 +747,8 @@ export default function InvestmentCalculatorPage({
                     Year-by-Year Growth Schedule
                   </h3>
                   <p className="text-xs text-muted-foreground">
-                    Review compound growth trajectories over your{" "}
-                    {inputs.timeHorizonYears}-year horizon
+                    Review compound growth trajectories over your {inputs.timeHorizonYears}-year
+                    horizon
                   </p>
                 </div>
                 <button
@@ -790,11 +756,7 @@ export default function InvestmentCalculatorPage({
                   onClick={() => setShowScheduleTable((prev) => !prev)}
                   className="self-start sm:self-auto text-xs font-semibold px-3 py-1.5 rounded-lg border border-border hover:bg-muted text-foreground transition-colors cursor-pointer flex items-center gap-1.5"
                 >
-                  <span>
-                    {showScheduleTable
-                      ? "Collapse Schedule"
-                      : "View Full Schedule"}
-                  </span>
+                  <span>{showScheduleTable ? 'Collapse Schedule' : 'View Full Schedule'}</span>
                   {showScheduleTable ? (
                     <ChevronUp className="w-3.5 h-3.5" />
                   ) : (
@@ -811,23 +773,14 @@ export default function InvestmentCalculatorPage({
                         <th className="py-2.5 px-3">Year</th>
                         <th className="py-2.5 px-3 text-right">Principal</th>
                         <th className="py-2.5 px-3 text-right">Yearly Gain</th>
-                        <th className="py-2.5 px-3 text-right">
-                          Cumulative Gain
-                        </th>
-                        <th className="py-2.5 px-3 text-right">
-                          Portfolio Balance
-                        </th>
+                        <th className="py-2.5 px-3 text-right">Cumulative Gain</th>
+                        <th className="py-2.5 px-3 text-right">Portfolio Balance</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border/60">
                       {results.yearlySchedule.map((row) => (
-                        <tr
-                          key={row.year}
-                          className="hover:bg-muted/30 transition-colors"
-                        >
-                          <td className="py-2 px-3 font-bold text-foreground">
-                            Year {row.year}
-                          </td>
+                        <tr key={row.year} className="hover:bg-muted/30 transition-colors">
+                          <td className="py-2 px-3 font-bold text-foreground">Year {row.year}</td>
                           <td className="py-2 px-3 text-right font-medium">
                             {formatINR(row.invested)}
                           </td>
@@ -851,5 +804,5 @@ export default function InvestmentCalculatorPage({
         )}
       </main>
     </div>
-  );
+  )
 }
