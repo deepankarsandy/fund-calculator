@@ -444,31 +444,53 @@ export const useScenarioStore = create<ScenarioState>()(
       applyProfileDefaults: (customProfile) => {
         const p = customProfile || getUserProfile()
 
-        // 1. Update self member's age/label while preserving all entered dependents!
+        // 1. Update self member's age/label while preserving all entered dependents,
+        // and synchronizing profile default dependents when configured
         const currentMembers = get().members || []
         const hasSelf = currentMembers.some((m) => m.id === 'self' || m.relationship === 'self')
-        const updatedMembers = hasSelf
-          ? currentMembers.map((m) => {
-              if (m.id === 'self' || m.relationship === 'self') {
-                return {
-                  ...m,
-                  age: p.currentAge,
-                  label: p.name ? `${p.name} (Self)` : m.label || 'Self',
+        const selfMember = hasSelf
+          ? currentMembers.find((m) => m.id === 'self' || m.relationship === 'self')!
+          : {
+              id: 'self',
+              label: p.name ? `${p.name} (Self)` : 'Self',
+              relationship: 'self' as const,
+              age: p.currentAge,
+              financiallyDependent: true,
+              hasHealthInsurance: false,
+            }
+
+        const updatedSelf: HouseholdMember = {
+          ...selfMember,
+          age: p.currentAge,
+          label: p.name ? `${p.name} (Self)` : selfMember.label || 'Self',
+        }
+
+        const existingNonSelf = currentMembers.filter(
+          (m) => m.id !== 'self' && m.relationship !== 'self'
+        )
+
+        const profileDependents: HouseholdMember[] = Array.isArray(p.dependents) ? p.dependents : []
+        let updatedDependents: HouseholdMember[] = [...existingNonSelf]
+
+        if (profileDependents.length > 0) {
+          if (existingNonSelf.length === 0) {
+            updatedDependents = [...profileDependents]
+          } else {
+            for (const dep of profileDependents) {
+              const existingIdx = updatedDependents.findIndex((m) => m.id === dep.id)
+              if (existingIdx >= 0) {
+                updatedDependents[existingIdx] = {
+                  ...dep,
+                  ...updatedDependents[existingIdx],
                 }
+              } else {
+                updatedDependents.push(dep)
               }
-              return m
-            })
-          : [
-              {
-                id: 'self',
-                label: p.name ? `${p.name} (Self)` : 'Self',
-                relationship: 'self' as const,
-                age: p.currentAge,
-                financiallyDependent: true,
-                hasHealthInsurance: false,
-              },
-              ...currentMembers,
-            ]
+            }
+          }
+        }
+
+        const updatedMembers = [updatedSelf, ...updatedDependents]
 
         // 2. Update profile specific values present in profile
         const updatedProfile: Profile = {
@@ -496,6 +518,7 @@ export const useScenarioStore = create<ScenarioState>()(
 
         // 5. Update categories: Retain all entered expenses and amounts (e.g. mobile recharge, food, rent)
         // Only update category-level inflation rate if sector inflation rates are configured
+        // Also activate zero-amount family items if child/parent dependents are added
         const currentCategories = get().categories
         let updatedCategories = currentCategories
         if (!currentCategories || currentCategories.length === 0) {
@@ -508,21 +531,75 @@ export const useScenarioStore = create<ScenarioState>()(
               : undefined
           )
         } else {
+          const childMembers = updatedMembers.filter(
+            (m) => m.relationship === 'child' && m.financiallyDependent
+          )
+          const parentMembers = updatedMembers.filter(
+            (m) => m.relationship === 'parent' && m.financiallyDependent
+          )
           const sectorRates = p.sectorInflationRates as unknown as
             Record<string, number> | undefined
-          if (p.inflationMode === 'sector' && sectorRates) {
-            updatedCategories = currentCategories.map((cat) => {
-              if (sectorRates[cat.id] != null) {
-                const rate =
-                  sectorRates[cat.id] > 1 ? sectorRates[cat.id] / 100 : sectorRates[cat.id]
-                return {
-                  ...cat,
-                  defaultInflationRate: rate,
-                }
+
+          updatedCategories = currentCategories.map((cat) => {
+            let catInflation = cat.defaultInflationRate
+            if (p.inflationMode === 'sector' && sectorRates && sectorRates[cat.id] != null) {
+              catInflation =
+                sectorRates[cat.id] > 1 ? sectorRates[cat.id] / 100 : sectorRates[cat.id]
+            }
+
+            if (cat.id === 'family') {
+              const factor = 1.0
+              return {
+                ...cat,
+                defaultInflationRate: catInflation,
+                items: cat.items.map((it) => {
+                  // Only activate if amount is currently 0 (unconfigured)
+                  if (it.amount === 0) {
+                    if (it.id.includes('school_fees') && childMembers.length > 0) {
+                      const child = childMembers[0]
+                      const startYear = Math.max(1, 5 - child.age)
+                      const endYear = startYear + 11
+                      return {
+                        ...it,
+                        amount: Math.round((35000 * factor * childMembers.length) / 500) * 500,
+                        startYear,
+                        endYear,
+                      }
+                    }
+                    if (it.id.includes('higher_education') && childMembers.length > 0) {
+                      const child = childMembers[0]
+                      const startYear = Math.max(1, 17 - child.age)
+                      const endYear = startYear + 3
+                      return {
+                        ...it,
+                        amount: Math.round((80000 * factor * childMembers.length) / 500) * 500,
+                        startYear,
+                        endYear,
+                      }
+                    }
+                    if (it.id.includes('parental_support') && parentMembers.length > 0) {
+                      const parent = parentMembers[0]
+                      const endYear = parent.supportUntilAge
+                        ? Math.max(1, parent.supportUntilAge - parent.age)
+                        : Math.max(1, 80 - parent.age)
+                      return {
+                        ...it,
+                        amount: Math.round((8000 * factor * parentMembers.length) / 500) * 500,
+                        startYear: 1,
+                        endYear,
+                      }
+                    }
+                  }
+                  return it
+                }),
               }
-              return cat
-            })
-          }
+            }
+
+            return {
+              ...cat,
+              defaultInflationRate: catInflation,
+            }
+          })
         }
 
         // Recompute calculation results if they were already computed

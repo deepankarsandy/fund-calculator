@@ -317,4 +317,127 @@ describe('useScenarioStore - applyProfileDefaults', () => {
     expect(updatedAssets.futureContributions).toHaveLength(1)
     expect(updatedAssets.futureContributions[0].amount).toBe(5000000)
   })
+
+  it('adds default dependents from profile into retirement calculator and activates child education & parental support', () => {
+    // Start with just self
+    useScenarioStore.setState({
+      members: [
+        {
+          id: 'self',
+          label: 'Self',
+          relationship: 'self',
+          age: 30,
+          financiallyDependent: true,
+          hasHealthInsurance: false,
+        },
+      ],
+    })
+
+    const customProfile: UserProfile = {
+      ...DEFAULT_USER_PROFILE,
+      name: 'Rohan',
+      currentAge: 32,
+      retirementAge: 60,
+      dependents: [
+        {
+          id: 'dep-spouse',
+          label: 'Ananya (Spouse)',
+          relationship: 'spouse',
+          age: 30,
+          financiallyDependent: true,
+          hasHealthInsurance: true,
+        },
+        {
+          id: 'dep-child',
+          label: 'Aarav (Child)',
+          relationship: 'child',
+          age: 4,
+          financiallyDependent: true,
+          supportUntilAge: 25,
+          hasHealthInsurance: false,
+        },
+        {
+          id: 'dep-parent',
+          label: 'Mother',
+          relationship: 'parent',
+          age: 62,
+          financiallyDependent: true,
+          supportUntilAge: 85,
+          hasHealthInsurance: false,
+        },
+      ],
+      isConfigured: true,
+    }
+
+    useScenarioStore.getState().applyProfileDefaults(customProfile)
+    const state = useScenarioStore.getState()
+
+    // 1. Members updated
+    expect(state.members).toHaveLength(4)
+    expect(state.members.find((m) => m.id === 'self')?.label).toBe('Rohan (Self)')
+    expect(state.members.find((m) => m.id === 'dep-spouse')?.label).toBe('Ananya (Spouse)')
+    expect(state.members.find((m) => m.id === 'dep-child')?.age).toBe(4)
+    expect(state.members.find((m) => m.id === 'dep-parent')?.age).toBe(62)
+
+    // 2. Family Category activated
+    const familyCat = state.categories.find((c) => c.id === 'family')
+    expect(familyCat).toBeDefined()
+    const schoolFees = familyCat?.items.find((i) => i.id.includes('school_fees'))
+    expect(schoolFees).toBeDefined()
+    expect(schoolFees?.amount).toBeGreaterThan(0)
+    expect(schoolFees?.startYear).toBe(1) // 5 - 4 = 1
+    expect(schoolFees?.endYear).toBe(12) // 1 + 11 = 12
+
+    const parentSupport = familyCat?.items.find((i) => i.id.includes('parental_support'))
+    expect(parentSupport).toBeDefined()
+    expect(parentSupport?.amount).toBeGreaterThan(0)
+    expect(parentSupport?.endYear).toBe(23) // 85 - 62 = 23
+  })
+
+  it('merges profile default dependents while preserving existing user-added dependents', () => {
+    useScenarioStore.setState({
+      members: [
+        {
+          id: 'self',
+          label: 'Self',
+          relationship: 'self',
+          age: 30,
+          financiallyDependent: true,
+          hasHealthInsurance: false,
+        },
+        {
+          id: 'custom-child',
+          label: 'Existing Custom Child',
+          relationship: 'child',
+          age: 7,
+          financiallyDependent: true,
+          supportUntilAge: 24,
+          hasHealthInsurance: true,
+        },
+      ],
+    })
+
+    const customProfile: UserProfile = {
+      ...DEFAULT_USER_PROFILE,
+      dependents: [
+        {
+          id: 'dep-spouse',
+          label: 'Spouse From Profile',
+          relationship: 'spouse',
+          age: 29,
+          financiallyDependent: true,
+          hasHealthInsurance: true,
+        },
+      ],
+      isConfigured: true,
+    }
+
+    useScenarioStore.getState().applyProfileDefaults(customProfile)
+    const members = useScenarioStore.getState().members
+
+    // Should contain self, existing custom child, and newly merged spouse
+    expect(members).toHaveLength(3)
+    expect(members.find((m) => m.id === 'custom-child')?.label).toBe('Existing Custom Child')
+    expect(members.find((m) => m.id === 'dep-spouse')?.label).toBe('Spouse From Profile')
+  })
 })

@@ -15,6 +15,7 @@ import {
   Download,
   Upload,
   AlertTriangle,
+  Users,
 } from 'lucide-react'
 import {
   UserProfile,
@@ -29,12 +30,13 @@ import { useScenarioStore } from '@/store/useScenarioStore'
 import { navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
 import { ProfileSyncConfirmModal } from '@/components/profile/ProfileSyncConfirmModal'
+import { ProfileDependentsTab } from '@/components/profile/ProfileDependentsTab'
 
 interface ProfilePageProps {
   onBackToHome: () => void
 }
 
-type ProfileTab = 'personal' | 'inflation' | 'income_tax' | 'returns'
+type ProfileTab = 'personal' | 'dependents' | 'inflation' | 'income_tax' | 'returns'
 
 const SECTOR_METADATA: {
   key: keyof SectorInflationRates
@@ -290,6 +292,32 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
             >
               <User className="w-4 h-4" />
               <span>Personal & Horizon</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('dependents')}
+              className={cn(
+                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                activeTab === 'dependents'
+                  ? 'bg-blue-600 text-white font-bold shadow-xs'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              )}
+            >
+              <Users className="w-4 h-4" />
+              <span>Dependents</span>
+              {formData.dependents && formData.dependents.length > 0 && (
+                <span
+                  className={cn(
+                    'text-[10px] px-1.5 py-0.5 rounded-full font-bold',
+                    activeTab === 'dependents'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                  )}
+                >
+                  {formData.dependents.length}
+                </span>
+              )}
             </button>
 
             <button
@@ -591,6 +619,15 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* TAB: DEPENDENTS */}
+            {activeTab === 'dependents' && (
+              <ProfileDependentsTab
+                dependents={formData.dependents || []}
+                onChange={(deps) => setFormData((prev) => ({ ...prev, dependents: deps }))}
+                userCurrentAge={formData.currentAge}
+              />
             )}
 
             {/* TAB 2: INFLATION DEFAULTS */}

@@ -1,4 +1,5 @@
 import type { AreaType, LifestyleScenario } from './profile'
+import type { HouseholdMember } from './household'
 
 export interface SectorInflationRates {
   housing: number
@@ -53,6 +54,9 @@ export interface UserProfile {
   fdInterestRate: number // in percentage, e.g. 7.0
   loanInterestRate: number // in percentage, e.g. 8.5
 
+  // Dependents & Household Defaults
+  dependents: HouseholdMember[]
+
   // Metadata
   isConfigured: boolean
   updatedAt?: string
@@ -98,6 +102,7 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   expectedDebtReturn: 7.0,
   fdInterestRate: 7.0,
   loanInterestRate: 8.5,
+  dependents: [],
   isConfigured: false,
 }
 

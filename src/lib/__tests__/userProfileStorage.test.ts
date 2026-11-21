@@ -104,6 +104,39 @@ describe('UserProfile Domain & Storage', () => {
       expect(loaded.isConfigured).toBe(true)
     })
 
+    it('saves and loads default dependents in profile', () => {
+      const custom: UserProfile = {
+        ...DEFAULT_USER_PROFILE,
+        dependents: [
+          {
+            id: 'dep-1',
+            label: 'Spouse',
+            relationship: 'spouse',
+            age: 28,
+            financiallyDependent: true,
+            hasHealthInsurance: true,
+          },
+          {
+            id: 'dep-2',
+            label: 'Child 1',
+            relationship: 'child',
+            age: 3,
+            financiallyDependent: true,
+            supportUntilAge: 25,
+            hasHealthInsurance: false,
+          },
+        ],
+        isConfigured: true,
+      }
+
+      saveUserProfile(custom)
+      const loaded = getUserProfile()
+
+      expect(loaded.dependents).toHaveLength(2)
+      expect(loaded.dependents[0].label).toBe('Spouse')
+      expect(loaded.dependents[1].supportUntilAge).toBe(25)
+    })
+
     it('updates partial fields smoothly', () => {
       updateUserProfile({ name: 'Aarav', monthlySipInvestment: 25000 })
       const loaded = getUserProfile()

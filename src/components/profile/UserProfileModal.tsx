@@ -14,6 +14,7 @@ import {
   BadgePercent,
   ChevronDown,
   AlertTriangle,
+  Users,
 } from 'lucide-react'
 import {
   UserProfile,
@@ -27,13 +28,14 @@ import { useUserProfile, syncProfileToCalculators } from '@/lib/userProfileStora
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { cn } from '@/lib/cn'
 import { ProfileSyncConfirmModal } from './ProfileSyncConfirmModal'
+import { ProfileDependentsTab } from './ProfileDependentsTab'
 
 interface UserProfileModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-type ProfileTab = 'personal' | 'inflation' | 'income_tax' | 'returns'
+type ProfileTab = 'personal' | 'dependents' | 'inflation' | 'income_tax' | 'returns'
 
 const SECTOR_METADATA: {
   key: keyof SectorInflationRates
@@ -255,6 +257,32 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           >
             <User className="w-3.5 h-3.5" />
             <span>Personal & Horizon</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveTab('dependents')}
+            className={cn(
+              'px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 shrink-0 cursor-pointer',
+              activeTab === 'dependents'
+                ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold border border-blue-200 dark:border-blue-800'
+                : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+            )}
+          >
+            <Users className="w-3.5 h-3.5" />
+            <span>Dependents</span>
+            {formData.dependents && formData.dependents.length > 0 && (
+              <span
+                className={cn(
+                  'text-[10px] px-1.5 py-0.2 rounded-full font-bold',
+                  activeTab === 'dependents'
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                )}
+              >
+                {formData.dependents.length}
+              </span>
+            )}
           </button>
 
           <button
@@ -519,6 +547,15 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* TAB: DEPENDENTS */}
+          {activeTab === 'dependents' && (
+            <ProfileDependentsTab
+              dependents={formData.dependents || []}
+              onChange={(deps) => setFormData((prev) => ({ ...prev, dependents: deps }))}
+              userCurrentAge={formData.currentAge}
+            />
           )}
 
           {/* TAB 2: INFLATION DEFAULTS */}

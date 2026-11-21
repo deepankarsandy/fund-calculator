@@ -31,9 +31,12 @@ export function getUserProfile(): UserProfile {
           ? parsed.currentAge
           : 30
 
+      const dependents = Array.isArray(parsed.dependents) ? parsed.dependents : []
+
       return {
         ...DEFAULT_USER_PROFILE,
         ...parsed,
+        dependents,
         dob,
         currentAge,
         sectorInflationRates: {

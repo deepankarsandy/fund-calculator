@@ -95,6 +95,10 @@ export function ProfileSyncConfirmModal({
                 <strong>EPF maturity (8.25%) & NPS annuity (40% at 6% p.a.)</strong> auto-calculated
                 in Income & Savings
               </li>
+              <li>
+                <strong>Default household dependents</strong> (spouse, children, parents)
+                synchronized to Step 3 of the Retirement Calculator
+              </li>
             </ul>
           </div>
 
