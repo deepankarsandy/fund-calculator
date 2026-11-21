@@ -2,7 +2,10 @@ import { WizardStepConfig } from '@/config/formFields'
 import { DynamicField } from '@/components/form/DynamicField'
 import { DynamicExpensesRenderer } from '@/components/expenses/DynamicExpensesRenderer'
 import { StepResults } from '@/components/steps/StepResults'
-import { LinkedIncomeCalculatorsCard } from '@/components/wizard/LinkedIncomeCalculatorsCard'
+import {
+  LinkedSipInflowCard,
+  LinkedFdInflowCard,
+} from '@/components/wizard/LinkedIncomeCalculatorsCard'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { Info } from 'lucide-react'
 
@@ -89,7 +92,8 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
           </div>
 
           {/* Linked SIP and FD Calculator Cards */}
-          <LinkedIncomeCalculatorsCard />
+          <LinkedSipInflowCard />
+          <LinkedFdInflowCard />
         </div>
       )}
 

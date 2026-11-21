@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   Percent,
   Building,
@@ -9,6 +9,7 @@ import {
   XCircle,
   Info,
   ExternalLink,
+  PlusCircle,
 } from 'lucide-react'
 import { useRouter } from '@/lib/router'
 import { formatINR, formatCrore } from '@/lib/currency'
@@ -71,34 +72,73 @@ export function LinkedLoanExpenseCard() {
     }
   }
 
-  const toggleLoanEnabled = () => {
-    const next = {
+  const loanTypes: LoanLinkedType[] = ['home', 'car', 'personal', 'custom']
+  const activeLoanCount = config.loan.enabled
+    ? loanTypes.filter((t) => config.loan.enabledTypes[t]).length
+    : 0
+
+  // Master toggle: Include all / Exclude all
+  const toggleLoanMaster = () => {
+    if (config.loan.enabled) {
+      const next: LinkedCalculatorsConfig = {
+        ...config,
+        loan: {
+          ...config.loan,
+          enabled: false,
+        },
+      }
+      updateConfig(next)
+    } else {
+      const anyActive = Object.values(config.loan.enabledTypes).some(Boolean)
+      const next: LinkedCalculatorsConfig = {
+        ...config,
+        loan: {
+          ...config.loan,
+          enabled: true,
+          enabledTypes: anyActive
+            ? config.loan.enabledTypes
+            : { home: true, car: false, personal: false, custom: false },
+        },
+      }
+      updateConfig(next)
+    }
+  }
+
+  // Individual loan subtype toggle
+  const toggleLoanSubtype = (type: LoanLinkedType, e?: React.MouseEvent) => {
+    e?.stopPropagation()
+    const nextVal = !config.loan.enabledTypes[type]
+    const nextEnabledTypes = {
+      ...config.loan.enabledTypes,
+      [type]: nextVal,
+    }
+    const anyActive = Object.values(nextEnabledTypes).some(Boolean)
+    const next: LinkedCalculatorsConfig = {
       ...config,
       loan: {
         ...config.loan,
-        enabled: !config.loan.enabled,
+        selectedType: type,
+        enabled: anyActive ? true : config.loan.enabled,
+        enabledTypes: nextEnabledTypes,
       },
     }
     updateConfig(next)
   }
 
   const setLoanSelectedType = (type: LoanLinkedType) => {
-    const next = {
+    const next: LinkedCalculatorsConfig = {
       ...config,
       loan: {
         ...config.loan,
         selectedType: type,
-        enabled: true, // Auto-enable when user chooses a type
-        enabledTypes: {
-          ...config.loan.enabledTypes,
-          [type]: true,
-        },
       },
     }
     updateConfig(next)
   }
 
   const currentLoan = loanSummaries[config.loan.selectedType]
+  const isSelectedActive =
+    config.loan.enabled && !!config.loan.enabledTypes[config.loan.selectedType]
 
   const typeIcons: Record<LoanLinkedType, any> = {
     home: Building,
@@ -106,6 +146,16 @@ export function LinkedLoanExpenseCard() {
     personal: UserCheck,
     custom: Sliders,
   }
+
+  // Total active monthly EMI across all enabled loan subtypes
+  const totalActiveMonthlyEmi = config.loan.enabled
+    ? loanTypes.reduce((sum, t) => {
+        if (config.loan.enabledTypes[t]) {
+          return sum + (loanSummaries[t]?.monthlyEmi || 0)
+        }
+        return sum
+      }, 0)
+    : 0
 
   return (
     <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-gradient-to-b from-amber-50/40 via-background to-background dark:from-amber-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-4">
@@ -124,31 +174,44 @@ export function LinkedLoanExpenseCard() {
             </span>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Pre-fills your contractual loan EMI into living expenses. Loan EMIs are fixed and do not
-            inflate with general living expenses, and terminate automatically once paid off.
+            Pre-fills your contractual loan EMI into living expenses. Loan EMIs are fixed nominal
+            payments (0% inflation rate) and drop off after payoff. You can include or exclude
+            individual loan obligations below.
           </p>
         </div>
 
-        {/* Include / Exclude Toggle Button */}
+        {/* Master Include / Exclude Toggle Button */}
         <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
+          {config.loan.enabled && activeLoanCount > 0 ? (
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-lg">
+              <CheckCircle2 className="w-3.5 h-3.5 text-amber-600" />
+              {activeLoanCount} of 4 Loans Included
+            </span>
+          ) : (
+            <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-1 rounded-lg">
+              <XCircle className="w-3.5 h-3.5 text-zinc-500" />
+              Excluded from Expenses
+            </span>
+          )}
+
           <button
             type="button"
-            onClick={toggleLoanEnabled}
+            onClick={toggleLoanMaster}
             className={`px-3 py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5 ${
               config.loan.enabled
                 ? 'border-red-200 dark:border-red-800/80 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
-                : 'bg-emerald-600 hover:bg-emerald-700 text-white border-transparent shadow-xs'
+                : 'bg-amber-600 hover:bg-amber-700 text-white border-transparent shadow-xs'
             }`}
           >
             {config.loan.enabled ? (
               <>
                 <XCircle className="w-3.5 h-3.5" />
-                <span>Exclude from Retirement Calc</span>
+                <span>Exclude All</span>
               </>
             ) : (
               <>
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Include in Retirement Calc</span>
+                <span>Include in Plan</span>
               </>
             )}
           </button>
@@ -157,59 +220,97 @@ export function LinkedLoanExpenseCard() {
 
       {/* Main Card Content */}
       <div className="rounded-xl border border-border/80 bg-card p-4 sm:p-5 space-y-4">
-        {/* Status Indicator */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Status Indicator & Total Active Monthly EMI */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-border/60">
           <div className="flex items-center gap-2">
-            <h4 className="text-sm font-bold text-foreground">Contractual Loan Obligation</h4>
-            {config.loan.enabled ? (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                Included in Living Expenses
+            <h4 className="text-sm font-bold text-foreground">Contractual Loan Obligations</h4>
+            {config.loan.enabled && activeLoanCount > 0 ? (
+              <span className="text-[11px] text-amber-800 dark:text-amber-300 font-semibold">
+                Total Linked EMI:{' '}
+                <span className="font-bold">{formatINR(totalActiveMonthlyEmi)}/mo</span> (
+                {formatCrore(totalActiveMonthlyEmi * 12)}/yr)
               </span>
             ) : (
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-2 py-0.5 rounded-full">
-                <XCircle className="w-3 h-3 text-zinc-500" />
-                Excluded from Living Expenses
+              <span className="text-[11px] text-muted-foreground">
+                No active loans linked to living expenses
               </span>
             )}
           </div>
-          <span className="text-xs text-muted-foreground font-mono">
-            {formatINR(currentLoan.monthlyEmi)}/mo ({currentLoan.actualPayoffYears} yrs)
+          <span className="text-xs text-muted-foreground">
+            Click card to preview • Toggle button to include/exclude
           </span>
         </div>
 
-        {/* Type Selector Pills (Link all different type of Loan data) */}
-        <div className="space-y-1.5">
+        {/* Sub-types Selector & Granular Include/Exclude Controls */}
+        <div className="space-y-2">
           <label className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-            Select Loan Obligation to Link:
+            Loan Obligations (Include / Exclude Individual Sub-Types):
           </label>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {(['home', 'car', 'personal', 'custom'] as LoanLinkedType[]).map((t) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {loanTypes.map((t) => {
               const s = loanSummaries[t]
               const isSelected = config.loan.selectedType === t
+              const isSubtypeEnabled = config.loan.enabled && !!config.loan.enabledTypes[t]
               const Icon = typeIcons[t]
+
               return (
-                <button
+                <div
                   key={t}
-                  type="button"
                   onClick={() => setLoanSelectedType(t)}
-                  className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer flex flex-col gap-1 ${
+                  className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-2.5 ${
                     isSelected
                       ? 'border-amber-500 bg-amber-50/50 dark:bg-amber-950/30 text-foreground ring-1 ring-amber-500'
                       : 'border-border/80 hover:border-amber-300 dark:hover:border-amber-800 bg-card text-muted-foreground hover:text-foreground'
                   }`}
                 >
-                  <div className="flex items-center justify-between gap-1">
-                    <div className="flex items-center gap-1.5">
-                      <Icon className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
-                      <span className="text-xs font-bold">{s.label}</span>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between gap-1">
+                      <div className="flex items-center gap-1.5">
+                        <Icon className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        <span className="text-xs font-bold text-foreground">{s.label}</span>
+                      </div>
+                      {isSelected && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-amber-200/70 dark:bg-amber-800/60 text-amber-900 dark:text-amber-100">
+                          Selected
+                        </span>
+                      )}
                     </div>
-                    {isSelected && <span className="w-2 h-2 rounded-full bg-amber-600 shrink-0" />}
+                    <p className="text-[11px] text-muted-foreground font-mono">
+                      {formatINR(s.monthlyEmi)}/mo • {s.actualPayoffYears} yrs
+                    </p>
+                    <p className="text-[10px] text-muted-foreground line-clamp-1">
+                      {s.shortDescription}
+                    </p>
                   </div>
-                  <span className="text-[11px] text-muted-foreground">
-                    {formatINR(s.monthlyEmi)}/mo • {s.actualPayoffYears}y
-                  </span>
-                </button>
+
+                  {/* Subtype Include / Exclude Toggle Button */}
+                  <div className="flex items-center justify-between pt-1 border-t border-border/50">
+                    <span className="text-[10px] font-semibold text-muted-foreground">
+                      Living Expense:
+                    </span>
+                    <button
+                      type="button"
+                      onClick={(e) => toggleLoanSubtype(t, e)}
+                      className={`px-2 py-1 text-[11px] font-bold rounded-md transition-all cursor-pointer flex items-center gap-1 ${
+                        isSubtypeEnabled
+                          ? 'bg-amber-100 hover:bg-amber-200 dark:bg-amber-900/60 dark:hover:bg-amber-800 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700'
+                          : 'bg-muted hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-500 dark:text-zinc-400 border border-border'
+                      }`}
+                    >
+                      {isSubtypeEnabled ? (
+                        <>
+                          <CheckCircle2 className="w-3 h-3 text-amber-600 dark:text-amber-400" />
+                          <span>Included</span>
+                        </>
+                      ) : (
+                        <>
+                          <PlusCircle className="w-3 h-3 text-zinc-400" />
+                          <span>Include</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
               )
             })}
           </div>
@@ -217,6 +318,23 @@ export function LinkedLoanExpenseCard() {
 
         {/* Active Loan Details Grid */}
         <div className="rounded-xl bg-muted/40 border border-border/80 p-3.5 sm:p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-xs font-bold text-foreground">
+              Selected Detail: {currentLoan.label}
+            </span>
+            {isSelectedActive ? (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-100/70 dark:bg-amber-900/50 px-2 py-0.5 rounded-full">
+                <CheckCircle2 className="w-3 h-3 text-amber-600" />
+                Active in Living Expenses
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 bg-zinc-200/70 dark:bg-zinc-800 px-2 py-0.5 rounded-full">
+                <XCircle className="w-3 h-3 text-zinc-500" />
+                Excluded from Living Expenses
+              </span>
+            )}
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
             <div>
               <span className="text-muted-foreground block text-[11px]">Loan Principal</span>

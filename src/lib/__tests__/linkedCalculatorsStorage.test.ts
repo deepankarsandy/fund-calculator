@@ -178,6 +178,41 @@ describe('Linked Calculators Storage & Synchronization Logic', () => {
       expect(futureContributions.length).toBe(0)
       expect(otherIncome.length).toBe(0)
     })
+
+    it('supports linking multiple SIP sub-types simultaneously (e.g. Regular SIP + SWP)', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: {
+          enabled: true,
+          selectedType: 'sip' as const,
+          enabledTypes: { sip: true, swp: true, combo: false },
+        },
+        fd: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.fd, enabled: false },
+      }
+      const { futureContributions, otherIncome } = buildLinkedIncomeItems(cfg)
+
+      // Both Regular SIP maturity and SWP payout are added
+      expect(futureContributions.some((l) => l.id === 'linked-sip-maturity')).toBe(true)
+      expect(otherIncome.some((i) => i.id === 'linked-sip-swp')).toBe(true)
+      expect(otherIncome.some((i) => i.id === 'linked-sip-combo')).toBe(false)
+    })
+
+    it('supports individual SIP sub-type exclusion', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: {
+          enabled: true,
+          selectedType: 'sip' as const,
+          enabledTypes: { sip: false, swp: true, combo: false },
+        },
+        fd: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.fd, enabled: false },
+      }
+      const { futureContributions, otherIncome } = buildLinkedIncomeItems(cfg)
+
+      // SIP is excluded, only SWP is included
+      expect(futureContributions.some((l) => l.id === 'linked-sip-maturity')).toBe(false)
+      expect(otherIncome.some((i) => i.id === 'linked-sip-swp')).toBe(true)
+    })
   })
 
   describe('FD Summaries & Linking', () => {
@@ -251,6 +286,41 @@ describe('Linked Calculators Storage & Synchronization Logic', () => {
       expect(futureContributions[0].id).toBe('linked-fd-principal-monthly')
       expect(futureContributions[0].amount).toBe(200000) // principal returned at end of tenure
     })
+
+    it('supports linking multiple FD sub-types simultaneously (e.g. Cumulative + Monthly)', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.sip, enabled: false },
+        fd: {
+          enabled: true,
+          selectedType: 'cumulative' as const,
+          enabledTypes: { cumulative: true, monthly: true, quarterly: false },
+        },
+      }
+      const { futureContributions, otherIncome } = buildLinkedIncomeItems(cfg)
+
+      // Both Cumulative maturity and Monthly payout interest/principal are added
+      expect(futureContributions.some((l) => l.id === 'linked-fd-cumulative')).toBe(true)
+      expect(otherIncome.some((i) => i.id === 'linked-fd-monthly')).toBe(true)
+      expect(futureContributions.some((l) => l.id === 'linked-fd-principal-monthly')).toBe(true)
+      expect(otherIncome.some((i) => i.id === 'linked-fd-quarterly')).toBe(false)
+    })
+
+    it('supports individual FD sub-type exclusion', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.sip, enabled: false },
+        fd: {
+          enabled: true,
+          selectedType: 'cumulative' as const,
+          enabledTypes: { cumulative: false, monthly: true, quarterly: false },
+        },
+      }
+      const { futureContributions, otherIncome } = buildLinkedIncomeItems(cfg)
+
+      expect(futureContributions.some((l) => l.id === 'linked-fd-cumulative')).toBe(false)
+      expect(otherIncome.some((i) => i.id === 'linked-fd-monthly')).toBe(true)
+    })
   })
 
   describe('Loan EMI Summaries & Linking', () => {
@@ -298,6 +368,38 @@ describe('Linked Calculators Storage & Synchronization Logic', () => {
       }
       const items = buildLinkedLoanExpenseItems(cfg)
       expect(items.length).toBe(0)
+    })
+
+    it('supports linking multiple loan sub-types simultaneously (e.g. Home + Car)', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        loan: {
+          enabled: true,
+          selectedType: 'home' as const,
+          enabledTypes: { home: true, car: true, personal: false, custom: false },
+        },
+      }
+      const items = buildLinkedLoanExpenseItems(cfg)
+
+      expect(items.length).toBe(2)
+      expect(items.some((i) => i.id === 'linked-loan-emi-home')).toBe(true)
+      expect(items.some((i) => i.id === 'linked-loan-emi-car')).toBe(true)
+      expect(items.some((i) => i.id === 'linked-loan-emi-personal')).toBe(false)
+    })
+
+    it('supports individual loan sub-type exclusion', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        loan: {
+          enabled: true,
+          selectedType: 'home' as const,
+          enabledTypes: { home: false, car: true, personal: false, custom: false },
+        },
+      }
+      const items = buildLinkedLoanExpenseItems(cfg)
+
+      expect(items.length).toBe(1)
+      expect(items[0].id).toBe('linked-loan-emi-car')
     })
   })
 

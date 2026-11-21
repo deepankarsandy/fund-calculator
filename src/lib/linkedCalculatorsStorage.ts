@@ -420,17 +420,12 @@ export function buildLinkedIncomeItems(config?: LinkedCalculatorsConfig): {
   if (cfg.sip.enabled) {
     const sipSummaries = getSipSummaries()
 
-    // Determine which types are active
-    const activeSipTypes: SipLinkedType[] = []
-    if (cfg.sip.enabledTypes[cfg.sip.selectedType]) {
-      activeSipTypes.push(cfg.sip.selectedType)
-    } else {
-      // Check if any specific types are toggled
-      ;(Object.keys(cfg.sip.enabledTypes) as SipLinkedType[]).forEach((t) => {
-        if (cfg.sip.enabledTypes[t]) activeSipTypes.push(t)
-      })
-      if (activeSipTypes.length === 0) activeSipTypes.push(cfg.sip.selectedType)
+    const enabledTypes = cfg.sip.enabledTypes || {
+      [cfg.sip.selectedType || 'sip']: true,
     }
+    const activeSipTypes: SipLinkedType[] = (['sip', 'swp', 'combo'] as SipLinkedType[]).filter(
+      (t) => enabledTypes[t]
+    )
 
     activeSipTypes.forEach((type) => {
       const summary = sipSummaries[type]
@@ -471,15 +466,12 @@ export function buildLinkedIncomeItems(config?: LinkedCalculatorsConfig): {
   if (cfg.fd.enabled) {
     const fdSummaries = getFdSummaries()
 
-    const activeFdTypes: FdLinkedType[] = []
-    if (cfg.fd.enabledTypes[cfg.fd.selectedType]) {
-      activeFdTypes.push(cfg.fd.selectedType)
-    } else {
-      ;(Object.keys(cfg.fd.enabledTypes) as FdLinkedType[]).forEach((t) => {
-        if (cfg.fd.enabledTypes[t]) activeFdTypes.push(t)
-      })
-      if (activeFdTypes.length === 0) activeFdTypes.push(cfg.fd.selectedType)
+    const enabledTypes = cfg.fd.enabledTypes || {
+      [cfg.fd.selectedType || 'cumulative']: true,
     }
+    const activeFdTypes: FdLinkedType[] = (
+      ['cumulative', 'monthly', 'quarterly'] as FdLinkedType[]
+    ).filter((t) => enabledTypes[t])
 
     activeFdTypes.forEach((type) => {
       const summary = fdSummaries[type]
@@ -542,15 +534,12 @@ export function buildLinkedLoanExpenseItems(config?: LinkedCalculatorsConfig): E
 
   const loanSummaries = getLoanSummaries()
 
-  const activeLoanTypes: LoanLinkedType[] = []
-  if (cfg.loan.enabledTypes[cfg.loan.selectedType]) {
-    activeLoanTypes.push(cfg.loan.selectedType)
-  } else {
-    ;(Object.keys(cfg.loan.enabledTypes) as LoanLinkedType[]).forEach((t) => {
-      if (cfg.loan.enabledTypes[t]) activeLoanTypes.push(t)
-    })
-    if (activeLoanTypes.length === 0) activeLoanTypes.push(cfg.loan.selectedType)
+  const enabledTypes = cfg.loan.enabledTypes || {
+    [cfg.loan.selectedType || 'home']: true,
   }
+  const activeLoanTypes: LoanLinkedType[] = (
+    ['home', 'car', 'personal', 'custom'] as LoanLinkedType[]
+  ).filter((t) => enabledTypes[t])
 
   activeLoanTypes.forEach((type) => {
     const summary = loanSummaries[type]

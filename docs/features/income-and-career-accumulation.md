@@ -36,6 +36,12 @@ Unlike basic retirement calculators that assume retirement starts immediately on
 - **Other Recurring Inflows**: Support for post-retirement pension, rental income, or annuity cash flows with customizable start and end years.
 - **Future Lump Sum Inflows**: Single-occurrence cash windfalls (inheritance, property sales, mature policies) credited in designated planning years.
 
-### 5. Self-Funded Plan Detection
+### 5. Linked SIP & Fixed Deposit (FD) Inflow Cards
+
+- Dedicated standalone cards for **SIP & SWP Inflows** and **Fixed Deposit Inflows** directly link saved calculator results without manual entry.
+- Supports dual-level controls: master inclusion toggle plus granular include/exclude toggles for each sub-type (Regular SIP, SWP, Combo, Cumulative FD, Monthly Payout FD, Quarterly Payout FD).
+- For complete details, see [Linked Calculators Integration](linked-calculators.md).
+
+### 6. Self-Funded Plan Detection
 
 - If projected accumulated savings exceed the retirement target corpus, the engine flags the plan as **Fully Self-Funded (₹0 Extra Starting Corpus Needed Today)**.
