@@ -14,6 +14,7 @@ import {
   ChevronDown,
   Download,
   Upload,
+  AlertTriangle,
 } from 'lucide-react'
 import {
   UserProfile,
@@ -793,6 +794,14 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                     <p className="text-[11px] text-muted-foreground">
                       Net monthly earnings after employer deductions.
                     </p>
+                    <div className="flex items-start gap-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                      <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>Important:</strong> Set your amount{' '}
+                        <strong>after deducting PF, Insurance, SIP, etc.</strong>, as they are
+                        calculated and projected separately.
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-1.5">

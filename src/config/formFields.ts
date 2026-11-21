@@ -15,6 +15,7 @@ export interface FieldConfig {
   type: FieldType
   defaultValue: any
   help: string
+  warning?: string
   options?: FieldOption[]
   min?: number
   max?: number
@@ -210,6 +211,8 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
         prefix: '₹',
         placeholder: 'e.g. 75000 (0 if already retired)',
         help: 'Your current net monthly salary or business income. Living expenses are subtracted from this, and the surplus is automatically invested into your corpus.',
+        warning:
+          'Important: Set the amount after deducting PF, Insurance, SIP, etc., as these investment channels and policies are calculated separately.',
         skippable: true,
       },
       {

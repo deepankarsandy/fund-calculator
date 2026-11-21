@@ -1,4 +1,4 @@
-import { Info, Plus, Trash2, ChevronDown, Shield, Landmark } from 'lucide-react'
+import { Info, Plus, Trash2, ChevronDown, Shield, Landmark, AlertTriangle } from 'lucide-react'
 import { FieldConfig } from '@/config/formFields'
 import { formatCrore } from '@/lib/currency'
 import { cn } from '@/lib/cn'
@@ -41,6 +41,14 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
         <div className="flex items-start gap-2 text-xs text-zinc-700 dark:text-zinc-300 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-2.5 rounded-lg leading-relaxed">
           <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
           <span>{field.help}</span>
+        </div>
+      )}
+
+      {/* Warning label / notice */}
+      {field.warning && (
+        <div className="flex items-start gap-2 text-xs text-amber-900 dark:text-amber-200 bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-lg leading-relaxed">
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <span>{field.warning}</span>
         </div>
       )}
 

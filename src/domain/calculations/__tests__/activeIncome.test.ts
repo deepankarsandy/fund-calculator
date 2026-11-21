@@ -201,4 +201,27 @@ describe('Active Earned Income & Career Savings Cashflow Projections', () => {
     expect(base.depletionAge).toBeDefined()
     expect(base.depletionAge).toBeLessThan(profile.targetAge)
   })
+
+  it('preserves set monthly income in earnedIncome without deducting SIP, PF, or other investments', () => {
+    const monthlyIncome = 150000 // 1.5 Lakhs/month
+    const assets: Assets = {
+      ...DEFAULT_ASSETS,
+      monthlyIncome,
+      incomeEndAge: 50,
+      incomeGrowthRate: 0.0,
+    }
+
+    const projections = projectCashflows({
+      categories: [],
+      assets,
+      assumptions: baseAssumptions,
+      currentAge: 30,
+      planningYears: 5,
+    })
+
+    // Baseline earned income must strictly equal monthlyIncome * 12 (18,00,000)
+    // and must not deduct any external SIP, PF, NPS, or insurance amounts.
+    expect(projections[0].earnedIncome).toBe(monthlyIncome * 12)
+    expect(projections[1].earnedIncome).toBe(monthlyIncome * 12)
+  })
 })

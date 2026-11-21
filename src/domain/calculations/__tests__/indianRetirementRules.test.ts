@@ -173,5 +173,19 @@ describe('Indian Retirement Rules - NPS & EPF Calculations', () => {
       expect(epfMaturity?.amount).toBeGreaterThan(15000000)
       expect(epfMaturity?.year).toBe(30)
     })
+
+    it('does not deduct SIP, PF, or NPS investment amounts from monthlyIncome during profile sync', () => {
+      const profile: UserProfile = {
+        ...DEFAULT_USER_PROFILE,
+        monthlyIncome: 200000,
+        monthlyPfInvestment: 15000,
+        monthlyNpsInvestment: 10000,
+        monthlySipInvestment: 25000,
+      }
+
+      const assets = buildDefaultAssetsFromProfile(profile)
+      // monthlyIncome should remain untouched and exactly 200,000 without deducting 15k PF, 10k NPS, or 25k SIP
+      expect(assets.monthlyIncome).toBe(200000)
+    })
   })
 })
