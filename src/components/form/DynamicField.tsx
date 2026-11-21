@@ -1,4 +1,4 @@
-import { Info, Plus, Trash2, ChevronDown } from 'lucide-react'
+import { Info, Plus, Trash2, ChevronDown, Shield, Landmark } from 'lucide-react'
 import { FieldConfig } from '@/config/formFields'
 import { formatCrore } from '@/lib/currency'
 import { cn } from '@/lib/cn'
@@ -221,16 +221,30 @@ function ArrayField({
   items: any[]
   onChange: (items: any[]) => void
 }) {
-  function addItem() {
+  function addItem(overrides?: Record<string, any>) {
     const newItem: Record<string, any> = {
       id: Math.random().toString(36).slice(2, 9),
     }
     field.subFields?.forEach((sub) => {
       newItem[sub.id] = sub.defaultValue
     })
+    if (overrides) {
+      Object.assign(newItem, overrides)
+    }
     const updated = [...items, newItem]
     onChange(updated)
     setLastFilled(`${field.id}_${updated.length - 1}`)
+  }
+
+  function addInsurancePlan() {
+    addItem({
+      incomeType: 'insurance_plan',
+      label: 'Guaranteed Income Insurance Plan',
+      annualAmount: 120000,
+      startYear: 1, // Explicitly starts in current year
+      endYear: 20,
+      inflationLinked: false,
+    })
   }
 
   function updateItem(index: number, subId: string, val: any) {
@@ -244,6 +258,9 @@ function ArrayField({
     onChange(items.filter((_, i) => i !== index))
   }
 
+  const isOtherIncome = field.id === 'otherIncome'
+  const isFutureContributions = field.id === 'futureContributions'
+
   return (
     <div className="space-y-3 pt-1" id={field.id}>
       {items.map((item, idx) => (
@@ -252,15 +269,66 @@ function ArrayField({
           id={`${field.id}_${idx}`}
           className="border border-zinc-200 dark:border-zinc-800 rounded-xl p-4 bg-white dark:bg-zinc-900/90 shadow-xs space-y-3 relative"
         >
-          <div className="flex items-center justify-between pb-2 border-b border-zinc-100 dark:border-zinc-800">
-            <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-              {item.label || item.name || `Item #${idx + 1}`}
-            </span>
+          <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-zinc-100 dark:border-zinc-800">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
+                {item.label || item.name || `Item #${idx + 1}`}
+              </span>
+
+              {/* Context Badges for Other Income */}
+              {isOtherIncome && (
+                <>
+                  {item.incomeType === 'insurance_plan' && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border border-amber-200 dark:border-amber-800 px-2 py-0.5 rounded-full">
+                      <Shield className="w-2.5 h-2.5" />
+                      Insurance Policy
+                    </span>
+                  )}
+                  {item.incomeType === 'nps_annuity' && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 px-2 py-0.5 rounded-full">
+                      <Landmark className="w-2.5 h-2.5" />
+                      NPS Annuity
+                    </span>
+                  )}
+                  {item.startYear === 1 ? (
+                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
+                      ● Starts in Current Year
+                    </span>
+                  ) : item.startYear > 1 ? (
+                    <span className="text-[10px] font-bold text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/50 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
+                      Starts in Year {item.startYear}
+                    </span>
+                  ) : null}
+                </>
+              )}
+
+              {/* Context Badges for Future Lump Sums */}
+              {isFutureContributions && (
+                <>
+                  {item.year != null && (
+                    <span className="text-[10px] font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 px-2 py-0.5 rounded-full">
+                      Year {item.year}
+                    </span>
+                  )}
+                  {typeof item.label === 'string' && item.label.toLowerCase().includes('epf') && (
+                    <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 px-2 py-0.5 rounded-full">
+                      EPFO 8.25%
+                    </span>
+                  )}
+                  {typeof item.label === 'string' && item.label.toLowerCase().includes('nps') && (
+                    <span className="text-[10px] font-bold text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border border-purple-200 dark:border-purple-800 px-2 py-0.5 rounded-full">
+                      Tax-Free 60%
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+
             {item.id !== 'self' && (
               <button
                 type="button"
                 onClick={() => removeItem(idx)}
-                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
                 title="Remove item"
               >
                 <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
@@ -281,14 +349,39 @@ function ArrayField({
         </div>
       ))}
 
-      <button
-        type="button"
-        onClick={addItem}
-        className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/60 px-4 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
-      >
-        <Plus className="w-4 h-4" />
-        <span>{field.addButtonText || '+ Add Item'}</span>
-      </button>
+      <div className="flex flex-wrap items-center gap-2.5 pt-1">
+        {isOtherIncome ? (
+          <>
+            <button
+              type="button"
+              onClick={addInsurancePlan}
+              className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/50 border border-amber-200 dark:border-amber-800/60 px-4 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+              title="Add a custom insurance-linked retirement plan or guaranteed income policy starting in the current year"
+            >
+              <Shield className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>+ Add Insurance Plan (Starts Current Year)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => addItem()}
+              className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/60 px-4 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>+ Add Other Income Source</span>
+            </button>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={() => addItem()}
+            className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/50 border border-blue-200 dark:border-blue-800/60 px-4 py-2.5 rounded-xl transition-all shadow-xs cursor-pointer"
+          >
+            <Plus className="w-4 h-4" />
+            <span>{field.addButtonText || '+ Add Item'}</span>
+          </button>
+        )}
+      </div>
     </div>
   )
 }

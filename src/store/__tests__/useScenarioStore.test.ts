@@ -213,7 +213,7 @@ describe('useScenarioStore - applyProfileDefaults', () => {
     expect(customFoodItem?.notes).toBe('Special dietary basket')
   })
 
-  it('preserves other assets data like lump sums and other income streams', () => {
+  it('preserves other assets data like lump sums and other income streams while auto-filling NPS & PF', () => {
     useScenarioStore.setState({
       assets: {
         ...useScenarioStore.getState().assets,
@@ -242,6 +242,8 @@ describe('useScenarioStore - applyProfileDefaults', () => {
       ...DEFAULT_USER_PROFILE,
       monthlyIncome: 120000,
       retirementAge: 58,
+      monthlyNpsInvestment: 5000,
+      monthlyPfInvestment: 10000,
       isConfigured: true,
     }
 
@@ -250,6 +252,66 @@ describe('useScenarioStore - applyProfileDefaults', () => {
 
     expect(updatedAssets.monthlyIncome).toBe(120000)
     expect(updatedAssets.incomeEndAge).toBe(58)
+
+    // Preserved custom income stream
+    const rentItem = updatedAssets.otherIncome.find((i) => i.id === 'rental-income')
+    expect(rentItem).toBeDefined()
+    expect(rentItem?.label).toBe('Commercial Property Rent')
+
+    // Auto-filled NPS pension based on Indian PFRDA rules (40% annuity)
+    const npsItem = updatedAssets.otherIncome.find(
+      (i) => i.id === 'nps_pension' || i.incomeType === 'nps_annuity'
+    )
+    expect(npsItem).toBeDefined()
+    expect(npsItem?.annualAmount).toBeGreaterThan(0)
+    expect(npsItem?.startYear).toBe(29) // 58 - 30 + 1 = 29
+
+    // Preserved custom lump sum
+    const inheritanceItem = updatedAssets.futureContributions.find((l) => l.id === 'inheritance')
+    expect(inheritanceItem).toBeDefined()
+    expect(inheritanceItem?.amount).toBe(5000000)
+
+    // Auto-filled EPF maturity based on Indian EPFO 8.25% rule
+    const pfItem = updatedAssets.futureContributions.find((l) => l.id === 'pf_maturity')
+    expect(pfItem).toBeDefined()
+    expect(pfItem?.amount).toBeGreaterThan(10000000)
+    expect(pfItem?.year).toBe(28) // working years = 58 - 30 = 28
+  })
+
+  it('preserves existing custom income streams strictly when NPS and PF investments are 0', () => {
+    useScenarioStore.setState({
+      assets: {
+        ...useScenarioStore.getState().assets,
+        otherIncome: [
+          {
+            id: 'rental-income',
+            label: 'Commercial Property Rent',
+            annualAmount: 360000,
+            startYear: 1,
+            inflationLinked: true,
+          },
+        ],
+        futureContributions: [
+          {
+            id: 'inheritance',
+            label: 'Ancestral Property Sale',
+            amount: 5000000,
+            year: 10,
+          },
+        ],
+      },
+    })
+
+    const customProfile: UserProfile = {
+      ...DEFAULT_USER_PROFILE,
+      monthlyPfInvestment: 0,
+      monthlyNpsInvestment: 0,
+      isConfigured: true,
+    }
+
+    useScenarioStore.getState().applyProfileDefaults(customProfile)
+    const updatedAssets = useScenarioStore.getState().assets
+
     expect(updatedAssets.otherIncome).toHaveLength(1)
     expect(updatedAssets.otherIncome[0].label).toBe('Commercial Property Rent')
     expect(updatedAssets.futureContributions).toHaveLength(1)

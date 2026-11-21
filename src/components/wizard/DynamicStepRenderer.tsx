@@ -3,6 +3,7 @@ import { DynamicField } from '@/components/form/DynamicField'
 import { DynamicExpensesRenderer } from '@/components/expenses/DynamicExpensesRenderer'
 import { StepResults } from '@/components/steps/StepResults'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { Info } from 'lucide-react'
 
 interface DynamicStepRendererProps {
   step: WizardStepConfig
@@ -68,6 +69,23 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
         </div>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">{step.subtitle}</p>
       </div>
+
+      {step.key === 'assets' && (
+        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50 text-xs text-blue-900 dark:text-blue-200">
+          <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <div className="space-y-0.5">
+            <p className="font-semibold">
+              Indian Retirement Calibration Active (EPF, NPS & Insurance Plans)
+            </p>
+            <p className="text-[11px] text-blue-700 dark:text-blue-300 leading-relaxed">
+              EPF maturity is calculated at official 8.25% p.a. EPFO compound. NPS Tier-1 models 10%
+              CAGR accumulation with statutory 40% annuity (at 6% p.a. lifetime pension starting
+              post-retirement). You can also add custom insurance-linked retirement plans that start
+              paying from the <strong>current year</strong>.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Fields Grid / Loop */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-3">

@@ -91,6 +91,10 @@ export function ProfileSyncConfirmModal({
               <li>
                 <strong>Monthly earned income & growth rate</strong>
               </li>
+              <li>
+                <strong>EPF maturity (8.25%) & NPS annuity (40% at 6% p.a.)</strong> auto-calculated
+                in Income & Savings
+              </li>
             </ul>
           </div>
 
@@ -108,6 +112,11 @@ export function ProfileSyncConfirmModal({
               <li>
                 <strong>Your entered dependents:</strong> Added household members (spouse, children,
                 parents) are preserved
+              </li>
+              <li>
+                <strong>Custom income streams & insurance plans:</strong> Existing rental income,
+                custom insurance plans starting from current year, and custom lump sums remain
+                intact
               </li>
               <li>
                 <strong>Custom calculator inputs:</strong> Custom loan amounts, tenures, and FD

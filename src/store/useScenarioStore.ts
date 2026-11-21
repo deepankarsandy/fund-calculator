@@ -9,6 +9,7 @@ import type { CalculationResults } from '@/domain/models/results'
 import { DEFAULT_PROFILE } from '@/domain/models/profile'
 import { DEFAULT_ASSUMPTIONS } from '@/domain/models/assumptions'
 import { DEFAULT_ASSETS } from '@/domain/models/assets'
+import { buildDefaultAssetsFromProfile } from '@/domain/calculations/indianRetirementRules'
 import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
@@ -480,14 +481,8 @@ export const useScenarioStore = create<ScenarioState>()(
           lifestyleScenario: p.lifestyleBaseline,
         }
 
-        // 3. Update assets specific values present in profile (retirement age, income, growth, corpus)
-        const updatedAssets: Assets = {
-          ...get().assets,
-          monthlyIncome: p.monthlyIncome,
-          incomeEndAge: p.retirementAge,
-          incomeGrowthRate: p.annualIncomeGrowthRate / 100,
-          existingInvestableCorpus: p.existingInvestableCorpus,
-        }
+        // 3. Update assets specific values present in profile (retirement age, income, growth, corpus, NPS annuity, and PF maturity)
+        const updatedAssets: Assets = buildDefaultAssetsFromProfile(p, get().assets)
 
         // 4. Update assumptions specific values present in profile
         const updatedAssumptions: Assumptions = {
