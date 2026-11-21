@@ -440,16 +440,36 @@ export const useScenarioStore = create<ScenarioState>()(
 
       applyProfileDefaults: (customProfile) => {
         const p = customProfile || getUserProfile()
-        const selfMember: HouseholdMember = {
-          id: 'self',
-          label: p.name ? `${p.name} (Self)` : 'Self',
-          relationship: 'self',
-          age: p.currentAge,
-          financiallyDependent: true,
-          hasHealthInsurance: false,
-        }
 
+        // 1. Update self member's age/label while preserving all entered dependents!
+        const currentMembers = get().members || []
+        const hasSelf = currentMembers.some((m) => m.id === 'self' || m.relationship === 'self')
+        const updatedMembers = hasSelf
+          ? currentMembers.map((m) => {
+              if (m.id === 'self' || m.relationship === 'self') {
+                return {
+                  ...m,
+                  age: p.currentAge,
+                  label: p.name ? `${p.name} (Self)` : m.label || 'Self',
+                }
+              }
+              return m
+            })
+          : [
+              {
+                id: 'self',
+                label: p.name ? `${p.name} (Self)` : 'Self',
+                relationship: 'self' as const,
+                age: p.currentAge,
+                financiallyDependent: true,
+                hasHealthInsurance: false,
+              },
+              ...currentMembers,
+            ]
+
+        // 2. Update profile specific values present in profile
         const updatedProfile: Profile = {
+          ...get().profile,
           country: p.country,
           region: get().profile.region || 'Odisha',
           city: get().profile.city || '',
@@ -460,6 +480,7 @@ export const useScenarioStore = create<ScenarioState>()(
           lifestyleScenario: p.lifestyleBaseline,
         }
 
+        // 3. Update assets specific values present in profile (retirement age, income, growth, corpus)
         const updatedAssets: Assets = {
           ...get().assets,
           monthlyIncome: p.monthlyIncome,
@@ -468,6 +489,7 @@ export const useScenarioStore = create<ScenarioState>()(
           existingInvestableCorpus: p.existingInvestableCorpus,
         }
 
+        // 4. Update assumptions specific values present in profile
         const updatedAssumptions: Assumptions = {
           ...get().assumptions,
           globalInflationRate: p.overallInflationRate / 100,
@@ -475,22 +497,56 @@ export const useScenarioStore = create<ScenarioState>()(
           annualInvestmentReturn: p.expectedDebtReturn / 100,
         }
 
-        const updatedCategories = buildCategoriesForProfile(
-          p.locationType,
-          p.lifestyleBaseline,
-          [selfMember],
-          p.inflationMode === 'sector'
-            ? (p.sectorInflationRates as unknown as Record<string, number>)
-            : undefined
-        )
+        // 5. Update categories: Retain all entered expenses and amounts (e.g. mobile recharge, food, rent)
+        // Only update category-level inflation rate if sector inflation rates are configured
+        const currentCategories = get().categories
+        let updatedCategories = currentCategories
+        if (!currentCategories || currentCategories.length === 0) {
+          updatedCategories = buildCategoriesForProfile(
+            p.locationType,
+            p.lifestyleBaseline,
+            updatedMembers,
+            p.inflationMode === 'sector'
+              ? (p.sectorInflationRates as unknown as Record<string, number>)
+              : undefined
+          )
+        } else {
+          const sectorRates = p.sectorInflationRates as unknown as
+            Record<string, number> | undefined
+          if (p.inflationMode === 'sector' && sectorRates) {
+            updatedCategories = currentCategories.map((cat) => {
+              if (sectorRates[cat.id] != null) {
+                const rate =
+                  sectorRates[cat.id] > 1 ? sectorRates[cat.id] / 100 : sectorRates[cat.id]
+                return {
+                  ...cat,
+                  defaultInflationRate: rate,
+                }
+              }
+              return cat
+            })
+          }
+        }
+
+        // Recompute calculation results if they were already computed
+        const currentResults = get().results
+        const newResults = currentResults
+          ? runScenarios({
+              profile: updatedProfile,
+              members: updatedMembers,
+              categories: updatedCategories,
+              assumptions: updatedAssumptions,
+              assets: updatedAssets,
+            })
+          : null
 
         set({
           profile: updatedProfile,
-          members: [selfMember],
+          members: updatedMembers,
           categories: updatedCategories,
           assumptions: updatedAssumptions,
           assets: updatedAssets,
-          results: null,
+          results: newResults,
         })
       },
 

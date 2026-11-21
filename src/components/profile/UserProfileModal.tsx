@@ -25,6 +25,7 @@ import { AreaType, LifestyleScenario } from '@/domain/models/profile'
 import { useUserProfile, syncProfileToCalculators } from '@/lib/userProfileStorage'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { cn } from '@/lib/cn'
+import { ProfileSyncConfirmModal } from './ProfileSyncConfirmModal'
 
 interface UserProfileModalProps {
   isOpen: boolean
@@ -115,12 +116,14 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [activeTab, setActiveTab] = useState<ProfileTab>('personal')
   const [autoSyncCalculators, setAutoSyncCalculators] = useState(true)
   const [showSavedToast, setShowSavedToast] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   // Sync internal state when storedProfile changes or modal opens
   useEffect(() => {
     if (isOpen) {
       setFormData(storedProfile)
       setShowSavedToast(false)
+      setShowConfirmModal(false)
     }
   }, [isOpen, storedProfile])
 
@@ -157,6 +160,15 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   }
 
   const handleSave = () => {
+    if (autoSyncCalculators) {
+      setShowConfirmModal(true)
+      return
+    }
+    executeSave()
+  }
+
+  const executeSave = () => {
+    setShowConfirmModal(false)
     // 1. Update Profile in local storage
     const updated = updateProfile(formData, autoSyncCalculators)
 
@@ -1129,6 +1141,12 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
           </div>
         </div>
       </div>
+
+      <ProfileSyncConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={executeSave}
+      />
     </div>
   )
 }

@@ -27,6 +27,7 @@ import { useUserProfile, syncProfileToCalculators } from '@/lib/userProfileStora
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
+import { ProfileSyncConfirmModal } from '@/components/profile/ProfileSyncConfirmModal'
 
 interface ProfilePageProps {
   onBackToHome: () => void
@@ -116,6 +117,7 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState<ProfileTab>('personal')
   const [autoSyncCalculators, setAutoSyncCalculators] = useState(true)
   const [showSavedToast, setShowSavedToast] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
 
   useEffect(() => {
     setFormData(storedProfile)
@@ -152,6 +154,15 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
   }
 
   const handleSave = () => {
+    if (autoSyncCalculators) {
+      setShowConfirmModal(true)
+      return
+    }
+    executeSave()
+  }
+
+  const executeSave = () => {
+    setShowConfirmModal(false)
     const updated = updateProfile(formData, autoSyncCalculators)
     if (autoSyncCalculators) {
       applyProfileDefaultsToWizard(updated)
@@ -1208,6 +1219,12 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
           device browser storage. Nothing is sent to any server.
         </p>
       </footer>
+
+      <ProfileSyncConfirmModal
+        isOpen={showConfirmModal}
+        onClose={() => setShowConfirmModal(false)}
+        onConfirm={executeSave}
+      />
     </div>
   )
 }
