@@ -16,6 +16,8 @@ import {
   calculateDobFromAge,
   normalizeDobToDdMmYyyy,
   isValidDob,
+  parseDobToIso,
+  formatDobToMmDdYyyy,
   UserProfile,
 } from '@/domain/models/userProfile'
 import { getStoredSipInputs } from '@/lib/sipStorage'
@@ -84,10 +86,23 @@ describe('UserProfile Domain & Storage', () => {
     it('validates DD/MM/YYYY and YYYY-MM-DD dates accurately', () => {
       expect(isValidDob('15/05/1994')).toBe(true)
       expect(isValidDob('1994-05-15')).toBe(true)
+      expect(isValidDob('05-15-1994')).toBe(true) // MM-DD-YYYY
       expect(isValidDob('31/02/1994')).toBe(false) // Invalid date
       expect(isValidDob('15/05')).toBe(false)
       expect(isValidDob('')).toBe(false)
       expect(isValidDob('hello')).toBe(false)
+    })
+
+    it('converts DOB to ISO format for native date pickers and formats to MM-DD-YYYY', () => {
+      expect(parseDobToIso('15/05/1994')).toBe('1994-05-15')
+      expect(parseDobToIso('1994-05-15')).toBe('1994-05-15')
+      expect(parseDobToIso('05-15-1994')).toBe('1994-05-15')
+      expect(parseDobToIso('')).toBe('')
+
+      expect(formatDobToMmDdYyyy('1994-05-15')).toBe('05-15-1994')
+      expect(formatDobToMmDdYyyy('15/05/1994')).toBe('05-15-1994')
+      expect(formatDobToMmDdYyyy('05-15-1994')).toBe('05-15-1994')
+      expect(formatDobToMmDdYyyy('')).toBe('')
     })
   })
 

@@ -131,9 +131,15 @@ export function normalizeDobToDdMmYyyy(dob: string): string {
     return `${parts[2].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[0]}`
   }
 
-  // DD-MM-YYYY or DD.MM.YYYY
+  // DD-MM-YYYY or MM-DD-YYYY or DD.MM.YYYY
   if (/^\d{1,2}[-.]\d{1,2}[-.]\d{4}$/.test(trimmed)) {
     const parts = trimmed.split(/[-.]/)
+    const p0 = parseInt(parts[0], 10)
+    const p1 = parseInt(parts[1], 10)
+    if (p0 <= 12 && p1 > 12) {
+      // MM-DD-YYYY -> DD/MM/YYYY
+      return `${parts[1].padStart(2, '0')}/${parts[0].padStart(2, '0')}/${parts[2]}`
+    }
     return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`
   }
 
@@ -166,10 +172,21 @@ export function isValidDob(dobString: string): boolean {
     month = parseInt(parts[1], 10) - 1
     day = parseInt(parts[2], 10)
   } else if (parts[2].length === 4) {
-    // DD/MM/YYYY
-    day = parseInt(parts[0], 10)
-    month = parseInt(parts[1], 10) - 1
-    year = parseInt(parts[2], 10)
+    // DD/MM/YYYY or MM-DD-YYYY
+    const p0 = parseInt(parts[0], 10)
+    const p1 = parseInt(parts[1], 10)
+    const p2 = parseInt(parts[2], 10)
+    if (p0 <= 12 && p1 > 12) {
+      // MM-DD-YYYY or MM/DD/YYYY
+      month = p0 - 1
+      day = p1
+      year = p2
+    } else {
+      // DD/MM/YYYY or DD-MM-YYYY
+      day = p0
+      month = p1 - 1
+      year = p2
+    }
   } else {
     return false
   }
@@ -213,10 +230,21 @@ export function calculateAgeFromDob(
     month = parseInt(parts[1], 10) - 1
     day = parseInt(parts[2], 10)
   } else if (parts[2].length === 4) {
-    // DD/MM/YYYY or DD-MM-YYYY
-    day = parseInt(parts[0], 10)
-    month = parseInt(parts[1], 10) - 1
-    year = parseInt(parts[2], 10)
+    // DD/MM/YYYY or MM-DD-YYYY
+    const p0 = parseInt(parts[0], 10)
+    const p1 = parseInt(parts[1], 10)
+    const p2 = parseInt(parts[2], 10)
+    if (p0 <= 12 && p1 > 12) {
+      // MM-DD-YYYY or MM/DD/YYYY
+      month = p0 - 1
+      day = p1
+      year = p2
+    } else {
+      // DD/MM/YYYY or DD-MM-YYYY
+      day = p0
+      month = p1 - 1
+      year = p2
+    }
   } else {
     const p0 = parseInt(parts[0], 10)
     const p2 = parseInt(parts[2], 10)
@@ -262,4 +290,56 @@ export function calculateDobFromAge(age: number, referenceDate: Date = new Date(
   const month = String(referenceDate.getMonth() + 1).padStart(2, '0')
   const day = String(referenceDate.getDate()).padStart(2, '0')
   return `${day}/${month}/${targetYear}`
+}
+
+/**
+ * Parses any valid DOB string (DD/MM/YYYY, YYYY-MM-DD, MM-DD-YYYY) to standard ISO YYYY-MM-DD for native HTML date pickers.
+ */
+export function parseDobToIso(dob: string): string {
+  if (!dob || typeof dob !== 'string') return ''
+  const trimmed = dob.trim()
+  if (!trimmed) return ''
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) {
+    return trimmed
+  }
+
+  const parts = trimmed.split(/[-/.]/)
+  if (parts.length === 3) {
+    if (parts[0].length === 4) {
+      const y = parts[0]
+      const m = parts[1].padStart(2, '0')
+      const d = parts[2].padStart(2, '0')
+      return `${y}-${m}-${d}`
+    }
+    if (parts[2].length === 4) {
+      const y = parts[2]
+      const p0 = parseInt(parts[0], 10)
+      const p1 = parseInt(parts[1], 10)
+      let m: string
+      let d: string
+      if (p0 <= 12 && p1 > 12) {
+        // MM-DD-YYYY or MM/DD/YYYY
+        m = parts[0].padStart(2, '0')
+        d = parts[1].padStart(2, '0')
+      } else {
+        // DD/MM/YYYY or DD-MM-YYYY
+        d = parts[0].padStart(2, '0')
+        m = parts[1].padStart(2, '0')
+      }
+      return `${y}-${m}-${d}`
+    }
+  }
+
+  return ''
+}
+
+/**
+ * Formats any valid DOB string into MM-DD-YYYY display format.
+ */
+export function formatDobToMmDdYyyy(dob: string): string {
+  const iso = parseDobToIso(dob)
+  if (!iso) return ''
+  const [y, m, d] = iso.split('-')
+  return `${m}-${d}-${y}`
 }

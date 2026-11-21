@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   ArrowLeft,
   User,
@@ -21,9 +21,10 @@ import {
   UserProfile,
   DEFAULT_SECTOR_INFLATION,
   calculateAgeFromDob,
-  calculateDobFromAge,
   normalizeDobToDdMmYyyy,
   isValidDob,
+  parseDobToIso,
+  formatDobToMmDdYyyy,
   SectorInflationRates,
 } from '@/domain/models/userProfile'
 import { AreaType, LifestyleScenario } from '@/domain/models/profile'
@@ -134,9 +135,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
   const [targetAgeInput, setTargetAgeInput] = useState<string>(
     String(storedProfile.targetAge || 85)
   )
-  const [currentAgeInput, setCurrentAgeInput] = useState<string>(
-    String(storedProfile.currentAge || 30)
-  )
+
+  // Calendar bounds: +/- 100 years from current date
+  const { minDate, maxDate } = useMemo(() => {
+    const today = new Date()
+    const currentYear = today.getFullYear()
+    const m = String(today.getMonth() + 1).padStart(2, '0')
+    const d = String(today.getDate()).padStart(2, '0')
+    return {
+      minDate: `${currentYear - 100}-${m}-${d}`,
+      maxDate: `${currentYear + 100}-${m}-${d}`,
+    }
+  }, [])
+
+  const dobIso = useMemo(() => parseDobToIso(formData.dob), [formData.dob])
 
   useEffect(() => {
     const normalizedDob = normalizeDobToDdMmYyyy(storedProfile.dob)
@@ -146,34 +158,21 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
     })
     setRetirementAgeInput(String(storedProfile.retirementAge || 60))
     setTargetAgeInput(String(storedProfile.targetAge || 85))
-    setCurrentAgeInput(String(storedProfile.currentAge || 30))
   }, [storedProfile])
 
-  // DOB & Age synchronization (DD/MM/YYYY support)
+  // DOB & Age synchronization
   const handleDobChange = (dob: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      dob,
-    }))
-    if (isValidDob(dob)) {
-      const age = calculateAgeFromDob(dob)
-      setFormData((prev) => ({
+    setFormData((prev) => {
+      let currentAge = prev.currentAge
+      if (isValidDob(dob)) {
+        currentAge = calculateAgeFromDob(dob)
+      }
+      return {
         ...prev,
-        currentAge: age,
-      }))
-      setCurrentAgeInput(String(age))
-    }
-  }
-
-  const handleAgeChange = (ageVal: number) => {
-    const safeAge = Math.max(1, Math.min(110, ageVal || 1))
-    const approxDob = calculateDobFromAge(safeAge)
-    setFormData((prev) => ({
-      ...prev,
-      currentAge: safeAge,
-      dob: approxDob,
-    }))
-    setCurrentAgeInput(String(safeAge))
+        dob,
+        currentAge,
+      }
+    })
   }
 
   const handleSectorInflationChange = (key: keyof SectorInflationRates, val: number) => {
@@ -233,7 +232,6 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
       })
       setRetirementAgeInput(String(defaults.retirementAge))
       setTargetAgeInput(String(defaults.targetAge))
-      setCurrentAgeInput(String(defaults.currentAge))
       if (autoSyncCalculators) {
         syncProfileToCalculators(defaults)
         applyProfileDefaultsToWizard(defaults)
@@ -468,63 +466,94 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                   </div>
                 </div>
 
-                {/* DOB and Age Row */}
+                {/* DOB and Lifestyle Baseline Row */}
                 <div className="p-4 rounded-xl border border-blue-200 dark:border-blue-900 bg-blue-50/50 dark:bg-blue-950/20 space-y-3">
                   <div className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-bold text-xs">
                     <Calendar className="w-4 h-4" />
-                    <span>Date of Birth & Age Calculation</span>
+                    <span>Date of Birth & Lifestyle Baseline</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* DOB Calendar Picker (MM-DD-YYYY) */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">
-                        Date of Birth (DOB)
+                      <label
+                        htmlFor="user-profile-dob"
+                        className="text-xs font-bold text-foreground"
+                      >
+                        Date of Birth (DOB) (MM-DD-YYYY)
                       </label>
                       <input
-                        type="text"
-                        placeholder="DD/MM/YYYY"
-                        value={formData.dob}
+                        id="user-profile-dob"
+                        type="date"
+                        lang="en-US"
+                        min={minDate}
+                        max={maxDate}
+                        value={dobIso}
                         onChange={(e) => handleDobChange(e.target.value)}
-                        className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                        onClick={(e) => {
+                          try {
+                            e.currentTarget.showPicker?.()
+                          } catch {
+                            // ignore fallback
+                          }
+                        }}
+                        className="w-full h-11 border border-border rounded-xl px-3.5 text-sm font-medium bg-background text-foreground [color-scheme:light] dark:[color-scheme:dark] shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
                       />
-                      <p className="text-[11px] text-muted-foreground">
-                        Enter DD/MM/YYYY (e.g. 15/08/1995) to auto-compute your age.
-                      </p>
+                      <div className="text-[11px] text-muted-foreground min-h-[1.25rem] flex items-center">
+                        {formData.dob && isValidDob(formData.dob) ? (
+                          <span className="inline-flex items-center gap-1.5 text-blue-700 dark:text-blue-300 font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <span>
+                              Age: {formData.currentAge}{' '}
+                              {formData.currentAge === 1 ? 'year' : 'years'} old
+                            </span>
+                            {formatDobToMmDdYyyy(formData.dob) && (
+                              <span className="text-muted-foreground font-normal">
+                                ({formatDobToMmDdYyyy(formData.dob)})
+                              </span>
+                            )}
+                          </span>
+                        ) : (
+                          <span>
+                            Select your date of birth (MM-DD-YYYY) to auto-compute your age.
+                          </span>
+                        )}
+                      </div>
                     </div>
 
+                    {/* Lifestyle Baseline Dropdown (in place of age field) */}
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">
-                        Current Age (Years)
+                      <label
+                        htmlFor="user-profile-lifestyle"
+                        className="text-xs font-bold text-foreground"
+                      >
+                        Lifestyle Baseline
                       </label>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min={1}
-                          max={110}
-                          value={currentAgeInput}
-                          onChange={(e) => {
-                            const val = e.target.value
-                            setCurrentAgeInput(val)
-                            if (val !== '') {
-                              const parsed = parseInt(val, 10)
-                              if (!isNaN(parsed) && parsed >= 1) {
-                                setFormData((p) => ({ ...p, currentAge: parsed }))
-                              }
-                            }
-                          }}
-                          onBlur={() => {
-                            const parsed = parseInt(currentAgeInput, 10)
-                            const safeAge = isNaN(parsed) ? 30 : Math.max(1, Math.min(110, parsed))
-                            handleAgeChange(safeAge)
-                          }}
-                          className="w-full h-11 border border-border rounded-xl px-3.5 text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                        <span className="text-xs font-semibold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
-                          Years Old
-                        </span>
+                      <div className="relative">
+                        <select
+                          id="user-profile-lifestyle"
+                          value={formData.lifestyleBaseline}
+                          onChange={(e) =>
+                            setFormData((p) => ({
+                              ...p,
+                              lifestyleBaseline: e.target.value as LifestyleScenario,
+                            }))
+                          }
+                          className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
+                        >
+                          <option value="bare_minimum">
+                            Bare Minimum (Survival essentials only)
+                          </option>
+                          <option value="comfortable">
+                            Comfortable (Leisure, outings & buffer)
+                          </option>
+                          <option value="luxury">Luxury (Premium lifestyle & higher buffer)</option>
+                          <option value="custom">Custom (Manually itemized)</option>
+                        </select>
+                        <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
                       </div>
                       <p className="text-[11px] text-muted-foreground">
-                        Age baseline for timeline simulations and seniority benefits.
+                        Baseline lifestyle spending tier for living expense benchmarks.
                       </p>
                     </div>
                   </div>
@@ -610,55 +639,6 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                     <p className="text-[11px] text-muted-foreground">
                       Corpus lasts up to this age (85–90 safeguards against longevity risk).
                     </p>
-                  </div>
-                </div>
-
-                {/* Lifestyle Baseline */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Lifestyle Baseline</label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    {[
-                      {
-                        id: 'bare_minimum',
-                        label: 'Bare Minimum',
-                        desc: 'Survival essentials only',
-                      },
-                      {
-                        id: 'comfortable',
-                        label: 'Comfortable',
-                        desc: 'Leisure, outings & buffer',
-                      },
-                      {
-                        id: 'luxury',
-                        label: 'Luxury',
-                        desc: 'Premium lifestyle & higher buffer',
-                      },
-                      {
-                        id: 'custom',
-                        label: 'Custom',
-                        desc: 'Manually itemized',
-                      },
-                    ].map((lvl) => (
-                      <button
-                        key={lvl.id}
-                        type="button"
-                        onClick={() =>
-                          setFormData((p) => ({
-                            ...p,
-                            lifestyleBaseline: lvl.id as LifestyleScenario,
-                          }))
-                        }
-                        className={cn(
-                          'p-3 rounded-xl border text-left transition-all cursor-pointer',
-                          formData.lifestyleBaseline === lvl.id
-                            ? 'border-blue-500 bg-blue-50/80 dark:bg-blue-950/50 text-blue-900 dark:text-blue-100 font-bold shadow-xs'
-                            : 'border-border hover:bg-muted text-foreground'
-                        )}
-                      >
-                        <div className="text-xs font-bold">{lvl.label}</div>
-                        <div className="text-[10px] text-muted-foreground mt-0.5">{lvl.desc}</div>
-                      </button>
-                    ))}
                   </div>
                 </div>
 
