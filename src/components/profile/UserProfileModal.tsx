@@ -21,6 +21,8 @@ import {
   DEFAULT_SECTOR_INFLATION,
   calculateAgeFromDob,
   calculateDobFromAge,
+  normalizeDobToDdMmYyyy,
+  isValidDob,
   SectorInflationRates,
 } from '@/domain/models/userProfile'
 import { AreaType, LifestyleScenario } from '@/domain/models/profile'
@@ -115,16 +117,37 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const { profile: storedProfile, updateProfile, resetProfile } = useUserProfile()
   const applyProfileDefaultsToWizard = useScenarioStore((s) => s.applyProfileDefaults)
 
-  const [formData, setFormData] = useState<UserProfile>(storedProfile)
+  const [formData, setFormData] = useState<UserProfile>(() => ({
+    ...storedProfile,
+    dob: normalizeDobToDdMmYyyy(storedProfile.dob),
+  }))
   const [activeTab, setActiveTab] = useState<ProfileTab>('personal')
   const [autoSyncCalculators, setAutoSyncCalculators] = useState(true)
   const [showSavedToast, setShowSavedToast] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
+  // Local input string states so users can clear, backspace, and type numbers freely without premature clamping
+  const [retirementAgeInput, setRetirementAgeInput] = useState<string>(
+    String(storedProfile.retirementAge || 60)
+  )
+  const [targetAgeInput, setTargetAgeInput] = useState<string>(
+    String(storedProfile.targetAge || 85)
+  )
+  const [currentAgeInput, setCurrentAgeInput] = useState<string>(
+    String(storedProfile.currentAge || 30)
+  )
+
   // Sync internal state when storedProfile changes or modal opens
   useEffect(() => {
     if (isOpen) {
-      setFormData(storedProfile)
+      const normalizedDob = normalizeDobToDdMmYyyy(storedProfile.dob)
+      setFormData({
+        ...storedProfile,
+        dob: normalizedDob,
+      })
+      setRetirementAgeInput(String(storedProfile.retirementAge || 60))
+      setTargetAgeInput(String(storedProfile.targetAge || 85))
+      setCurrentAgeInput(String(storedProfile.currentAge || 30))
       setShowSavedToast(false)
       setShowConfirmModal(false)
     }
@@ -132,24 +155,31 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   if (!isOpen) return null
 
-  // Date of Birth and Age synchronization
+  // Date of Birth and Age synchronization (DD/MM/YYYY support)
   const handleDobChange = (dob: string) => {
-    const age = calculateAgeFromDob(dob)
     setFormData((prev) => ({
       ...prev,
       dob,
-      currentAge: age,
     }))
+    if (isValidDob(dob)) {
+      const age = calculateAgeFromDob(dob)
+      setFormData((prev) => ({
+        ...prev,
+        currentAge: age,
+      }))
+      setCurrentAgeInput(String(age))
+    }
   }
 
   const handleAgeChange = (ageVal: number) => {
-    const safeAge = Math.max(1, Math.min(120, ageVal || 1))
+    const safeAge = Math.max(1, Math.min(110, ageVal || 1))
     const approxDob = calculateDobFromAge(safeAge)
     setFormData((prev) => ({
       ...prev,
       currentAge: safeAge,
       dob: approxDob,
     }))
+    setCurrentAgeInput(String(safeAge))
   }
 
   const handleSectorInflationChange = (key: keyof SectorInflationRates, val: number) => {
@@ -172,8 +202,24 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
 
   const executeSave = () => {
     setShowConfirmModal(false)
+
+    // Ensure final validated numbers from inputs
+    const numRetire = parseInt(retirementAgeInput, 10)
+    const minAge = Math.max(18, formData.currentAge)
+    const finalRetire = isNaN(numRetire) ? 60 : Math.max(minAge, Math.min(100, numRetire))
+
+    const numTarget = parseInt(targetAgeInput, 10)
+    const minTarget = Math.max(finalRetire + 1, 65)
+    const finalTarget = isNaN(numTarget) ? 85 : Math.max(minTarget, Math.min(120, numTarget))
+
+    const payload: UserProfile = {
+      ...formData,
+      retirementAge: finalRetire,
+      targetAge: finalTarget,
+    }
+
     // 1. Update Profile in local storage
-    const updated = updateProfile(formData, autoSyncCalculators)
+    const updated = updateProfile(payload, autoSyncCalculators)
 
     // 2. Also sync to Scenario Wizard store if autoSync is enabled
     if (autoSyncCalculators) {
@@ -190,7 +236,14 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const handleReset = () => {
     if (window.confirm('Reset your profile defaults back to system recommended values?')) {
       const defaults = resetProfile()
-      setFormData(defaults)
+      const normalizedDob = normalizeDobToDdMmYyyy(defaults.dob)
+      setFormData({
+        ...defaults,
+        dob: normalizedDob,
+      })
+      setRetirementAgeInput(String(defaults.retirementAge))
+      setTargetAgeInput(String(defaults.targetAge))
+      setCurrentAgeInput(String(defaults.currentAge))
       if (autoSyncCalculators) {
         syncProfileToCalculators(defaults)
         applyProfileDefaultsToWizard(defaults)
@@ -342,33 +395,34 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     value={formData.name}
                     onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
                     placeholder="e.g. Rahul Sharma"
-                    className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     Used to personalize headers and reports.
                   </p>
                 </div>
 
-                {/* Country */}
+                {/* Location / Area Type */}
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Country</label>
+                  <label className="text-xs font-bold text-foreground">Location / Area Type</label>
                   <div className="relative">
                     <select
-                      value={formData.country}
-                      onChange={(e) => setFormData((p) => ({ ...p, country: e.target.value }))}
+                      value={formData.locationType}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, locationType: e.target.value as AreaType }))
+                      }
                       className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
                     >
-                      <option value="India">India</option>
-                      <option value="United States">United States</option>
-                      <option value="United Kingdom">United Kingdom</option>
-                      <option value="Canada">Canada</option>
-                      <option value="Australia">Australia</option>
-                      <option value="Singapore">Singapore</option>
-                      <option value="UAE">United Arab Emirates</option>
-                      <option value="Other">Other</option>
+                      <option value="village">Village / Rural (~50% of metro cost)</option>
+                      <option value="small_town">Small Town Tier 3 (Baseline benchmark)</option>
+                      <option value="city">City Tier 2 (~1.6x of small town)</option>
+                      <option value="tier1_metro">Metro Tier 1 (~2.5x of small town)</option>
                     </select>
                     <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
                   </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Calibrates baseline living expenses for Indian geography.
+                  </p>
                 </div>
               </div>
 
@@ -383,13 +437,14 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-foreground">Date of Birth (DOB)</label>
                     <input
-                      type="date"
+                      type="text"
+                      placeholder="DD/MM/YYYY"
                       value={formData.dob}
                       onChange={(e) => handleDobChange(e.target.value)}
-                      className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                     />
                     <p className="text-[11px] text-muted-foreground">
-                      Setting your DOB automatically computes your current age.
+                      Enter DD/MM/YYYY (e.g. 15/08/1995) to auto-compute your age.
                     </p>
                   </div>
 
@@ -400,11 +455,25 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                         type="number"
                         min={1}
                         max={110}
-                        value={formData.currentAge}
-                        onChange={(e) => handleAgeChange(parseInt(e.target.value, 10))}
-                        className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                        value={currentAgeInput}
+                        onChange={(e) => {
+                          const val = e.target.value
+                          setCurrentAgeInput(val)
+                          if (val !== '') {
+                            const parsed = parseInt(val, 10)
+                            if (!isNaN(parsed) && parsed >= 1) {
+                              setFormData((p) => ({ ...p, currentAge: parsed }))
+                            }
+                          }
+                        }}
+                        onBlur={() => {
+                          const parsed = parseInt(currentAgeInput, 10)
+                          const safeAge = isNaN(parsed) ? 30 : Math.max(1, Math.min(110, parsed))
+                          handleAgeChange(safeAge)
+                        }}
+                        className="w-full h-11 border border-border rounded-xl px-3.5 text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
-                      <span className="text-xs font-semibold text-muted-foreground px-2 py-1 bg-muted rounded-lg">
+                      <span className="text-xs font-semibold text-muted-foreground px-2 py-1 bg-muted rounded-lg shrink-0">
                         Years Old
                       </span>
                     </div>
@@ -430,14 +499,25 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     type="number"
                     min={Math.max(18, formData.currentAge)}
                     max={100}
-                    value={formData.retirementAge}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        retirementAge: Math.max(18, parseInt(e.target.value, 10) || 60),
-                      }))
-                    }
-                    className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    value={retirementAgeInput}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setRetirementAgeInput(val)
+                      if (val !== '') {
+                        const parsed = parseInt(val, 10)
+                        if (!isNaN(parsed)) {
+                          setFormData((p) => ({ ...p, retirementAge: parsed }))
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      const parsed = parseInt(retirementAgeInput, 10)
+                      const minAge = Math.max(18, formData.currentAge)
+                      const validAge = isNaN(parsed) ? 60 : Math.max(minAge, Math.min(100, parsed))
+                      setRetirementAgeInput(String(validAge))
+                      setFormData((p) => ({ ...p, retirementAge: validAge }))
+                    }}
+                    className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     Age when active salary stops and withdrawals begin.
@@ -457,60 +537,31 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     type="number"
                     min={Math.max(formData.retirementAge + 1, 65)}
                     max={120}
-                    value={formData.targetAge}
-                    onChange={(e) =>
-                      setFormData((p) => ({
-                        ...p,
-                        targetAge: Math.max(
-                          formData.retirementAge + 1,
-                          parseInt(e.target.value, 10) || 85
-                        ),
-                      }))
-                    }
-                    className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    value={targetAgeInput}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setTargetAgeInput(val)
+                      if (val !== '') {
+                        const parsed = parseInt(val, 10)
+                        if (!isNaN(parsed)) {
+                          setFormData((p) => ({ ...p, targetAge: parsed }))
+                        }
+                      }
+                    }}
+                    onBlur={() => {
+                      const parsed = parseInt(targetAgeInput, 10)
+                      const minTarget = Math.max(formData.retirementAge + 1, 65)
+                      const validTarget = isNaN(parsed)
+                        ? 85
+                        : Math.max(minTarget, Math.min(120, parsed))
+                      setTargetAgeInput(String(validTarget))
+                      setFormData((p) => ({ ...p, targetAge: validTarget }))
+                    }}
+                    className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                   />
                   <p className="text-[11px] text-muted-foreground">
                     Corpus lasts up to this age (e.g. 85-90 protects against longevity).
                   </p>
-                </div>
-              </div>
-
-              {/* Currency & Location Type */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Currency</label>
-                  <div className="relative">
-                    <select
-                      value={formData.currency}
-                      onChange={(e) => setFormData((p) => ({ ...p, currency: e.target.value }))}
-                      className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
-                    >
-                      <option value="INR">INR (₹) - Indian Rupee</option>
-                      <option value="USD">USD ($) - US Dollar</option>
-                      <option value="EUR">EUR (€) - Euro</option>
-                      <option value="GBP">GBP (£) - British Pound</option>
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-foreground">Location / Area Type</label>
-                  <div className="relative">
-                    <select
-                      value={formData.locationType}
-                      onChange={(e) =>
-                        setFormData((p) => ({ ...p, locationType: e.target.value as AreaType }))
-                      }
-                      className="w-full h-11 appearance-none border border-border rounded-xl pl-3.5 pr-10 text-sm font-medium bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all cursor-pointer"
-                    >
-                      <option value="village">Village / Rural (~50% of metro cost)</option>
-                      <option value="small_town">Small Town Tier 3 (Baseline benchmark)</option>
-                      <option value="city">City Tier 2 (~1.6x of small town)</option>
-                      <option value="tier1_metro">Metro Tier 1 (~2.5x of small town)</option>
-                    </select>
-                    <ChevronDown className="w-4 h-4 text-muted-foreground pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2" />
-                  </div>
                 </div>
               </div>
 

@@ -107,7 +107,6 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
           const isWide =
             field.type === 'array' ||
             field.type === 'radio' ||
-            field.id === 'lifestyleScenario' ||
             field.id === 'otherIncome' ||
             field.id === 'futureContributions'
 

@@ -14,6 +14,8 @@ import {
   DEFAULT_USER_PROFILE,
   calculateAgeFromDob,
   calculateDobFromAge,
+  normalizeDobToDdMmYyyy,
+  isValidDob,
   UserProfile,
 } from '@/domain/models/userProfile'
 import { getStoredSipInputs } from '@/lib/sipStorage'
@@ -41,28 +43,51 @@ describe('UserProfile Domain & Storage', () => {
   })
 
   describe('calculateAgeFromDob', () => {
-    it('calculates exact age from date of birth', () => {
+    it('calculates exact age from date of birth in both DD/MM/YYYY and legacy YYYY-MM-DD formats', () => {
       const refDate = new Date(2026, 4, 15) // May 15, 2026
 
-      // Birthday has already occurred this year
+      // Legacy YYYY-MM-DD format
       expect(calculateAgeFromDob('1994-01-10', refDate)).toBe(32)
-
-      // Birthday is later this year
       expect(calculateAgeFromDob('1994-11-20', refDate)).toBe(31)
-
-      // Same birthday
       expect(calculateAgeFromDob('1994-05-15', refDate)).toBe(32)
+
+      // New DD/MM/YYYY format
+      expect(calculateAgeFromDob('10/01/1994', refDate)).toBe(32)
+      expect(calculateAgeFromDob('20/11/1994', refDate)).toBe(31)
+      expect(calculateAgeFromDob('15/05/1994', refDate)).toBe(32)
+
+      // DD-MM-YYYY format
+      expect(calculateAgeFromDob('15-05-1994', refDate)).toBe(32)
     })
 
     it('falls back safely for invalid or empty dob', () => {
       expect(calculateAgeFromDob('')).toBe(30)
       expect(calculateAgeFromDob('invalid-date')).toBe(30)
+      expect(calculateAgeFromDob('15/05')).toBe(30)
     })
 
-    it('derives approximate DOB from age', () => {
+    it('derives approximate DOB from age in DD/MM/YYYY format', () => {
       const refDate = new Date(2026, 4, 15)
       const dob = calculateDobFromAge(30, refDate)
-      expect(dob).toBe('1996-05-15')
+      expect(dob).toBe('15/05/1996')
+    })
+
+    it('normalizes legacy YYYY-MM-DD or variant DOB strings to DD/MM/YYYY without crashing', () => {
+      expect(normalizeDobToDdMmYyyy('1994-05-15')).toBe('15/05/1994')
+      expect(normalizeDobToDdMmYyyy('15/05/1994')).toBe('15/05/1994')
+      expect(normalizeDobToDdMmYyyy('15-05-1994')).toBe('15/05/1994')
+      expect(normalizeDobToDdMmYyyy('15051994')).toBe('15/05/1994')
+      expect(normalizeDobToDdMmYyyy('')).toBe('')
+      expect(normalizeDobToDdMmYyyy('invalid')).toBe('invalid')
+    })
+
+    it('validates DD/MM/YYYY and YYYY-MM-DD dates accurately', () => {
+      expect(isValidDob('15/05/1994')).toBe(true)
+      expect(isValidDob('1994-05-15')).toBe(true)
+      expect(isValidDob('31/02/1994')).toBe(false) // Invalid date
+      expect(isValidDob('15/05')).toBe(false)
+      expect(isValidDob('')).toBe(false)
+      expect(isValidDob('hello')).toBe(false)
     })
   })
 
