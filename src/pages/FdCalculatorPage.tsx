@@ -91,7 +91,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
   const interestPct = Math.max(0, 100 - principalPct)
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-8 w-full">
         {/* Navigation & Header */}
@@ -138,7 +138,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
               <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mt-1">
                 Fixed Deposit (FD) Calculator
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
+              <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
                 Calculate maturity values, quarterly compounding yield, senior citizen rates, and
                 Section 194A TDS deductions.
               </p>
@@ -225,7 +225,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
               </div>
 
               {/* Quick preset chips */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[50000, 100000, 200000, 500000, 1000000, 2500000].map((amt) => (
                   <button
                     key={amt}
@@ -311,7 +311,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
               </label>
 
               {/* Standard Bank Presets */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[6.5, 7.0, 7.25, 7.5, 8.0].map((rate) => (
                   <button
                     key={rate}
@@ -377,7 +377,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
               </div>
 
               {/* Presets */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[
                   { label: '1 Year', y: 1, m: 0 },
                   { label: '2 Years', y: 2, m: 0 },
@@ -668,7 +668,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
             </div>
 
             {/* Indian Banking Rules Insight Note */}
-            <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+            <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
               <div className="flex items-center gap-1.5 text-foreground font-bold">
                 <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>Indian Banking & Privacy Note</span>
@@ -683,7 +683,7 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
         </div>
 
         {/* Year-by-Year Schedule Table */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="calc-schedule-table calc-clean-hide bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 className="text-base font-extrabold text-foreground">

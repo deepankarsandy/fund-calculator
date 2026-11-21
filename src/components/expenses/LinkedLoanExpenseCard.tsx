@@ -14,6 +14,8 @@ import {
 import { useRouter } from '@/lib/router'
 import { formatINR, formatCrore } from '@/lib/currency'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { useCleanView } from '@/lib/cleanView'
+import { cn } from '@/lib/cn'
 import {
   LinkedCalculatorsConfig,
   getLinkedCalculatorsConfig,
@@ -24,8 +26,66 @@ import {
 } from '@/lib/linkedCalculatorsStorage'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 
+function LoanCumulativeImpactBox({
+  activeTypes,
+  totalCumulativePayment,
+  totalMonthlyEmi,
+  loanSummaries,
+}: {
+  activeTypes: LoanLinkedType[]
+  totalCumulativePayment: number
+  totalMonthlyEmi: number
+  loanSummaries: Record<LoanLinkedType, any>
+}) {
+  if (activeTypes.length === 0) {
+    return (
+      <div className="rounded-xl bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-3 sm:p-3.5 text-xs text-muted-foreground flex items-center justify-between gap-2">
+        <span>No loans linked to living expenses. Toggle any loan type above to include.</span>
+        <span className="font-semibold text-zinc-500 text-[11px] shrink-0">0 of 4 Active</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl bg-amber-500/10 border border-amber-500/30 p-3.5 sm:p-4 space-y-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          <Percent className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+          Total Cumulative Loan Liability Impact
+        </span>
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800">
+          {activeTypes.length} of 4 Loans Active
+        </span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-amber-200/40 dark:border-amber-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Total Cumulative Payments (Payoff)
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-amber-600 dark:text-amber-400">
+            {formatCrore(totalCumulativePayment)}
+          </span>
+        </div>
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-amber-200/40 dark:border-amber-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Total Active Monthly EMI (0% Inflation)
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-foreground">
+            {formatINR(totalMonthlyEmi)}/mo ({formatCrore(totalMonthlyEmi * 12)}/yr)
+          </span>
+        </div>
+      </div>
+      <p className="text-[11px] text-muted-foreground leading-snug">
+        <strong>Included in living expenses:</strong>{' '}
+        {activeTypes.map((t) => loanSummaries[t]?.label).join(', ')}
+      </p>
+    </div>
+  )
+}
+
 export function LinkedLoanExpenseCard() {
   const router = useRouter()
+  const { isCleanView } = useCleanView()
   const {
     assets,
     categories,
@@ -73,9 +133,20 @@ export function LinkedLoanExpenseCard() {
   }
 
   const loanTypes: LoanLinkedType[] = ['home', 'car', 'personal', 'custom']
-  const activeLoanCount = config.loan.enabled
-    ? loanTypes.filter((t) => config.loan.enabledTypes[t]).length
-    : 0
+  const activeLoanTypes = config.loan.enabled
+    ? loanTypes.filter((t) => config.loan.enabledTypes[t])
+    : []
+  const activeLoanCount = activeLoanTypes.length
+
+  // Calculate cumulative impact totals across active loan subtypes
+  const totalLoanCumulativePayment = activeLoanTypes.reduce((sum, t) => {
+    const s = loanSummaries[t]
+    return sum + (s?.monthlyEmi || 0) * 12 * (s?.actualPayoffYears || 1)
+  }, 0)
+
+  const totalLoanMonthlyEmi = activeLoanTypes.reduce((sum, t) => {
+    return sum + (loanSummaries[t]?.monthlyEmi || 0)
+  }, 0)
 
   // Master toggle: Include all / Exclude all
   const toggleLoanMaster = () => {
@@ -147,16 +218,110 @@ export function LinkedLoanExpenseCard() {
     custom: Sliders,
   }
 
-  // Total active monthly EMI across all enabled loan subtypes
-  const totalActiveMonthlyEmi = config.loan.enabled
-    ? loanTypes.reduce((sum, t) => {
-        if (config.loan.enabledTypes[t]) {
-          return sum + (loanSummaries[t]?.monthlyEmi || 0)
-        }
-        return sum
-      }, 0)
-    : 0
+  // ─── Clean / Compact View ──────────────────────────────────────────────────
+  if (isCleanView) {
+    return (
+      <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-gradient-to-b from-amber-50/40 via-background to-background dark:from-amber-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-3">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300">
+              <Percent className="w-4 h-4" />
+            </span>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">
+              Linked Loan Liability
+            </h3>
+          </div>
 
+          <button
+            type="button"
+            onClick={toggleLoanMaster}
+            className={cn(
+              'px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5',
+              config.loan.enabled && activeLoanCount > 0
+                ? 'border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
+                : 'bg-amber-600 hover:bg-amber-700 text-white border-transparent'
+            )}
+          >
+            {config.loan.enabled && activeLoanCount > 0 ? (
+              <>
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Exclude All</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Include All</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Granular Include/Exclude buttons for each loan type */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+          {loanTypes.map((t) => {
+            const s = loanSummaries[t]
+            const isSubtypeEnabled = config.loan.enabled && !!config.loan.enabledTypes[t]
+            const Icon = typeIcons[t]
+
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={(e) => toggleLoanSubtype(t, e)}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2',
+                  isSubtypeEnabled
+                    ? 'border-amber-500 bg-amber-50/70 dark:bg-amber-950/40 text-foreground ring-1 ring-amber-500/40'
+                    : 'border-border/80 hover:border-amber-300 dark:hover:border-amber-800 bg-card text-muted-foreground'
+                )}
+              >
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <Icon className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0" />
+                    <span className="text-xs font-bold text-foreground truncate">{s.label}</span>
+                  </div>
+                  <span className="text-[11px] text-muted-foreground font-mono block">
+                    {formatINR(s.monthlyEmi)}/mo
+                  </span>
+                </div>
+                <span
+                  className={cn(
+                    'px-2 py-1 text-[11px] font-bold rounded-md transition-all shrink-0 flex items-center gap-1',
+                    isSubtypeEnabled
+                      ? 'bg-amber-600 text-white'
+                      : 'bg-muted text-muted-foreground border border-border'
+                  )}
+                >
+                  {isSubtypeEnabled ? (
+                    <>
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Included</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle className="w-3 h-3" />
+                      <span>Include</span>
+                    </>
+                  )}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Cumulative Impact Box at bottom of card */}
+        <LoanCumulativeImpactBox
+          activeTypes={activeLoanTypes}
+          totalCumulativePayment={totalLoanCumulativePayment}
+          totalMonthlyEmi={totalLoanMonthlyEmi}
+          loanSummaries={loanSummaries}
+        />
+      </div>
+    )
+  }
+
+  // ─── Full View ─────────────────────────────────────────────────────────────
   return (
     <div className="rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-gradient-to-b from-amber-50/40 via-background to-background dark:from-amber-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-4">
       {/* Header */}
@@ -227,8 +392,8 @@ export function LinkedLoanExpenseCard() {
             {config.loan.enabled && activeLoanCount > 0 ? (
               <span className="text-[11px] text-amber-800 dark:text-amber-300 font-semibold">
                 Total Linked EMI:{' '}
-                <span className="font-bold">{formatINR(totalActiveMonthlyEmi)}/mo</span> (
-                {formatCrore(totalActiveMonthlyEmi * 12)}/yr)
+                <span className="font-bold">{formatINR(totalLoanMonthlyEmi)}/mo</span> (
+                {formatCrore(totalLoanMonthlyEmi * 12)}/yr)
               </span>
             ) : (
               <span className="text-[11px] text-muted-foreground">
@@ -379,6 +544,14 @@ export function LinkedLoanExpenseCard() {
             </div>
           </div>
         </div>
+
+        {/* Cumulative Impact Box in Full View as well */}
+        <LoanCumulativeImpactBox
+          activeTypes={activeLoanTypes}
+          totalCumulativePayment={totalLoanCumulativePayment}
+          totalMonthlyEmi={totalLoanMonthlyEmi}
+          loanSummaries={loanSummaries}
+        />
 
         {/* Edit in Loan EMI Calculator Link */}
         <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">

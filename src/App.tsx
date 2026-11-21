@@ -2,6 +2,7 @@ import { useEffect, lazy, Suspense } from 'react'
 import { useRouter } from '@/lib/router'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { useHeaderStore } from '@/store/useHeaderStore'
+import { useCleanView } from '@/lib/cleanView'
 import { AppHeader } from '@/components/layout/AppHeader'
 import { AppFooter } from '@/components/layout/AppFooter'
 
@@ -44,6 +45,7 @@ export default function App() {
 
   const { currentStep, goToStep } = useScenarioStore()
   const setHeaderForPage = useHeaderStore((s) => s.setHeaderForPage)
+  useCleanView()
 
   // Sync header state with current route
   useEffect(() => {

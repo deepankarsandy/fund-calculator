@@ -231,7 +231,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
   }, [comboResults.yearlySchedule, scheduleFilter])
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-8 w-full">
         {/* Navigation & Header */}
@@ -294,7 +294,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     ? 'SWP Calculator'
                     : 'SIP to SWP Retirement Journey'}
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
+              <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
                 {mode === 'sip'
                   ? 'Simulate monthly mutual fund compounding, annual step-up top-ups, and post-Budget 2024 LTCG tax impact.'
                   : mode === 'swp'
@@ -390,7 +390,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Quick preset chips */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[2500, 5000, 10000, 25000, 50000].map((amt) => (
                     <button
                       key={amt}
@@ -447,7 +447,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[
                     { label: '8% (Debt/Hybrid)', rate: 8 },
                     { label: '10% (Conservative)', rate: 10 },
@@ -509,7 +509,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[3, 5, 10, 15, 20, 25].map((yr) => (
                     <button
                       key={yr}
@@ -821,7 +821,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
               <button
                 type="button"
                 onClick={() => setMode('combo')}
-                className="w-full p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
+                className="calc-info-box calc-clean-hide w-full p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
@@ -837,7 +837,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
               </button>
 
               {/* Privacy Note */}
-              <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+              <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
                 <div className="flex items-center gap-1.5 text-foreground font-bold">
                   <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Automatic Browser Persistence</span>
@@ -894,7 +894,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Quick preset chips */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[1000000, 2500000, 5000000, 7500000, 10000000, 20000000].map((amt) => (
                     <button
                       key={amt}
@@ -950,7 +950,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[15000, 25000, 35000, 50000, 75000, 100000].map((amt) => (
                     <button
                       key={amt}
@@ -1007,7 +1007,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[
                     { label: '7% (Debt / FD)', rate: 7 },
                     { label: '8.5% (Balanced Advantage)', rate: 8.5 },
@@ -1069,7 +1069,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Presets */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[5, 10, 15, 20, 25, 30].map((yr) => (
                     <button
                       key={yr}
@@ -1271,7 +1271,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
               <button
                 type="button"
                 onClick={() => setMode('combo')}
-                className="w-full p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
+                className="calc-info-box calc-clean-hide w-full p-3.5 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
               >
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
@@ -1287,7 +1287,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
               </button>
 
               {/* Privacy Note */}
-              <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+              <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
                 <div className="flex items-center gap-1.5 text-foreground font-bold">
                   <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                   <span>Automatic Browser Persistence</span>
@@ -1536,7 +1536,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-0.5">
                       {[5000, 10000, 15000, 25000, 50000].map((amt) => (
                         <button
                           key={amt}
@@ -1592,7 +1592,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-0.5">
                       {[10, 12, 14, 15].map((rate) => (
                         <button
                           key={rate}
@@ -1730,7 +1730,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-0.5">
                       {[35000, 50000, 60000, 75000, 100000, 150000].map((amt) => (
                         <button
                           key={amt}
@@ -1786,7 +1786,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                    <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-0.5">
                       {[7, 8, 9, 10].map((rate) => (
                         <button
                           key={rate}
@@ -2222,7 +2222,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                 </div>
 
                 {/* Privacy Note */}
-                <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+                <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
                   <div className="flex items-center gap-1.5 text-foreground font-bold">
                     <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Automatic Browser Persistence</span>
@@ -2238,7 +2238,7 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
         )}
 
         {/* Schedule Table (Works for SIP, SWP, and Combo) */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="calc-schedule-table calc-clean-hide bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 className="text-base font-extrabold text-foreground">

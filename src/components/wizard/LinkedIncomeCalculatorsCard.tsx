@@ -11,6 +11,8 @@ import {
 import { useRouter } from '@/lib/router'
 import { formatINR, formatCrore } from '@/lib/currency'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { useCleanView } from '@/lib/cleanView'
+import { cn } from '@/lib/cn'
 import {
   LinkedCalculatorsConfig,
   getLinkedCalculatorsConfig,
@@ -25,8 +27,66 @@ import { runScenarios } from '@/domain/calculations/runScenarios'
 
 // ─── 1. Standalone SIP & SWP Inflow Card ──────────────────────────────────────
 
+function SipCumulativeImpactBox({
+  activeTypes,
+  totalCumulativeValue,
+  totalMonthlyInflow,
+  sipSummaries,
+}: {
+  activeTypes: SipLinkedType[]
+  totalCumulativeValue: number
+  totalMonthlyInflow: number
+  sipSummaries: Record<SipLinkedType, any>
+}) {
+  if (activeTypes.length === 0) {
+    return (
+      <div className="rounded-xl bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-3 sm:p-3.5 text-xs text-muted-foreground flex items-center justify-between gap-2">
+        <span>No SIP/SWP inflows included in plan. Toggle any subtype above to include.</span>
+        <span className="font-semibold text-zinc-500 text-[11px] shrink-0">0 of 3 Active</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl bg-emerald-500/10 border border-emerald-500/30 p-3.5 sm:p-4 space-y-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          <TrendingUp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+          Total Cumulative SIP & SWP Impact
+        </span>
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800">
+          {activeTypes.length} of 3 Types Active
+        </span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-emerald-200/40 dark:border-emerald-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Total Cumulative Inflow Value
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-emerald-600 dark:text-emerald-400">
+            {formatCrore(totalCumulativeValue)}
+          </span>
+        </div>
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-emerald-200/40 dark:border-emerald-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Active Monthly Cashflow / Contribution
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-foreground">
+            {formatINR(totalMonthlyInflow)}/mo
+          </span>
+        </div>
+      </div>
+      <p className="text-[11px] text-muted-foreground leading-snug">
+        <strong>Included in plan:</strong>{' '}
+        {activeTypes.map((t) => sipSummaries[t]?.label?.split('(')[0]?.trim()).join(', ')}
+      </p>
+    </div>
+  )
+}
+
 export function LinkedSipInflowCard() {
   const router = useRouter()
+  const { isCleanView } = useCleanView()
   const { assets, categories, setAssets, setResults, profile, members, assumptions, results } =
     useScenarioStore()
 
@@ -59,9 +119,28 @@ export function LinkedSipInflowCard() {
   }
 
   const sipTypes: SipLinkedType[] = ['sip', 'swp', 'combo']
-  const activeSipCount = config.sip.enabled
-    ? sipTypes.filter((t) => config.sip.enabledTypes[t]).length
-    : 0
+  const activeSipTypes = config.sip.enabled
+    ? sipTypes.filter((t) => config.sip.enabledTypes[t])
+    : []
+  const activeSipCount = activeSipTypes.length
+
+  // Calculate cumulative impact totals across active SIP/SWP subtypes
+  const totalSipCumulativeValue = activeSipTypes.reduce((sum, t) => {
+    const s = sipSummaries[t]
+    if (t === 'sip') {
+      return sum + (s?.maturityAmount || 0)
+    } else if (t === 'swp') {
+      return sum + (s?.annualAmount || s?.monthlyAmount * 12) * (s?.tenureYears || 1)
+    } else if (t === 'combo') {
+      const years = Math.max(1, (s?.endYear || 30) - (s?.startYear || 1) + 1)
+      return sum + (s?.annualAmount || s?.monthlyAmount * 12) * years
+    }
+    return sum
+  }, 0)
+
+  const totalSipMonthlyInflow = activeSipTypes.reduce((sum, t) => {
+    return sum + (sipSummaries[t]?.monthlyAmount || 0)
+  }, 0)
 
   // Master toggle: Include all / Exclude all
   const toggleSipMaster = () => {
@@ -125,6 +204,108 @@ export function LinkedSipInflowCard() {
   const currentSip = sipSummaries[config.sip.selectedType]
   const isSelectedActive = config.sip.enabled && !!config.sip.enabledTypes[config.sip.selectedType]
 
+  // ─── Clean / Compact View ──────────────────────────────────────────────────
+  if (isCleanView) {
+    return (
+      <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-gradient-to-b from-emerald-50/40 via-background to-background dark:from-emerald-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-3">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">
+              <TrendingUp className="w-4 h-4" />
+            </span>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">
+              Linked SIP & SWP Inflows
+            </h3>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleSipMaster}
+            className={cn(
+              'px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5',
+              config.sip.enabled && activeSipCount > 0
+                ? 'border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
+                : 'bg-emerald-600 hover:bg-emerald-700 text-white border-transparent'
+            )}
+          >
+            {config.sip.enabled && activeSipCount > 0 ? (
+              <>
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Exclude All</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Include All</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Granular Include/Exclude buttons for each type */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {sipTypes.map((t) => {
+            const s = sipSummaries[t]
+            const isSubtypeEnabled = config.sip.enabled && !!config.sip.enabledTypes[t]
+
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={(e) => toggleSipSubtype(t, e)}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2.5',
+                  isSubtypeEnabled
+                    ? 'border-emerald-500 bg-emerald-50/70 dark:bg-emerald-950/40 text-foreground ring-1 ring-emerald-500/40'
+                    : 'border-border/80 hover:border-emerald-300 dark:hover:border-emerald-800 bg-card text-muted-foreground'
+                )}
+              >
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-foreground block truncate">
+                    {s.label.split('(')[0].trim()}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-mono">
+                    {formatINR(s.monthlyAmount)}/mo
+                  </span>
+                </div>
+                <span
+                  className={cn(
+                    'px-2 py-1 text-[11px] font-bold rounded-md transition-all shrink-0 flex items-center gap-1',
+                    isSubtypeEnabled
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-muted text-muted-foreground border border-border'
+                  )}
+                >
+                  {isSubtypeEnabled ? (
+                    <>
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Included</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle className="w-3 h-3" />
+                      <span>Include</span>
+                    </>
+                  )}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Cumulative Impact Box at bottom of card */}
+        <SipCumulativeImpactBox
+          activeTypes={activeSipTypes}
+          totalCumulativeValue={totalSipCumulativeValue}
+          totalMonthlyInflow={totalSipMonthlyInflow}
+          sipSummaries={sipSummaries}
+        />
+      </div>
+    )
+  }
+
+  // ─── Full View ─────────────────────────────────────────────────────────────
   return (
     <div className="rounded-2xl border border-emerald-200 dark:border-emerald-900/60 bg-gradient-to-b from-emerald-50/40 via-background to-background dark:from-emerald-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-4">
       {/* Card Header */}
@@ -355,6 +536,14 @@ export function LinkedSipInflowCard() {
         </div>
       </div>
 
+      {/* Cumulative Impact Box in Full View as well */}
+      <SipCumulativeImpactBox
+        activeTypes={activeSipTypes}
+        totalCumulativeValue={totalSipCumulativeValue}
+        totalMonthlyInflow={totalSipMonthlyInflow}
+        sipSummaries={sipSummaries}
+      />
+
       {/* Edit in SIP Calculator Link */}
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
         <span className="text-muted-foreground">
@@ -375,8 +564,68 @@ export function LinkedSipInflowCard() {
 
 // ─── 2. Standalone Fixed Deposit (FD) Inflow Card ─────────────────────────────
 
+function FdCumulativeImpactBox({
+  activeTypes,
+  totalCumulativeValue,
+  totalMonthlyInflow,
+  fdSummaries,
+}: {
+  activeTypes: FdLinkedType[]
+  totalCumulativeValue: number
+  totalMonthlyInflow: number
+  fdSummaries: Record<FdLinkedType, any>
+}) {
+  if (activeTypes.length === 0) {
+    return (
+      <div className="rounded-xl bg-zinc-100/80 dark:bg-zinc-900/60 border border-zinc-200 dark:border-zinc-800 p-3 sm:p-3.5 text-xs text-muted-foreground flex items-center justify-between gap-2">
+        <span>No Fixed Deposit inflows included in plan. Toggle any subtype above to include.</span>
+        <span className="font-semibold text-zinc-500 text-[11px] shrink-0">0 of 3 Active</span>
+      </div>
+    )
+  }
+
+  return (
+    <div className="rounded-xl bg-blue-500/10 border border-blue-500/30 p-3.5 sm:p-4 space-y-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-bold text-foreground flex items-center gap-1.5">
+          <Landmark className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+          Total Cumulative FD Inflow Impact
+        </span>
+        <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-blue-800 dark:text-blue-200 border border-blue-200 dark:border-blue-800">
+          {activeTypes.length} of 3 Types Active
+        </span>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-blue-200/40 dark:border-blue-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Total Cumulative Maturity & Interest
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-blue-600 dark:text-blue-400">
+            {formatCrore(totalCumulativeValue)}
+          </span>
+        </div>
+        <div className="bg-background/80 dark:bg-background/50 rounded-lg p-2.5 border border-blue-200/40 dark:border-blue-800/40">
+          <span className="text-muted-foreground block text-[11px]">
+            Active Periodic Interest Payout
+          </span>
+          <span className="text-base sm:text-lg font-extrabold text-foreground">
+            {totalMonthlyInflow > 0
+              ? `${formatINR(totalMonthlyInflow)}/mo`
+              : 'Cumulative Reinvested'}
+          </span>
+        </div>
+      </div>
+      <p className="text-[11px] text-muted-foreground leading-snug">
+        <strong>Included in plan:</strong>{' '}
+        {activeTypes.map((t) => fdSummaries[t]?.label?.split('(')[0]?.trim()).join(', ')}
+      </p>
+    </div>
+  )
+}
+
 export function LinkedFdInflowCard() {
   const router = useRouter()
+  const { isCleanView } = useCleanView()
   const { assets, categories, setAssets, setResults, profile, members, assumptions, results } =
     useScenarioStore()
 
@@ -409,9 +658,30 @@ export function LinkedFdInflowCard() {
   }
 
   const fdTypes: FdLinkedType[] = ['cumulative', 'monthly', 'quarterly']
-  const activeFdCount = config.fd.enabled
-    ? fdTypes.filter((t) => config.fd.enabledTypes[t]).length
-    : 0
+  const activeFdTypes = config.fd.enabled ? fdTypes.filter((t) => config.fd.enabledTypes[t]) : []
+  const activeFdCount = activeFdTypes.length
+
+  // Calculate cumulative impact totals across active FD subtypes
+  const totalFdCumulativeValue = activeFdTypes.reduce((sum, t) => {
+    const s = fdSummaries[t]
+    if (t === 'cumulative') {
+      return sum + (s?.maturityAmount || 0)
+    } else {
+      return (
+        sum + (s?.annualInterestAmount || 0) * (s?.tenureYears || 1) + (s?.principalAmount || 0)
+      )
+    }
+  }, 0)
+
+  const totalFdMonthlyInflow = activeFdTypes.reduce((sum, t) => {
+    const s = fdSummaries[t]
+    if (t === 'monthly') {
+      return sum + (s?.periodicPayoutAmount || 0)
+    } else if (t === 'quarterly') {
+      return sum + Math.round((s?.periodicPayoutAmount || 0) / 3)
+    }
+    return sum
+  }, 0)
 
   // Master toggle: Include all / Exclude all
   const toggleFdMaster = () => {
@@ -475,6 +745,110 @@ export function LinkedFdInflowCard() {
   const currentFd = fdSummaries[config.fd.selectedType]
   const isSelectedActive = config.fd.enabled && !!config.fd.enabledTypes[config.fd.selectedType]
 
+  // ─── Clean / Compact View ──────────────────────────────────────────────────
+  if (isCleanView) {
+    return (
+      <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-b from-blue-50/40 via-background to-background dark:from-blue-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-3">
+        {/* Header */}
+        <div className="flex items-center justify-between gap-3 pb-2 border-b border-border/60">
+          <div className="flex items-center gap-2">
+            <span className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
+              <Landmark className="w-4 h-4" />
+            </span>
+            <h3 className="text-sm sm:text-base font-bold text-foreground">
+              Linked Fixed Deposit Inflows
+            </h3>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleFdMaster}
+            className={cn(
+              'px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all cursor-pointer flex items-center gap-1.5',
+              config.fd.enabled && activeFdCount > 0
+                ? 'border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40'
+                : 'bg-blue-600 hover:bg-blue-700 text-white border-transparent'
+            )}
+          >
+            {config.fd.enabled && activeFdCount > 0 ? (
+              <>
+                <XCircle className="w-3.5 h-3.5" />
+                <span>Exclude All</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Include All</span>
+              </>
+            )}
+          </button>
+        </div>
+
+        {/* Granular Include/Exclude buttons for each type */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {fdTypes.map((t) => {
+            const s = fdSummaries[t]
+            const isSubtypeEnabled = config.fd.enabled && !!config.fd.enabledTypes[t]
+
+            return (
+              <button
+                key={t}
+                type="button"
+                onClick={(e) => toggleFdSubtype(t, e)}
+                className={cn(
+                  'p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-2.5',
+                  isSubtypeEnabled
+                    ? 'border-blue-500 bg-blue-50/70 dark:bg-blue-950/40 text-foreground ring-1 ring-blue-500/40'
+                    : 'border-border/80 hover:border-blue-300 dark:hover:border-blue-800 bg-card text-muted-foreground'
+                )}
+              >
+                <div className="min-w-0">
+                  <span className="text-xs font-bold text-foreground block truncate">
+                    {s.label.split('(')[0].trim()}
+                  </span>
+                  <span className="text-[11px] text-muted-foreground font-mono">
+                    {t === 'cumulative'
+                      ? `${formatCrore(s.maturityAmount)} maturity`
+                      : `${formatINR(s.periodicPayoutAmount)}/${t === 'monthly' ? 'mo' : 'qtr'}`}
+                  </span>
+                </div>
+                <span
+                  className={cn(
+                    'px-2 py-1 text-[11px] font-bold rounded-md transition-all shrink-0 flex items-center gap-1',
+                    isSubtypeEnabled
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-muted text-muted-foreground border border-border'
+                  )}
+                >
+                  {isSubtypeEnabled ? (
+                    <>
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>Included</span>
+                    </>
+                  ) : (
+                    <>
+                      <PlusCircle className="w-3 h-3" />
+                      <span>Include</span>
+                    </>
+                  )}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Cumulative Impact Box at bottom of card */}
+        <FdCumulativeImpactBox
+          activeTypes={activeFdTypes}
+          totalCumulativeValue={totalFdCumulativeValue}
+          totalMonthlyInflow={totalFdMonthlyInflow}
+          fdSummaries={fdSummaries}
+        />
+      </div>
+    )
+  }
+
+  // ─── Full View ─────────────────────────────────────────────────────────────
   return (
     <div className="rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-gradient-to-b from-blue-50/40 via-background to-background dark:from-blue-950/20 dark:via-background dark:to-background p-4 sm:p-5 shadow-xs space-y-4">
       {/* Card Header */}
@@ -705,6 +1079,14 @@ export function LinkedFdInflowCard() {
           </div>
         </div>
       </div>
+
+      {/* Cumulative Impact Box in Full View as well */}
+      <FdCumulativeImpactBox
+        activeTypes={activeFdTypes}
+        totalCumulativeValue={totalFdCumulativeValue}
+        totalMonthlyInflow={totalFdMonthlyInflow}
+        fdSummaries={fdSummaries}
+      />
 
       {/* Edit in FD Calculator Link */}
       <div className="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">

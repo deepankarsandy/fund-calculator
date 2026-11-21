@@ -65,6 +65,15 @@ export function saveUserProfile(profile: UserProfile, syncToCalculators: boolean
     }
     localStorage.setItem(USER_PROFILE_STORAGE_KEY, JSON.stringify(prepared))
 
+    if (typeof prepared.cleanView === 'boolean') {
+      localStorage.setItem('corpus_clean_view', String(prepared.cleanView))
+      if (prepared.cleanView) {
+        document.documentElement.classList.add('clean-view')
+      } else {
+        document.documentElement.classList.remove('clean-view')
+      }
+    }
+
     if (syncToCalculators) {
       syncProfileToCalculators(prepared)
     }

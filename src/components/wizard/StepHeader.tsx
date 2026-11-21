@@ -20,7 +20,9 @@ export function StepHeader({
     <div className={cn('flex items-start justify-between gap-4 mb-6', className)}>
       <div>
         <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-        <p className="text-sm text-muted-foreground mt-1 max-w-prose">{subtitle}</p>
+        <p className="calc-helper-text calc-clean-hide text-sm text-muted-foreground mt-1 max-w-prose">
+          {subtitle}
+        </p>
       </div>
       {onSkip && (
         <button
@@ -53,9 +55,11 @@ export function FieldGroup({ label, htmlFor, help, error, children, className }:
       >
         {label}
       </label>
-      {help && <p className="text-xs text-muted-foreground">{help}</p>}
+      {help && (
+        <p className="calc-helper-text calc-clean-hide text-xs text-muted-foreground">{help}</p>
+      )}
       {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
+      {error && <p className="calc-error text-xs text-destructive">{error}</p>}
     </div>
   )
 }

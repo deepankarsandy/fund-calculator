@@ -246,14 +246,14 @@ function ExpenseWindowPanel({
         <span className="text-[11px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
           ⏱ Expense Window
         </span>
-        <span className="text-[10px] text-blue-600 dark:text-blue-400">
+        <span className="calc-helper-text calc-clean-hide text-[10px] text-blue-600 dark:text-blue-400">
           When does this expense apply?
         </span>
       </div>
 
       {/* Smart suggestion chips */}
       {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5">
           <span className="text-[10px] text-zinc-500 self-center">Quick set:</span>
           {suggestions.map((s, i) => (
             <button
@@ -474,14 +474,14 @@ function SubItemRow({
       </div>
 
       {item.notes && !showDetails && !showWindowPanel && (
-        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
+        <p className="calc-helper-text calc-clean-hide text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
         </p>
       )}
 
       {item.notes && showWindowPanel && (
-        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
+        <p className="calc-helper-text calc-clean-hide text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
         </p>
@@ -625,7 +625,7 @@ function CategoryPanel({
       className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl"
       id={`category-${cat.id}`}
     >
-      <div className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
+      <div className="calc-info-box calc-clean-hide text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
         <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
           <p className="font-medium">{cat.description}</p>
@@ -639,7 +639,7 @@ function CategoryPanel({
       {/* Dependent Warning / Context Tag */}
       {isFamilyCategory ? (
         dependentsCount > 0 ? (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
             <span>👶</span>
             <span>
               Time-windowed dependent support for{' '}
@@ -651,7 +651,7 @@ function CategoryPanel({
             </span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
             <span>ℹ️</span>
             <span>
               No dependents added in Step 3. Child education and parental care expenses activate
@@ -661,7 +661,7 @@ function CategoryPanel({
         )
       ) : (
         totalCovered > 1 && (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
             <span>👥</span>
             <span>
               Covers all <strong>{totalCovered} household members</strong> (Self + {dependentsCount}{' '}
@@ -770,7 +770,7 @@ function CategoryPanel({
           </div>
 
           {/* Reference Sub-categories (Disabled / Non-editable) */}
-          <div className="space-y-2 pt-1">
+          <div className="calc-helper-text calc-clean-hide space-y-2 pt-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
                 Reference Sub-Categories (Disabled while Category Total is active):

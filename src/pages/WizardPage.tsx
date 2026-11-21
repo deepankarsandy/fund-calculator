@@ -81,7 +81,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Step Body */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 space-y-6">
         {/* Navigation & Header */}

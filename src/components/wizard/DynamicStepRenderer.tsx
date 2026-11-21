@@ -35,7 +35,9 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
               </button>
             )}
           </div>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1">{step.subtitle}</p>
+          <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground mt-1">
+            {step.subtitle}
+          </p>
         </div>
         <DynamicExpensesRenderer />
       </div>
@@ -71,12 +73,14 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
             </button>
           )}
         </div>
-        <p className="text-xs sm:text-sm text-muted-foreground mt-1">{step.subtitle}</p>
+        <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground mt-1">
+          {step.subtitle}
+        </p>
       </div>
 
       {step.key === 'assets' && (
         <div className="space-y-4">
-          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50 text-xs text-blue-900 dark:text-blue-200">
+          <div className="calc-info-box calc-clean-hide flex items-start gap-2.5 p-3 rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200/70 dark:border-blue-900/50 text-xs text-blue-900 dark:text-blue-200">
             <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
               <p className="font-semibold">

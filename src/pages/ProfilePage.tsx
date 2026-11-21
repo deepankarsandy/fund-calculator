@@ -618,6 +618,47 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                     ))}
                   </div>
                 </div>
+
+                {/* Clean / Simplified Calculator Mode Switch */}
+                <div className="p-4 rounded-xl border border-border bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                  <div className="space-y-0.5">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                      <h4 className="text-xs font-bold text-foreground">
+                        Clean & Simplified UI Mode
+                      </h4>
+                      <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+                        Quick Calculations
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground leading-snug">
+                      Minimizes helper texts, explanatory info boxes, suggestive preset chips (like
+                      8%, 10%), and full schedule tables across all calculators for a quick,
+                      distraction-free calculation experience. Warning and error notices remain
+                      fully visible.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={Boolean(formData.cleanView)}
+                    onClick={() => setFormData((p) => ({ ...p, cleanView: !p.cleanView }))}
+                    className={cn(
+                      'w-12 h-6.5 flex items-center rounded-full p-1 transition-colors cursor-pointer shrink-0 border border-transparent shadow-xs',
+                      formData.cleanView
+                        ? 'bg-blue-600 justify-end'
+                        : 'bg-zinc-200 dark:bg-zinc-700 justify-start'
+                    )}
+                    title={
+                      formData.cleanView
+                        ? 'Clean View enabled: click to disable'
+                        : 'Clean View disabled: click to enable'
+                    }
+                  >
+                    <span className="bg-white w-4.5 h-4.5 rounded-full shadow-md transition-transform" />
+                  </button>
+                </div>
               </div>
             )}
 

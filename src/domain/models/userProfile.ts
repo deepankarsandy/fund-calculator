@@ -57,6 +57,9 @@ export interface UserProfile {
   // Dependents & Household Defaults
   dependents: HouseholdMember[]
 
+  // Display Preferences
+  cleanView?: boolean
+
   // Metadata
   isConfigured: boolean
   updatedAt?: string
@@ -103,6 +106,7 @@ export const DEFAULT_USER_PROFILE: UserProfile = {
   fdInterestRate: 7.0,
   loanInterestRate: 8.5,
   dependents: [],
+  cleanView: false,
   isConfigured: false,
 }
 
