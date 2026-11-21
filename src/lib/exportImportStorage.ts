@@ -10,6 +10,7 @@ import {
 } from '@/lib/investmentStorage'
 import { FD_INPUTS_STORAGE_KEY, FD_RESULTS_STORAGE_KEY } from '@/lib/fdStorage'
 import { LOAN_EMI_INPUTS_STORAGE_KEY, LOAN_EMI_RESULTS_STORAGE_KEY } from '@/lib/loanEmiStorage'
+import { LINKED_CALCULATORS_STORAGE_KEY } from '@/lib/linkedCalculatorsStorage'
 import { applyTheme, getSavedTheme } from '@/lib/theme'
 import { useScenarioStore } from '@/store/useScenarioStore'
 
@@ -42,7 +43,7 @@ export const STORAGE_SECTIONS: StorageSectionConfig[] = [
     shortTitle: 'Retirement Fund',
     description:
       'Wizard input parameters, household dependents, customized expense categories, and career accumulation.',
-    keys: [RETIREMENT_CALC_STORAGE_KEY, 'corpus-calc-v1'],
+    keys: [RETIREMENT_CALC_STORAGE_KEY, 'corpus-calc-v1', LINKED_CALCULATORS_STORAGE_KEY],
     icon: 'calculator',
   },
   {

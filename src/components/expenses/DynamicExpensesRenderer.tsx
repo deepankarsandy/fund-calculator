@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, Info, Plus, Trash2, RotateCcw } from 'lucide-react'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { LinkedLoanExpenseCard } from '@/components/expenses/LinkedLoanExpenseCard'
 import { formatCrore } from '@/lib/currency'
 import { annualiseExpense } from '@/domain/calculations/annualise'
 import type { ExpenseCategory, ExpenseItem, Frequency } from '@/domain/models/expense'
@@ -784,41 +785,47 @@ function CategoryPanel({
             </div>
 
             <div className="space-y-1.5 opacity-60 pointer-events-none select-none">
-              {cat.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
-                >
-                  <span className="font-medium text-zinc-800 dark:text-zinc-200">{item.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-zinc-700 dark:text-zinc-300">
-                      ₹{item.amount.toLocaleString('en-IN')}{' '}
-                      {FREQUENCY_LABELS[item.frequency] || item.frequency}
+              {cat.items
+                .filter((item) => !String(item.id || '').startsWith('linked-'))
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
+                  >
+                    <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                      {item.name}
                     </span>
-                    <span className="text-[10px] text-zinc-400">
-                      (≈ {formatCrore(annualiseExpense(item))}/yr)
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-zinc-700 dark:text-zinc-300">
+                        ₹{item.amount.toLocaleString('en-IN')}{' '}
+                        {FREQUENCY_LABELS[item.frequency] || item.frequency}
+                      </span>
+                      <span className="text-[10px] text-zinc-400">
+                        (≈ {formatCrore(annualiseExpense(item))}/yr)
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
       ) : (
         /* Sub-items Mode */
         <div className="space-y-2.5">
-          {cat.items.map((item) => (
-            <SubItemRow
-              key={item.id}
-              item={item}
-              onUpdate={(patch) => updateExpenseItem(cat.id, item.id, patch)}
-              onRemove={() => removeExpenseItem(cat.id, item.id)}
-              isFamilyCategory={isFamilyCategory}
-              members={members}
-              userCurrentAge={userCurrentAge}
-              categoryInflationRate={cat.defaultInflationRate}
-            />
-          ))}
+          {cat.items
+            .filter((item) => !String(item.id || '').startsWith('linked-'))
+            .map((item) => (
+              <SubItemRow
+                key={item.id}
+                item={item}
+                onUpdate={(patch) => updateExpenseItem(cat.id, item.id, patch)}
+                onRemove={() => removeExpenseItem(cat.id, item.id)}
+                isFamilyCategory={isFamilyCategory}
+                members={members}
+                userCurrentAge={userCurrentAge}
+                categoryInflationRate={cat.defaultInflationRate}
+              />
+            ))}
 
           <button
             type="button"
@@ -912,6 +919,9 @@ export function DynamicExpensesRenderer() {
           </div>
         </div>
       </div>
+
+      {/* Linked Loan EMI Calculator Card */}
+      <LinkedLoanExpenseCard />
 
       {/* Dependent Expense Banner — shown only when there are financially-dependent non-self members */}
       <DependentExpenseBanner members={members} />

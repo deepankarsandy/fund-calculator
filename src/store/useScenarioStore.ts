@@ -16,6 +16,7 @@ import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/
 import { syncStepToUrl } from '@/lib/router'
 import { getUserProfile } from '@/lib/userProfileStorage'
 import type { UserProfile } from '@/domain/models/userProfile'
+import { LinkedCalculatorsConfig, applyLinkedDataToStore } from '@/lib/linkedCalculatorsStorage'
 
 interface ScenarioState {
   // Data
@@ -63,6 +64,7 @@ interface ScenarioState {
   selectLifestylePlan: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
   applyShortfallRemedy: (type: 'savings' | 'salary' | 'retirement_age', value: number) => void
   applyProfileDefaults: (customProfile?: UserProfile) => void
+  syncLinkedCalculators: (customConfig?: LinkedCalculatorsConfig) => void
 
   // Navigation
   goToStep: (step: number) => void
@@ -541,6 +543,30 @@ export const useScenarioStore = create<ScenarioState>()(
           categories: updatedCategories,
           assumptions: updatedAssumptions,
           assets: updatedAssets,
+          results: newResults,
+        })
+      },
+
+      syncLinkedCalculators: (customConfig) => {
+        const { updatedAssets, updatedCategories } = applyLinkedDataToStore(
+          get().assets,
+          get().categories,
+          customConfig
+        )
+        const currentResults = get().results
+        const newResults = currentResults
+          ? runScenarios({
+              profile: get().profile,
+              members: get().members,
+              categories: updatedCategories,
+              assumptions: get().assumptions,
+              assets: updatedAssets as any,
+            })
+          : null
+
+        set({
+          assets: updatedAssets as Assets,
+          categories: updatedCategories,
           results: newResults,
         })
       },

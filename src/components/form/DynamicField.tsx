@@ -255,23 +255,41 @@ function ArrayField({
     })
   }
 
-  function updateItem(index: number, subId: string, val: any) {
-    const copy = [...items]
-    copy[index] = { ...copy[index], [subId]: val }
-    onChange(copy)
-    setLastFilled(`${field.id}_${index}_${subId}`)
-  }
-
-  function removeItem(index: number) {
-    onChange(items.filter((_, i) => i !== index))
-  }
-
   const isOtherIncome = field.id === 'otherIncome'
   const isFutureContributions = field.id === 'futureContributions'
 
+  // Filter out system-linked items so manual list stays clean and non-bulky
+  const isLinkedItem = (item: any) => String(item?.id || '').startsWith('linked-')
+  const visibleItems =
+    isOtherIncome || isFutureContributions
+      ? items.filter((item: any) => !isLinkedItem(item))
+      : items
+
+  function updateItem(visibleIndex: number, subId: string, val: any) {
+    if (isOtherIncome || isFutureContributions) {
+      const targetItem = visibleItems[visibleIndex]
+      const updated = items.map((it: any) => (it === targetItem ? { ...it, [subId]: val } : it))
+      onChange(updated)
+    } else {
+      const copy = [...items]
+      copy[visibleIndex] = { ...copy[visibleIndex], [subId]: val }
+      onChange(copy)
+    }
+    setLastFilled(`${field.id}_${visibleIndex}_${subId}`)
+  }
+
+  function removeItem(visibleIndex: number) {
+    if (isOtherIncome || isFutureContributions) {
+      const targetItem = visibleItems[visibleIndex]
+      onChange(items.filter((it: any) => it !== targetItem))
+    } else {
+      onChange(items.filter((_: any, i: number) => i !== visibleIndex))
+    }
+  }
+
   return (
     <div className="space-y-3 pt-1" id={field.id}>
-      {items.map((item, idx) => (
+      {visibleItems.map((item: any, idx: number) => (
         <div
           key={item.id || idx}
           id={`${field.id}_${idx}`}
