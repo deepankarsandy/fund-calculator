@@ -1,3 +1,5 @@
+import { cn } from '@/lib/cn'
+
 export function GithubIcon({ className = 'w-4 h-4' }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -37,38 +39,46 @@ export function InstagramIcon({ className = 'w-4 h-4' }: { className?: string })
   )
 }
 
-export function SocialLinks() {
+export interface SocialLinksProps {
+  className?: string
+  showLabels?: boolean
+}
+
+export function SocialLinks({ className, showLabels = true }: SocialLinksProps) {
   return (
-    <div className="flex items-center gap-1.5">
+    <div className={cn('flex flex-wrap items-center gap-2', className)}>
       <a
         href="https://github.com/deepankarsandy"
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-all shadow-xs flex items-center justify-center cursor-pointer"
+        className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted border border-border transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-xs font-semibold"
         title="View GitHub Profile"
         aria-label="GitHub profile"
       >
-        <GithubIcon className="w-4 h-4" />
+        <GithubIcon className="w-4 h-4 text-foreground" />
+        {showLabels && <span>GitHub</span>}
       </a>
       <a
         href="https://www.linkedin.com/in/deepankarsandhibigraha"
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 rounded-lg text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-muted border border-border transition-all shadow-xs flex items-center justify-center cursor-pointer"
+        className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 hover:bg-muted border border-border transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-xs font-semibold"
         title="Connect on LinkedIn"
         aria-label="LinkedIn profile"
       >
-        <LinkedInIcon className="w-4 h-4" />
+        <LinkedInIcon className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+        {showLabels && <span>LinkedIn</span>}
       </a>
       <a
         href="https://www.instagram.com/deepankar_sandy"
         target="_blank"
         rel="noopener noreferrer"
-        className="p-2 rounded-lg text-muted-foreground hover:text-pink-600 dark:hover:text-pink-400 hover:bg-muted border border-border transition-all shadow-xs flex items-center justify-center cursor-pointer"
+        className="px-2.5 py-1.5 rounded-lg text-muted-foreground hover:text-pink-600 dark:hover:text-pink-400 hover:bg-muted border border-border transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-xs font-semibold"
         title="Follow on Instagram"
         aria-label="Instagram profile"
       >
-        <InstagramIcon className="w-4 h-4" />
+        <InstagramIcon className="w-4 h-4 text-pink-600 dark:text-pink-400" />
+        {showLabels && <span>Instagram</span>}
       </a>
     </div>
   )

@@ -10,6 +10,7 @@ import {
 } from '@/lib/investmentStorage'
 import { FD_INPUTS_STORAGE_KEY, FD_RESULTS_STORAGE_KEY } from '@/lib/fdStorage'
 import { LOAN_EMI_INPUTS_STORAGE_KEY, LOAN_EMI_RESULTS_STORAGE_KEY } from '@/lib/loanEmiStorage'
+import { LINKED_CALCULATORS_STORAGE_KEY } from '@/lib/linkedCalculatorsStorage'
 import { applyTheme, getSavedTheme } from '@/lib/theme'
 import { useScenarioStore } from '@/store/useScenarioStore'
 
@@ -42,7 +43,7 @@ export const STORAGE_SECTIONS: StorageSectionConfig[] = [
     shortTitle: 'Retirement Fund',
     description:
       'Wizard input parameters, household dependents, customized expense categories, and career accumulation.',
-    keys: [RETIREMENT_CALC_STORAGE_KEY, 'corpus-calc-v1'],
+    keys: [RETIREMENT_CALC_STORAGE_KEY, 'corpus-calc-v1', LINKED_CALCULATORS_STORAGE_KEY],
     icon: 'calculator',
   },
   {
@@ -167,10 +168,14 @@ export function getSectionDataSummary(sectionId: string, data: any): string {
           typeof data.targetRetirementAge === 'number'
             ? `, Retires at ${data.targetRetirementAge}`
             : ''
+        const deps =
+          Array.isArray(data.dependents) && data.dependents.length > 0
+            ? `, ${data.dependents.length} dependent${data.dependents.length > 1 ? 's' : ''}`
+            : ''
         const rates = data.sectorInflationRates
           ? `, ${Object.keys(data.sectorInflationRates).length} sector rates`
           : ''
-        return `${name}${age}${retAge}${rates}` || 'Profile configuration'
+        return `${name}${age}${retAge}${deps}${rates}` || 'Profile configuration'
       }
       case 'retirement': {
         const state = data.state || data
@@ -318,6 +323,15 @@ export function validateSectionCompatibility(
           return {
             isValid: false,
             error: 'Invalid sectorInflationRates: must be an object of sector rates.',
+          }
+        }
+      }
+
+      if (data.dependents !== undefined) {
+        if (!Array.isArray(data.dependents)) {
+          return {
+            isValid: false,
+            error: 'Invalid dependents: must be an array of household members.',
           }
         }
       }

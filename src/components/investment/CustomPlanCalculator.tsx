@@ -175,7 +175,7 @@ Generated via Fund Calculator (100% Private & Open Source)
   return (
     <div className="space-y-8">
       {/* Plan Presets Carousel / Quick Picks */}
-      <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="calc-presets calc-clean-hide bg-card border border-border rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
@@ -355,7 +355,7 @@ Generated via Fund Calculator (100% Private & Open Source)
                 </div>
 
                 {/* Preset Chips */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                   {[50000, 100000, 150000, 200000, 250000, 500000].map((amt) => (
                     <button
                       key={amt}
@@ -1178,7 +1178,7 @@ Generated via Fund Calculator (100% Private & Open Source)
       </div>
 
       {/* Year-by-Year Cash Flow Schedule Table */}
-      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="calc-schedule-table calc-clean-hide bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <h3 className="text-base font-extrabold text-foreground">

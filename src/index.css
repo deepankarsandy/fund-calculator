@@ -103,6 +103,65 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ========================================================================= */
+/* Clean View / Minimal Calculator Mode Transitions                         */
+/* Smooth CSS animations: only active on calculator pages                     */
+/* Never hides error or warning labels/texts                                 */
+/* ========================================================================= */
+
+.calculator-page .calc-clean-hide,
+.calculator-page .calc-helper-text,
+.calculator-page .calc-info-box,
+.calculator-page .calc-presets,
+.calculator-page .calc-schedule-table,
+.calculator-page .calc-verbose-results {
+  max-height: 5000px;
+  opacity: 1;
+  overflow: hidden;
+  transform-origin: top;
+  visibility: visible;
+  transition:
+    max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.25s ease,
+    margin 0.35s ease,
+    padding 0.35s ease,
+    transform 0.35s ease,
+    visibility 0.35s ease;
+}
+
+.clean-view .calculator-page .calc-clean-hide,
+.clean-view .calculator-page .calc-helper-text,
+.clean-view .calculator-page .calc-info-box,
+.clean-view .calculator-page .calc-presets,
+.clean-view .calculator-page .calc-schedule-table,
+.clean-view .calculator-page .calc-verbose-results {
+  max-height: 0 !important;
+  opacity: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-top-width: 0 !important;
+  border-bottom-width: 0 !important;
+  pointer-events: none !important;
+  transform: scaleY(0.96);
+  visibility: hidden;
+}
+
+/* Guard: Error and warning labels/texts must NEVER be hidden in any mode */
+.calculator-page .calc-warning,
+.calculator-page .calc-error,
+.clean-view .calculator-page .calc-warning,
+.clean-view .calculator-page .calc-error,
+.calculator-page [role='alert'],
+.clean-view .calculator-page [role='alert'] {
+  max-height: none !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: none !important;
+  overflow: visible !important;
+}
+
 @media print {
   @page {
     size: A4 portrait;

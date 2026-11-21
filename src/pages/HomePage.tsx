@@ -503,18 +503,6 @@ export default function HomePage({ onStart, onSelectCalculator, onViewLogic }: H
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-border py-6 bg-card/50 text-center text-xs text-muted-foreground space-y-1.5 px-4">
-        <p className="font-medium">
-          Fund Calculator · Open Source Personal Financial Planning Suite
-        </p>
-        <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
-          <strong>Disclaimer:</strong> This application is an estimation and scenario planning tool.
-          It is not regulated financial advice, investment advisory, or a guarantee of safe
-          withdrawal rates.
-        </p>
-      </footer>
     </div>
   )
 }

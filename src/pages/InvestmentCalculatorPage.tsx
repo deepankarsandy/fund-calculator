@@ -144,7 +144,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
   const returnsPct = Math.max(0, 100 - investedPct)
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-8 w-full">
         {/* Navigation & Header */}
@@ -208,7 +208,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                   ? 'Custom Plan & Policy XIRR Calculator'
                   : 'Investment & Returns Calculator'}
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
+              <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
                 {activeTab === 'custom_plan'
                   ? 'Analyze insurance policies, guaranteed income plans, and deferred annuities. Uncover the real annualized XIRR and inflation-adjusted purchasing power.'
                   : 'Simulate lump-sum compounding across equities, debt, gold, and liquid funds with Indian capital gains taxation.'}
@@ -312,7 +312,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                   </div>
 
                   {/* Quick preset chips */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                     {[100000, 250000, 500000, 1000000, 2500000, 5000000].map((amt) => (
                       <button
                         key={amt}
@@ -365,7 +365,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-1.5 pt-1">
+                  <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                     {[3, 5, 7, 10, 15, 20, 25, 30].map((yr) => (
                       <button
                         key={yr}
@@ -501,7 +501,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap gap-1.5 pt-1">
+                    <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                       {[7.0, 8.5, 10.0, 11.5, 12.0, 14.0, 15.0].map((rate) => (
                         <button
                           key={rate}
@@ -710,7 +710,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                 <button
                   type="button"
                   onClick={() => handleTabChange('custom_plan')}
-                  className="w-full p-4 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
+                  className="calc-info-box calc-clean-hide w-full p-4 rounded-xl border border-purple-200 dark:border-purple-800/80 bg-purple-50/50 dark:bg-purple-950/30 text-left hover:bg-purple-100/50 dark:hover:bg-purple-900/40 transition-colors cursor-pointer space-y-1.5"
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
@@ -726,7 +726,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                 </button>
 
                 {/* Privacy Note */}
-                <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+                <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
                   <div className="flex items-center gap-1.5 text-foreground font-bold">
                     <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                     <span>Automatic Browser Persistence</span>
@@ -740,7 +740,7 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
             </div>
 
             {/* Year-by-Year Growth Table */}
-            <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="calc-schedule-table calc-clean-hide bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <h3 className="text-base font-extrabold text-foreground">

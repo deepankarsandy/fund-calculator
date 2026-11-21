@@ -4,6 +4,7 @@ import {
   DEFAULT_USER_PROFILE,
   DEFAULT_SECTOR_INFLATION,
   calculateAgeFromDob,
+  normalizeDobToDdMmYyyy,
 } from '@/domain/models/userProfile'
 import { StoredSipData, getStoredSipInputs, saveStoredSipInputs } from '@/lib/sipStorage'
 import { getStoredInvestmentInputs, saveStoredInvestmentInputs } from '@/lib/investmentStorage'
@@ -24,16 +25,24 @@ export function getUserProfile(): UserProfile {
     const raw = localStorage.getItem(USER_PROFILE_STORAGE_KEY)
     if (raw) {
       const parsed = JSON.parse(raw)
-      const dob = typeof parsed.dob === 'string' ? parsed.dob : ''
+      const rawDob = typeof parsed.dob === 'string' ? parsed.dob : ''
+      const dob = normalizeDobToDdMmYyyy(rawDob)
       const currentAge = dob
-        ? calculateAgeFromDob(dob)
+        ? calculateAgeFromDob(
+            dob,
+            undefined,
+            typeof parsed.currentAge === 'number' ? parsed.currentAge : 30
+          )
         : typeof parsed.currentAge === 'number'
           ? parsed.currentAge
           : 30
 
+      const dependents = Array.isArray(parsed.dependents) ? parsed.dependents : []
+
       return {
         ...DEFAULT_USER_PROFILE,
         ...parsed,
+        dependents,
         dob,
         currentAge,
         sectorInflationRates: {
@@ -54,13 +63,24 @@ export function getUserProfile(): UserProfile {
 export function saveUserProfile(profile: UserProfile, syncToCalculators: boolean = false): void {
   if (typeof window === 'undefined') return
   try {
+    const normalizedDob = normalizeDobToDdMmYyyy(profile.dob)
     const prepared: UserProfile = {
       ...profile,
-      currentAge: profile.dob ? calculateAgeFromDob(profile.dob) : profile.currentAge,
+      dob: normalizedDob,
+      currentAge: normalizedDob ? calculateAgeFromDob(normalizedDob) : profile.currentAge,
       isConfigured: true,
       updatedAt: new Date().toISOString(),
     }
     localStorage.setItem(USER_PROFILE_STORAGE_KEY, JSON.stringify(prepared))
+
+    if (typeof prepared.cleanView === 'boolean') {
+      localStorage.setItem('corpus_clean_view', String(prepared.cleanView))
+      if (prepared.cleanView) {
+        document.documentElement.classList.add('clean-view')
+      } else {
+        document.documentElement.classList.remove('clean-view')
+      }
+    }
 
     if (syncToCalculators) {
       syncProfileToCalculators(prepared)
@@ -107,11 +127,13 @@ export function updateUserProfile(
   syncToCalculators: boolean = false
 ): UserProfile {
   const current = getUserProfile()
+  const normalizedPatchDob = patch.dob !== undefined ? normalizeDobToDdMmYyyy(patch.dob) : undefined
   const updated: UserProfile = {
     ...current,
     ...patch,
-    currentAge: patch.dob
-      ? calculateAgeFromDob(patch.dob)
+    ...(normalizedPatchDob !== undefined ? { dob: normalizedPatchDob } : {}),
+    currentAge: normalizedPatchDob
+      ? calculateAgeFromDob(normalizedPatchDob)
       : (patch.currentAge ?? current.currentAge),
   }
   saveUserProfile(updated, syncToCalculators)

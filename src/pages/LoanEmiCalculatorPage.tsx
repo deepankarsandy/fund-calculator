@@ -113,7 +113,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
   const interestPct = Math.max(0, 100 - principalPct)
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Content */}
       <main className="flex-1 max-w-5xl mx-auto px-4 py-4 space-y-8 w-full">
         {/* Navigation & Header */}
@@ -160,7 +160,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
               <h2 className="text-2xl sm:text-3xl font-black text-foreground tracking-tight mt-1">
                 Loan & Interest EMI Calculator
               </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
+              <p className="calc-helper-text calc-clean-hide text-xs sm:text-sm text-muted-foreground font-medium mt-0.5">
                 Calculate monthly EMI, prepayment interest savings, and Section 24(b) / 80C tax
                 relief for Indian loans.
               </p>
@@ -250,7 +250,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
               </div>
 
               {/* Quick preset chips */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[1000000, 2500000, 4000000, 6000000, 8000000, 10000000].map((amt) => (
                   <button
                     key={amt}
@@ -307,7 +307,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
               </div>
 
               {/* Presets */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[8.25, 8.5, 8.75, 9.0, 9.5, 12.0].map((rate) => (
                   <button
                     key={rate}
@@ -418,7 +418,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
               </div>
 
               {/* Presets */}
-              <div className="flex flex-wrap gap-1.5 pt-1">
+              <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5 pt-1">
                 {[3, 5, 10, 15, 20, 25, 30].map((yr) => (
                   <button
                     key={yr}
@@ -715,7 +715,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
             </div>
 
             {/* Privacy Note */}
-            <div className="p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
+            <div className="calc-info-box calc-clean-hide p-3.5 rounded-xl border border-border bg-card text-xs space-y-2 text-muted-foreground">
               <div className="flex items-center gap-1.5 text-foreground font-bold">
                 <Lock className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                 <span>100% Local & Private In-Browser</span>
@@ -729,7 +729,7 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
         </div>
 
         {/* Amortization Schedule Table */}
-        <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div className="calc-schedule-table calc-clean-hide bg-card border border-border rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <h3 className="text-base font-extrabold text-foreground">

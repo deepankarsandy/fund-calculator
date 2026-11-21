@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { ChevronDown, ChevronRight, Info, Plus, Trash2, RotateCcw } from 'lucide-react'
 import { useScenarioStore } from '@/store/useScenarioStore'
+import { LinkedLoanExpenseCard } from '@/components/expenses/LinkedLoanExpenseCard'
 import { formatCrore } from '@/lib/currency'
 import { annualiseExpense } from '@/domain/calculations/annualise'
 import type { ExpenseCategory, ExpenseItem, Frequency } from '@/domain/models/expense'
@@ -245,14 +246,14 @@ function ExpenseWindowPanel({
         <span className="text-[11px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
           ⏱ Expense Window
         </span>
-        <span className="text-[10px] text-blue-600 dark:text-blue-400">
+        <span className="calc-helper-text calc-clean-hide text-[10px] text-blue-600 dark:text-blue-400">
           When does this expense apply?
         </span>
       </div>
 
       {/* Smart suggestion chips */}
       {suggestions.length > 0 && (
-        <div className="flex flex-wrap gap-1.5">
+        <div className="calc-presets calc-clean-hide flex flex-wrap gap-1.5">
           <span className="text-[10px] text-zinc-500 self-center">Quick set:</span>
           {suggestions.map((s, i) => (
             <button
@@ -473,14 +474,14 @@ function SubItemRow({
       </div>
 
       {item.notes && !showDetails && !showWindowPanel && (
-        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
+        <p className="calc-helper-text calc-clean-hide text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
         </p>
       )}
 
       {item.notes && showWindowPanel && (
-        <p className="text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
+        <p className="calc-helper-text calc-clean-hide text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
         </p>
@@ -624,7 +625,7 @@ function CategoryPanel({
       className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl"
       id={`category-${cat.id}`}
     >
-      <div className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
+      <div className="calc-info-box calc-clean-hide text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
         <Info className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
         <div>
           <p className="font-medium">{cat.description}</p>
@@ -638,7 +639,7 @@ function CategoryPanel({
       {/* Dependent Warning / Context Tag */}
       {isFamilyCategory ? (
         dependentsCount > 0 ? (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/50 text-blue-700 dark:text-blue-300 px-3 py-2 rounded-lg">
             <span>👶</span>
             <span>
               Time-windowed dependent support for{' '}
@@ -650,7 +651,7 @@ function CategoryPanel({
             </span>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-zinc-100 dark:bg-zinc-800/80 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 px-3 py-2 rounded-lg">
             <span>ℹ️</span>
             <span>
               No dependents added in Step 3. Child education and parental care expenses activate
@@ -660,7 +661,7 @@ function CategoryPanel({
         )
       ) : (
         totalCovered > 1 && (
-          <div className="flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
+          <div className="calc-info-box calc-clean-hide flex items-center gap-2 text-[11px] font-semibold bg-orange-50 dark:bg-orange-950/40 border border-orange-200 dark:border-orange-800/50 text-orange-700 dark:text-orange-300 px-3 py-2 rounded-lg">
             <span>👥</span>
             <span>
               Covers all <strong>{totalCovered} household members</strong> (Self + {dependentsCount}{' '}
@@ -769,7 +770,7 @@ function CategoryPanel({
           </div>
 
           {/* Reference Sub-categories (Disabled / Non-editable) */}
-          <div className="space-y-2 pt-1">
+          <div className="calc-helper-text calc-clean-hide space-y-2 pt-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400">
                 Reference Sub-Categories (Disabled while Category Total is active):
@@ -784,41 +785,47 @@ function CategoryPanel({
             </div>
 
             <div className="space-y-1.5 opacity-60 pointer-events-none select-none">
-              {cat.items.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
-                >
-                  <span className="font-medium text-zinc-800 dark:text-zinc-200">{item.name}</span>
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-zinc-700 dark:text-zinc-300">
-                      ₹{item.amount.toLocaleString('en-IN')}{' '}
-                      {FREQUENCY_LABELS[item.frequency] || item.frequency}
+              {cat.items
+                .filter((item) => !String(item.id || '').startsWith('linked-'))
+                .map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center justify-between py-2 px-3 bg-zinc-100/70 dark:bg-zinc-800/40 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs"
+                  >
+                    <span className="font-medium text-zinc-800 dark:text-zinc-200">
+                      {item.name}
                     </span>
-                    <span className="text-[10px] text-zinc-400">
-                      (≈ {formatCrore(annualiseExpense(item))}/yr)
-                    </span>
+                    <div className="flex items-center gap-3">
+                      <span className="font-bold text-zinc-700 dark:text-zinc-300">
+                        ₹{item.amount.toLocaleString('en-IN')}{' '}
+                        {FREQUENCY_LABELS[item.frequency] || item.frequency}
+                      </span>
+                      <span className="text-[10px] text-zinc-400">
+                        (≈ {formatCrore(annualiseExpense(item))}/yr)
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
           </div>
         </div>
       ) : (
         /* Sub-items Mode */
         <div className="space-y-2.5">
-          {cat.items.map((item) => (
-            <SubItemRow
-              key={item.id}
-              item={item}
-              onUpdate={(patch) => updateExpenseItem(cat.id, item.id, patch)}
-              onRemove={() => removeExpenseItem(cat.id, item.id)}
-              isFamilyCategory={isFamilyCategory}
-              members={members}
-              userCurrentAge={userCurrentAge}
-              categoryInflationRate={cat.defaultInflationRate}
-            />
-          ))}
+          {cat.items
+            .filter((item) => !String(item.id || '').startsWith('linked-'))
+            .map((item) => (
+              <SubItemRow
+                key={item.id}
+                item={item}
+                onUpdate={(patch) => updateExpenseItem(cat.id, item.id, patch)}
+                onRemove={() => removeExpenseItem(cat.id, item.id)}
+                isFamilyCategory={isFamilyCategory}
+                members={members}
+                userCurrentAge={userCurrentAge}
+                categoryInflationRate={cat.defaultInflationRate}
+              />
+            ))}
 
           <button
             type="button"
@@ -912,6 +919,9 @@ export function DynamicExpensesRenderer() {
           </div>
         </div>
       </div>
+
+      {/* Linked Loan EMI Calculator Card */}
+      <LinkedLoanExpenseCard />
 
       {/* Dependent Expense Banner — shown only when there are financially-dependent non-self members */}
       <DependentExpenseBanner members={members} />

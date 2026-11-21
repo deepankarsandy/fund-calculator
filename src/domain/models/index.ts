@@ -13,6 +13,8 @@ export {
   DEFAULT_SECTOR_INFLATION,
   calculateAgeFromDob,
   calculateDobFromAge,
+  normalizeDobToDdMmYyyy,
+  isValidDob,
 } from './userProfile'
 
 export type { HouseholdMember, Relationship } from './household'

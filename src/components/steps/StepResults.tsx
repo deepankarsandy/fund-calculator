@@ -475,7 +475,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
           <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-100 tracking-tight">
             Corpus Calculation & Lifetime Results
           </h2>
-          <p className="text-xs text-zinc-500 font-medium">
+          <p className="calc-helper-text calc-clean-hide text-xs text-zinc-500 font-medium">
             Clear comparison of retirement corpus requirements, career savings, and lifetime
             cashflow
           </p>
@@ -515,7 +515,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
 
       {/* Warnings & Suggestions Card */}
       {results.warnings.length > 0 && (
-        <div className="rounded-2xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-4 space-y-2 shadow-xs print-break-inside-avoid">
+        <div className="calc-warning rounded-2xl border border-amber-300 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 p-4 space-y-2 shadow-xs print-break-inside-avoid">
           <div className="flex items-center gap-2 text-amber-950 dark:text-amber-200 font-bold text-sm">
             <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
             <span>Planning Items to Review</span>
@@ -646,7 +646,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
           {/* Actionable Explanation Banner */}
           <div
             className={cn(
-              'p-3.5 rounded-xl border text-xs font-medium leading-relaxed',
+              'calc-info-box calc-clean-hide p-3.5 rounded-xl border text-xs font-medium leading-relaxed',
               isFullyFunded
                 ? 'bg-emerald-50/80 dark:bg-emerald-950/30 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
                 : 'bg-amber-50/80 dark:bg-amber-950/30 border-amber-200 dark:border-amber-800 text-amber-900 dark:text-amber-200'
@@ -691,7 +691,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
       />
 
       {/* POSITIVE & NEGATIVE FLOW SUMMARY CARDS (Consistent Color Coding) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 print-break-inside-avoid">
+      <div className="calc-verbose-results calc-clean-hide grid grid-cols-1 md:grid-cols-3 gap-3 print-break-inside-avoid">
         {/* Positive Inflow Card (Emerald Green) */}
         <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/50 bg-emerald-50/40 dark:bg-emerald-950/20 p-4 space-y-2">
           <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-bold uppercase tracking-wide">
@@ -780,7 +780,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
       </div>
 
       {/* LIFETIME FINANCIAL RECONCILIATION: Cashflow Transparency */}
-      <div className="rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs space-y-3 print-break-inside-avoid">
+      <div className="calc-verbose-results calc-clean-hide rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5 shadow-xs space-y-3 print-break-inside-avoid">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-zinc-100 dark:border-zinc-800 pb-2.5">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
@@ -863,7 +863,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
       />
 
       {/* HOW WAS THIS CALCULATED DROPDOWN */}
-      <div className="print:hidden">
+      <div className="calc-info-box calc-clean-hide print:hidden">
         <button
           type="button"
           onClick={() => setShowExplain((x) => !x)}
@@ -951,7 +951,7 @@ export function StepResults({ onViewLogic }: StepResultsProps = {}) {
           <button
             type="button"
             onClick={() => setActiveTab('table')}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-xs ${
+            className={`calc-schedule-table calc-clean-hide px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shadow-xs ${
               activeTab === 'table'
                 ? 'bg-blue-600 text-white'
                 : 'bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-600 dark:text-zinc-400'

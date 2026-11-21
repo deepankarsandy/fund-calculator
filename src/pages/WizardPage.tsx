@@ -81,7 +81,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
   }
 
   return (
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col calculator-page">
       {/* Main Step Body */}
       <main className="flex-1 max-w-5xl mx-auto w-full px-4 py-4 space-y-6">
         {/* Navigation & Header */}
@@ -125,9 +125,12 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
         )}
       </main>
 
-      {/* Footer Navigation */}
+      {/* Step Navigation Action Bar */}
       {!isResultsStep && (
-        <footer className="border-t border-border bg-card/90 backdrop-blur-md sticky bottom-0 z-20 shadow-md">
+        <nav
+          aria-label="Wizard navigation"
+          className="border-t border-border bg-card/90 backdrop-blur-md sticky bottom-0 z-20 shadow-md"
+        >
           <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
             <button
               type="button"
@@ -163,7 +166,7 @@ export default function WizardPage({ onBackToHome, onViewLogic }: WizardPageProp
               </button>
             )}
           </div>
-        </footer>
+        </nav>
       )}
     </div>
   )

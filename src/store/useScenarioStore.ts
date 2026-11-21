@@ -9,12 +9,14 @@ import type { CalculationResults } from '@/domain/models/results'
 import { DEFAULT_PROFILE } from '@/domain/models/profile'
 import { DEFAULT_ASSUMPTIONS } from '@/domain/models/assumptions'
 import { DEFAULT_ASSETS } from '@/domain/models/assets'
+import { buildDefaultAssetsFromProfile } from '@/domain/calculations/indianRetirementRules'
 import { buildCategoriesForProfile } from '@/domain/calculations/areaDefaults'
 import { runScenarios } from '@/domain/calculations/runScenarios'
 import { getStoredSettings, updateStoredSettings, clearStoredSettings } from '@/lib/settingsStorage'
 import { syncStepToUrl } from '@/lib/router'
 import { getUserProfile } from '@/lib/userProfileStorage'
 import type { UserProfile } from '@/domain/models/userProfile'
+import { LinkedCalculatorsConfig, applyLinkedDataToStore } from '@/lib/linkedCalculatorsStorage'
 
 interface ScenarioState {
   // Data
@@ -62,6 +64,7 @@ interface ScenarioState {
   selectLifestylePlan: (lifestyle: 'bare_minimum' | 'comfortable' | 'luxury') => void
   applyShortfallRemedy: (type: 'savings' | 'salary' | 'retirement_age', value: number) => void
   applyProfileDefaults: (customProfile?: UserProfile) => void
+  syncLinkedCalculators: (customConfig?: LinkedCalculatorsConfig) => void
 
   // Navigation
   goToStep: (step: number) => void
@@ -440,16 +443,58 @@ export const useScenarioStore = create<ScenarioState>()(
 
       applyProfileDefaults: (customProfile) => {
         const p = customProfile || getUserProfile()
-        const selfMember: HouseholdMember = {
-          id: 'self',
-          label: p.name ? `${p.name} (Self)` : 'Self',
-          relationship: 'self',
+
+        // 1. Update self member's age/label while preserving all entered dependents,
+        // and synchronizing profile default dependents when configured
+        const currentMembers = get().members || []
+        const hasSelf = currentMembers.some((m) => m.id === 'self' || m.relationship === 'self')
+        const selfMember = hasSelf
+          ? currentMembers.find((m) => m.id === 'self' || m.relationship === 'self')!
+          : {
+              id: 'self',
+              label: p.name ? `${p.name} (Self)` : 'Self',
+              relationship: 'self' as const,
+              age: p.currentAge,
+              financiallyDependent: true,
+              hasHealthInsurance: false,
+            }
+
+        const updatedSelf: HouseholdMember = {
+          ...selfMember,
           age: p.currentAge,
-          financiallyDependent: true,
-          hasHealthInsurance: false,
+          label: p.name ? `${p.name} (Self)` : selfMember.label || 'Self',
         }
 
+        const existingNonSelf = currentMembers.filter(
+          (m) => m.id !== 'self' && m.relationship !== 'self'
+        )
+
+        const profileDependents: HouseholdMember[] = Array.isArray(p.dependents) ? p.dependents : []
+        let updatedDependents: HouseholdMember[] = [...existingNonSelf]
+
+        if (profileDependents.length > 0) {
+          if (existingNonSelf.length === 0) {
+            updatedDependents = [...profileDependents]
+          } else {
+            for (const dep of profileDependents) {
+              const existingIdx = updatedDependents.findIndex((m) => m.id === dep.id)
+              if (existingIdx >= 0) {
+                updatedDependents[existingIdx] = {
+                  ...dep,
+                  ...updatedDependents[existingIdx],
+                }
+              } else {
+                updatedDependents.push(dep)
+              }
+            }
+          }
+        }
+
+        const updatedMembers = [updatedSelf, ...updatedDependents]
+
+        // 2. Update profile specific values present in profile
         const updatedProfile: Profile = {
+          ...get().profile,
           country: p.country,
           region: get().profile.region || 'Odisha',
           city: get().profile.city || '',
@@ -460,14 +505,10 @@ export const useScenarioStore = create<ScenarioState>()(
           lifestyleScenario: p.lifestyleBaseline,
         }
 
-        const updatedAssets: Assets = {
-          ...get().assets,
-          monthlyIncome: p.monthlyIncome,
-          incomeEndAge: p.retirementAge,
-          incomeGrowthRate: p.annualIncomeGrowthRate / 100,
-          existingInvestableCorpus: p.existingInvestableCorpus,
-        }
+        // 3. Update assets specific values present in profile (retirement age, income, growth, corpus, NPS annuity, and PF maturity)
+        const updatedAssets: Assets = buildDefaultAssetsFromProfile(p, get().assets)
 
+        // 4. Update assumptions specific values present in profile
         const updatedAssumptions: Assumptions = {
           ...get().assumptions,
           globalInflationRate: p.overallInflationRate / 100,
@@ -475,22 +516,135 @@ export const useScenarioStore = create<ScenarioState>()(
           annualInvestmentReturn: p.expectedDebtReturn / 100,
         }
 
-        const updatedCategories = buildCategoriesForProfile(
-          p.locationType,
-          p.lifestyleBaseline,
-          [selfMember],
-          p.inflationMode === 'sector'
-            ? (p.sectorInflationRates as unknown as Record<string, number>)
-            : undefined
-        )
+        // 5. Update categories: Retain all entered expenses and amounts (e.g. mobile recharge, food, rent)
+        // Only update category-level inflation rate if sector inflation rates are configured
+        // Also activate zero-amount family items if child/parent dependents are added
+        const currentCategories = get().categories
+        let updatedCategories = currentCategories
+        if (!currentCategories || currentCategories.length === 0) {
+          updatedCategories = buildCategoriesForProfile(
+            p.locationType,
+            p.lifestyleBaseline,
+            updatedMembers,
+            p.inflationMode === 'sector'
+              ? (p.sectorInflationRates as unknown as Record<string, number>)
+              : undefined
+          )
+        } else {
+          const childMembers = updatedMembers.filter(
+            (m) => m.relationship === 'child' && m.financiallyDependent
+          )
+          const parentMembers = updatedMembers.filter(
+            (m) => m.relationship === 'parent' && m.financiallyDependent
+          )
+          const sectorRates = p.sectorInflationRates as unknown as
+            Record<string, number> | undefined
+
+          updatedCategories = currentCategories.map((cat) => {
+            let catInflation = cat.defaultInflationRate
+            if (p.inflationMode === 'sector' && sectorRates && sectorRates[cat.id] != null) {
+              catInflation =
+                sectorRates[cat.id] > 1 ? sectorRates[cat.id] / 100 : sectorRates[cat.id]
+            }
+
+            if (cat.id === 'family') {
+              const factor = 1.0
+              return {
+                ...cat,
+                defaultInflationRate: catInflation,
+                items: cat.items.map((it) => {
+                  // Only activate if amount is currently 0 (unconfigured)
+                  if (it.amount === 0) {
+                    if (it.id.includes('school_fees') && childMembers.length > 0) {
+                      const child = childMembers[0]
+                      const startYear = Math.max(1, 5 - child.age)
+                      const endYear = startYear + 11
+                      return {
+                        ...it,
+                        amount: Math.round((35000 * factor * childMembers.length) / 500) * 500,
+                        startYear,
+                        endYear,
+                      }
+                    }
+                    if (it.id.includes('higher_education') && childMembers.length > 0) {
+                      const child = childMembers[0]
+                      const startYear = Math.max(1, 17 - child.age)
+                      const endYear = startYear + 3
+                      return {
+                        ...it,
+                        amount: Math.round((80000 * factor * childMembers.length) / 500) * 500,
+                        startYear,
+                        endYear,
+                      }
+                    }
+                    if (it.id.includes('parental_support') && parentMembers.length > 0) {
+                      const parent = parentMembers[0]
+                      const endYear = parent.supportUntilAge
+                        ? Math.max(1, parent.supportUntilAge - parent.age)
+                        : Math.max(1, 80 - parent.age)
+                      return {
+                        ...it,
+                        amount: Math.round((8000 * factor * parentMembers.length) / 500) * 500,
+                        startYear: 1,
+                        endYear,
+                      }
+                    }
+                  }
+                  return it
+                }),
+              }
+            }
+
+            return {
+              ...cat,
+              defaultInflationRate: catInflation,
+            }
+          })
+        }
+
+        // Recompute calculation results if they were already computed
+        const currentResults = get().results
+        const newResults = currentResults
+          ? runScenarios({
+              profile: updatedProfile,
+              members: updatedMembers,
+              categories: updatedCategories,
+              assumptions: updatedAssumptions,
+              assets: updatedAssets,
+            })
+          : null
 
         set({
           profile: updatedProfile,
-          members: [selfMember],
+          members: updatedMembers,
           categories: updatedCategories,
           assumptions: updatedAssumptions,
           assets: updatedAssets,
-          results: null,
+          results: newResults,
+        })
+      },
+
+      syncLinkedCalculators: (customConfig) => {
+        const { updatedAssets, updatedCategories } = applyLinkedDataToStore(
+          get().assets,
+          get().categories,
+          customConfig
+        )
+        const currentResults = get().results
+        const newResults = currentResults
+          ? runScenarios({
+              profile: get().profile,
+              members: get().members,
+              categories: updatedCategories,
+              assumptions: get().assumptions,
+              assets: updatedAssets as any,
+            })
+          : null
+
+        set({
+          assets: updatedAssets as Assets,
+          categories: updatedCategories,
+          results: newResults,
         })
       },
 

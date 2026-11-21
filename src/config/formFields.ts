@@ -15,6 +15,7 @@ export interface FieldConfig {
   type: FieldType
   defaultValue: any
   help: string
+  warning?: string
   options?: FieldOption[]
   min?: number
   max?: number
@@ -70,79 +71,6 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
     skippable: false,
     fields: [
       {
-        id: 'country',
-        label: 'Country',
-        type: 'select',
-        defaultValue: 'India',
-        help: 'The country where you plan to live in retirement. Sets the local currency context.',
-        options: [
-          { label: 'India', value: 'India' },
-          { label: 'United States', value: 'United States' },
-          { label: 'United Kingdom', value: 'United Kingdom' },
-          { label: 'Other', value: 'Other' },
-        ],
-      },
-      {
-        id: 'currency',
-        label: 'Currency',
-        type: 'select',
-        defaultValue: 'INR',
-        help: 'Currency used for all cost estimations and output graphs.',
-        options: [
-          { label: 'INR (₹)', value: 'INR' },
-          { label: 'USD ($)', value: 'USD' },
-          { label: 'EUR (€)', value: 'EUR' },
-          { label: 'GBP (£)', value: 'GBP' },
-        ],
-      },
-      {
-        id: 'areaType',
-        label: 'Area / Location Type',
-        type: 'radio',
-        defaultValue: 'small_town',
-        help: 'Living expenses vary dramatically across India. Selecting your area automatically calibrates baseline expense defaults.',
-        options: [
-          {
-            label: 'Village / Rural',
-            value: 'village',
-            description: 'Lowest cost of living (~40-60% of metro costs).',
-          },
-          {
-            label: 'Small Town (Tier 3)',
-            value: 'small_town',
-            description: 'Moderate costs (e.g. baseline sample from planning guide).',
-          },
-          {
-            label: 'City (Tier 2)',
-            value: 'city',
-            description: 'State capitals & growing urban centers (~1.6x of small town).',
-          },
-          {
-            label: 'Metro (Tier 1)',
-            value: 'tier1_metro',
-            description: 'Major metros: Mumbai, Bengaluru, Delhi NCR, Hyderabad (~2.5x).',
-          },
-        ],
-      },
-      {
-        id: 'region',
-        label: 'State / Region (Optional)',
-        type: 'text',
-        defaultValue: 'Odisha',
-        placeholder: 'e.g. Odisha, Karnataka, Maharashtra',
-        help: 'Optional geographic context for your reference.',
-        skippable: true,
-      },
-      {
-        id: 'city',
-        label: 'City / Town (Optional)',
-        type: 'text',
-        defaultValue: '',
-        placeholder: 'e.g. Bhubaneswar, Bengaluru, Pune',
-        help: 'Optional city or town name to help distinguish different saved scenarios.',
-        skippable: true,
-      },
-      {
         id: 'currentAge',
         label: 'Current Age',
         type: 'number',
@@ -163,31 +91,52 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
         help: 'The age up to which you want your corpus to last safely. Planning to age 85–100 protects against longevity risk.',
       },
       {
+        id: 'areaType',
+        label: 'Area / Location Type',
+        type: 'select',
+        defaultValue: 'small_town',
+        help: 'Living expenses vary dramatically across India. Selecting your area automatically calibrates baseline expense defaults.',
+        options: [
+          {
+            label: 'Village / Rural (~50% of metro cost)',
+            value: 'village',
+          },
+          {
+            label: 'Small Town (Tier 3)',
+            value: 'small_town',
+          },
+          {
+            label: 'City (Tier 2 - ~1.6x of small town)',
+            value: 'city',
+          },
+          {
+            label: 'Metro (Tier 1 - ~2.5x of small town)',
+            value: 'tier1_metro',
+          },
+        ],
+      },
+      {
         id: 'lifestyleScenario',
         label: 'Lifestyle Baseline',
-        type: 'radio',
+        type: 'select',
         defaultValue: 'comfortable',
         help: 'Bare Minimum covers only survival essentials. Comfortable includes discretionary leisure, travel, and personal hobbies.',
         options: [
           {
-            label: 'Bare Minimum',
+            label: 'Bare Minimum (Survival essentials only)',
             value: 'bare_minimum',
-            description: 'Essential living only: food, shelter, routine healthcare.',
           },
           {
-            label: 'Comfortable',
+            label: 'Comfortable (Leisure, outings & buffer)',
             value: 'comfortable',
-            description: 'Includes leisure, hobbies, outings, travel, and buffer.',
           },
           {
-            label: 'Luxury / Aspirational',
+            label: 'Luxury / Aspirational (Elevated lifestyle)',
             value: 'luxury',
-            description: 'Elevated lifestyle: premium housing, dining, travel, and higher buffer.',
           },
           {
-            label: 'Custom',
+            label: 'Custom (Manually itemized)',
             value: 'custom',
-            description: 'Manually specify essential vs discretionary items.',
           },
         ],
       },
@@ -210,6 +159,8 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
         prefix: '₹',
         placeholder: 'e.g. 75000 (0 if already retired)',
         help: 'Your current net monthly salary or business income. Living expenses are subtracted from this, and the surplus is automatically invested into your corpus.',
+        warning:
+          'Important: Set the amount after deducting PF, Insurance, SIP, etc., as these investment channels and policies are calculated separately.',
         skippable: true,
       },
       {
@@ -246,18 +197,33 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
       },
       {
         id: 'otherIncome',
-        label: 'Regular Post-Retirement Income',
+        label:
+          'Regular & Additional Income Sources (Insurance Plans, Pensions, Annuities & Rental)',
         type: 'array',
         addButtonText: '+ Add Income Source',
         defaultValue: [],
-        help: 'Guaranteed or reliable income like employer pension, annuity, or rental property income.',
+        help: 'Guaranteed or recurring income like NPS pension, insurance-linked retirement plans (can start from current year), employer pension, or rental property income.',
         subFields: [
           {
+            id: 'incomeType',
+            label: 'Income Source Type',
+            type: 'select',
+            defaultValue: 'insurance_plan',
+            options: [
+              { label: 'Insurance Plan (Guaranteed / Custom Income)', value: 'insurance_plan' },
+              { label: 'NPS Pension / Annuity', value: 'nps_annuity' },
+              { label: 'Employer / Government Pension', value: 'pension' },
+              { label: 'Rental Property Income', value: 'rental' },
+              { label: 'Other Recurring Income', value: 'other' },
+            ],
+            help: 'Select the income category. Insurance plans and rental income can start from the current year, whereas pensions/annuities typically start at retirement.',
+          },
+          {
             id: 'label',
-            label: 'Description',
+            label: 'Description / Plan Name',
             type: 'text',
-            defaultValue: 'Pension',
-            help: 'e.g. Government pension, Commercial rental, Annuity.',
+            defaultValue: 'Insurance Plan (Guaranteed Income)',
+            help: 'e.g. Guaranteed Income Insurance Plan, NPS Pension, Commercial Rental, Pension.',
           },
           {
             id: 'annualAmount',
@@ -270,11 +236,11 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
           },
           {
             id: 'startYear',
-            label: 'Starting in Year',
+            label: 'Starting Planning Year (1 = Current Year)',
             type: 'number',
             defaultValue: 1,
             min: 1,
-            help: 'Planning year when payments start (1 = immediately upon retirement).',
+            help: 'Planning year when payments start. Set to 1 to start from the CURRENT YEAR (ideal for insurance plans & money-back policies), or set to retirement year for post-retirement pension.',
           },
           {
             id: 'endYear',
@@ -282,7 +248,7 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
             type: 'number',
             defaultValue: undefined,
             min: 1,
-            help: 'Leave blank if this income continues for life.',
+            help: 'Leave blank if this income continues for life. For limited-duration insurance policies (e.g. 15–25 years payout), enter the last payout year.',
             skippable: true,
           },
           {
@@ -290,30 +256,30 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
             label: 'Inflation-linked (Increases yearly)?',
             type: 'checkbox',
             defaultValue: false,
-            help: 'Check if this pension or rent increases annually with inflation (e.g. DA-linked pension).',
+            help: 'Check if this income increases annually with inflation (e.g. DA-linked pension). Most insurance plans offer fixed guaranteed payouts.',
           },
         ],
       },
       {
         id: 'futureContributions',
-        label: 'Future Lump Sums Expected',
+        label: 'Future Lump Sums Expected (EPF, NPS 60% & Inheritances)',
         type: 'array',
         addButtonText: '+ Add Lump Sum',
         defaultValue: [],
-        help: 'One-off future cash inflows such as EPF maturity, property sale, or inheritance.',
+        help: 'One-off future cash inflows such as EPF maturity (8.25% p.a. EPFO compound), NPS 60% tax-free lump sum, property sale, or inheritance.',
         subFields: [
           {
             id: 'label',
             label: 'Description',
             type: 'text',
-            defaultValue: 'EPF Maturity',
-            help: 'Description of the lump sum.',
+            defaultValue: 'EPF / PF Maturity',
+            help: 'Description of the lump sum (e.g. EPF Maturity, NPS 60% Lump Sum, Ancestral Land Sale).',
           },
           {
             id: 'amount',
             label: 'Amount Expected',
             type: 'number',
-            defaultValue: 500000,
+            defaultValue: 1500000,
             prefix: '₹',
             min: 0,
             help: "Estimated cash amount to be received in today's or future terms.",
@@ -322,9 +288,9 @@ export const WIZARD_STEPS_CONFIG: WizardStepConfig[] = [
             id: 'year',
             label: 'In Planning Year',
             type: 'number',
-            defaultValue: 5,
+            defaultValue: 30,
             min: 1,
-            help: 'Which year of the plan this cash inflow arrives.',
+            help: 'Which planning year this cash inflow arrives (e.g. at retirement year for EPF maturity).',
           },
         ],
       },

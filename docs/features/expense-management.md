@@ -55,3 +55,10 @@ Each line item supports realistic billing cadences:
 ### 4. One-Click Category Skipping
 
 - If a category is irrelevant (e.g. user has no vehicle or no children), a single click on **"Skip Category"** zeros out its contribution while preserving the data structure.
+
+### 5. Linked Loan Liabilities (Fixed 0% Inflation)
+
+- Contractual loan EMIs from the dedicated Loan EMI Calculator are integrated directly into Category I (Financial & Insurance).
+- Enforces an explicit 0% inflation rate because contractual loan EMIs do not inflate with general living expenses, and drops off automatically post-payoff.
+- Supports independent include/exclude toggles for each loan sub-type (Home, Car, Personal, Custom) with simultaneous multi-loan support.
+- For complete details, see [Linked Calculators Integration](linked-calculators.md).

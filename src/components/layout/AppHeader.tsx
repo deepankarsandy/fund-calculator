@@ -1,6 +1,6 @@
 import { ShieldCheck } from 'lucide-react'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
-import { SocialLinks } from '@/components/ui/SocialLinks'
+import { CleanViewToggle } from '@/components/ui/CleanViewToggle'
 import { CalculatorsDropdown } from '@/components/ui/CalculatorsDropdown'
 import { ProfileHeaderButton } from '@/components/profile/ProfileHeaderButton'
 import { WizardStepper } from '@/components/wizard/WizardStepper'
@@ -55,7 +55,8 @@ export function AppHeader({ onBackToHome, onSelectCalculator, onViewLogic }: App
               onViewLogic={onViewLogic}
             />
 
-            <SocialLinks />
+            <CleanViewToggle />
+
             <ThemeToggle />
 
             {/* Profile Button - Right Most Side */}

@@ -1,3 +1,5 @@
+export type IncomeSourceType = 'insurance_plan' | 'nps_annuity' | 'pension' | 'rental' | 'other'
+
 export interface OtherIncome {
   id: string
   label: string
@@ -5,6 +7,7 @@ export interface OtherIncome {
   startYear: number
   endYear?: number
   inflationLinked: boolean
+  incomeType?: IncomeSourceType
 }
 
 export interface FutureLumpSum {
