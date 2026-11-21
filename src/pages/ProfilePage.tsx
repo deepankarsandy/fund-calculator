@@ -1255,17 +1255,6 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-6 bg-card/50 text-center text-xs text-muted-foreground space-y-1.5 px-4 mt-10">
-        <p className="font-medium">
-          Fund Calculator · Open Source Personal Financial Planning Suite
-        </p>
-        <p className="text-[11px] text-muted-foreground/80 max-w-xl mx-auto">
-          <strong>100% Local & Private:</strong> All your profile settings are kept strictly in your
-          device browser storage. Nothing is sent to any server.
-        </p>
-      </footer>
-
       <ProfileSyncConfirmModal
         isOpen={showConfirmModal}
         onClose={() => setShowConfirmModal(false)}

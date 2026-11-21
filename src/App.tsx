@@ -3,6 +3,7 @@ import { useRouter } from '@/lib/router'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { useHeaderStore } from '@/store/useHeaderStore'
 import { AppHeader } from '@/components/layout/AppHeader'
+import { AppFooter } from '@/components/layout/AppFooter'
 
 // Dynamic lazy loaded pages for route-based chunk splitting
 const HomePage = lazy(() => import('@/pages/HomePage'))
@@ -120,7 +121,10 @@ export default function App() {
         onSelectCalculator={handleSelectCalculator}
         onViewLogic={navigateToLogic}
       />
-      <Suspense fallback={<PageFallback />}>{renderPage()}</Suspense>
+      <main className="flex-1 flex flex-col">
+        <Suspense fallback={<PageFallback />}>{renderPage()}</Suspense>
+      </main>
+      <AppFooter />
     </div>
   )
 }
