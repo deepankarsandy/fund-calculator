@@ -34,6 +34,7 @@ import { navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
 import { ProfileSyncConfirmModal } from '@/components/profile/ProfileSyncConfirmModal'
 import { ProfileDependentsTab } from '@/components/profile/ProfileDependentsTab'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface ProfilePageProps {
   onBackToHome: () => void
@@ -570,31 +571,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         {workingYearsRemaining} working yrs left
                       </span>
                     </div>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={Math.max(18, formData.currentAge)}
                       max={100}
-                      value={retirementAgeInput}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setRetirementAgeInput(val)
-                        if (val !== '') {
-                          const parsed = parseInt(val, 10)
-                          if (!isNaN(parsed)) {
-                            setFormData((p) => ({ ...p, retirementAge: parsed }))
-                          }
+                      integerOnly={true}
+                      fallbackValue={60}
+                      value={formData.retirementAge}
+                      onChange={(val) => {
+                        if (val !== undefined) {
+                          setRetirementAgeInput(String(val))
+                          setFormData((p) => ({ ...p, retirementAge: val }))
                         }
                       }}
-                      onBlur={() => {
-                        const parsed = parseInt(retirementAgeInput, 10)
-                        const minAge = Math.max(18, formData.currentAge)
-                        const validAge = isNaN(parsed)
-                          ? 60
-                          : Math.max(minAge, Math.min(100, parsed))
-                        setRetirementAgeInput(String(validAge))
-                        setFormData((p) => ({ ...p, retirementAge: validAge }))
-                      }}
-                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all font-bold"
                     />
                     <p className="text-[11px] text-muted-foreground">
                       Age when active salary stops and withdrawals begin.
@@ -610,31 +599,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         {retirementYears} yrs in retirement
                       </span>
                     </div>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={Math.max(formData.retirementAge + 1, 65)}
                       max={120}
-                      value={targetAgeInput}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setTargetAgeInput(val)
-                        if (val !== '') {
-                          const parsed = parseInt(val, 10)
-                          if (!isNaN(parsed)) {
-                            setFormData((p) => ({ ...p, targetAge: parsed }))
-                          }
+                      integerOnly={true}
+                      fallbackValue={85}
+                      value={formData.targetAge}
+                      onChange={(val) => {
+                        if (val !== undefined) {
+                          setTargetAgeInput(String(val))
+                          setFormData((p) => ({ ...p, targetAge: val }))
                         }
                       }}
-                      onBlur={() => {
-                        const parsed = parseInt(targetAgeInput, 10)
-                        const minTarget = Math.max(formData.retirementAge + 1, 65)
-                        const validTarget = isNaN(parsed)
-                          ? 85
-                          : Math.max(minTarget, Math.min(120, parsed))
-                        setTargetAgeInput(String(validTarget))
-                        setFormData((p) => ({ ...p, targetAge: validTarget }))
-                      }}
-                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all font-bold"
                     />
                     <p className="text-[11px] text-muted-foreground">
                       Corpus lasts up to this age (85–90 safeguards against longevity risk).
@@ -767,18 +744,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         }
                         className="flex-1 accent-blue-600 cursor-pointer"
                       />
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1}
                         max={20}
                         step={0.1}
+                        fallbackValue={6.0}
                         value={formData.overallInflationRate}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            overallInflationRate: Math.max(0, parseFloat(e.target.value) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              overallInflationRate: val,
+                            }))
+                          }
+                        }}
                         className="w-24 h-11 px-3 text-sm bg-background border border-border rounded-xl font-bold text-center"
                       />
                     </div>
@@ -840,18 +819,17 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                               </p>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
-                              <input
-                                type="number"
+                              <NumberInput
                                 min={0}
                                 max={25}
                                 step={0.5}
+                                fallbackValue={sector.suggested}
                                 value={currentRate}
-                                onChange={(e) =>
-                                  handleSectorInflationChange(
-                                    sector.key,
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
+                                onChange={(val) => {
+                                  if (val !== undefined) {
+                                    handleSectorInflationChange(sector.key, val)
+                                  }
+                                }}
                                 className="w-18 h-9 px-2 text-xs bg-background border border-border rounded-lg font-bold text-right"
                               />
                               <span className="text-xs font-bold text-muted-foreground">%</span>
@@ -878,17 +856,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
                         ₹
                       </span>
-                      <input
-                        type="number"
+                      <NumberInput
                         min={0}
                         step={5000}
+                        fallbackValue={0}
                         value={formData.monthlyIncome}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            monthlyIncome: Math.max(0, parseInt(e.target.value, 10) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              monthlyIncome: val,
+                            }))
+                          }
+                        }}
                         className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
                     </div>
@@ -910,18 +890,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       Expected Annual Salary Increment (%)
                     </label>
                     <div className="flex items-center gap-2">
-                      <input
-                        type="number"
+                      <NumberInput
                         min={0}
                         max={30}
                         step={0.5}
+                        fallbackValue={8.0}
                         value={formData.annualIncomeGrowthRate}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            annualIncomeGrowthRate: Math.max(0, parseFloat(e.target.value) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              annualIncomeGrowthRate: val,
+                            }))
+                          }
+                        }}
                         className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
                       <span className="text-xs font-bold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
@@ -946,27 +928,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Existing Investable Corpus Today
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={50000}
-                          value={formData.existingInvestableCorpus}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              existingInvestableCorpus: Math.max(
-                                0,
-                                parseInt(e.target.value, 10) || 0
-                              ),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={50000}
+                        value={formData.existingInvestableCorpus}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            existingInvestableCorpus: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Liquid mutual funds, FDs, savings (excluding primary home).
                       </p>
@@ -976,24 +951,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Default Monthly SIP Amount
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlySipInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlySipInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlySipInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlySipInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Baseline for systematic investment calculator.
                       </p>
@@ -1006,24 +977,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Monthly EPF / PF Contribution
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlyPfInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlyPfInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlyPfInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlyPfInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Provident Fund deductions (Employee + Employer).
                       </p>
@@ -1034,24 +1001,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Monthly NPS Contribution
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlyNpsInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlyNpsInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlyNpsInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlyNpsInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         National Pension System Tier 1 monthly contribution.
                       </p>
@@ -1123,25 +1086,21 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Equity LTCG Tax Rate
                       </label>
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          max={30}
-                          step={0.5}
-                          value={formData.ltcgTaxRate}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              ltcgTaxRate: Math.max(0, parseFloat(e.target.value) || 0),
-                            }))
-                          }
-                          className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs"
-                        />
-                        <span className="text-xs font-bold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
-                          %
-                        </span>
-                      </div>
+                      <NumberInput
+                        min={0}
+                        max={30}
+                        step={0.5}
+                        value={formData.ltcgTaxRate}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            ltcgTaxRate: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={12.5}
+                        suffix="%"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[10px] text-muted-foreground">
                         12.5% per Indian Budget 2024.
                       </p>

@@ -26,6 +26,7 @@ import { getStoredFdInputs, saveStoredFdInputs, saveStoredFdResults } from '@/li
 import { getStoredFdPageTab, saveStoredFdPageTab, FdPageTab } from '@/lib/ppfStorage'
 import { PpfCalculatorSection } from '@/components/calculator/PpfCalculatorSection'
 import { cn } from '@/lib/cn'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface FdCalculatorPageProps {
   onBackToHome: () => void
@@ -53,15 +54,19 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
     saveStoredFdResults(results)
   }, [inputs, results])
 
-  const handlePrincipalChange = (val: number) => {
-    setInputs((prev) => ({ ...prev, principalAmount: Math.max(0, val) }))
+  const handlePrincipalChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({ ...prev, principalAmount: val }))
+    }
   }
 
-  const handleRateChange = (val: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      annualInterestRate: Math.max(0, Math.min(20, val)),
-    }))
+  const handleRateChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        annualInterestRate: val,
+      }))
+    }
   }
 
   const handleYearsChange = (val: number) => {
@@ -261,12 +266,12 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                         ₹
                       </span>
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1000}
                         step={10000}
+                        fallbackValue={1000}
                         value={inputs.principalAmount}
-                        onChange={(e) => handlePrincipalChange(Number(e.target.value))}
+                        onChange={handlePrincipalChange}
                         className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -319,13 +324,13 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
                       className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                     />
                     <div className="relative w-28 shrink-0">
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1}
                         max={20}
                         step={0.1}
+                        fallbackValue={7.0}
                         value={inputs.annualInterestRate}
-                        onChange={(e) => handleRateChange(Number(e.target.value))}
+                        onChange={handleRateChange}
                         className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                       />
                       <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -572,14 +577,16 @@ export default function FdCalculatorPage({ onBackToHome }: FdCalculatorPageProps
                         <label className="text-[11px] font-semibold text-muted-foreground block mb-1">
                           General Inflation Rate (% p.a.)
                         </label>
-                        <input
-                          type="number"
+                        <NumberInput
+                          min={0}
+                          max={30}
                           step={0.5}
+                          fallbackValue={6.0}
                           value={inputs.inflationRatePercent}
-                          onChange={(e) =>
+                          onChange={(val) =>
                             setInputs((prev) => ({
                               ...prev,
-                              inflationRatePercent: Number(e.target.value),
+                              inflationRatePercent: val ?? 6.0,
                             }))
                           }
                           className="w-32 px-2.5 py-1.5 bg-background border border-border rounded-lg text-xs font-bold"

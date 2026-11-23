@@ -9,6 +9,7 @@ import { FREQUENCY_LABELS, FREQUENCY_MULTIPLIERS } from '@/domain/models/expense
 import type { HouseholdMember } from '@/domain/models/household'
 import { cn } from '@/lib/cn'
 import { getStoredSettings, updateStoredSettings, setLastFilled } from '@/lib/settingsStorage'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 // ─── localStorage-backed expanded categories ──────────────────────────────────
 
@@ -277,14 +278,14 @@ function ExpenseWindowPanel({
           <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
             Starts year
           </span>
-          <input
-            type="number"
+          <NumberInput
             min={1}
+            integerOnly={true}
             value={item.startYear}
             onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-            onChange={(e) => {
+            onChange={(val) => {
               setLastFilled(`expense-item-${item.id}`, 4)
-              onUpdate({ startYear: Math.max(1, Number(e.target.value)) })
+              onUpdate({ startYear: val ?? 1 })
             }}
             className="w-14 h-7 border border-zinc-300 dark:border-zinc-700 rounded-lg px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
@@ -294,15 +295,16 @@ function ExpenseWindowPanel({
           <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
             Ends year
           </span>
-          <input
-            type="number"
+          <NumberInput
             min={item.startYear}
-            value={item.endYear ?? ''}
+            integerOnly={true}
+            value={item.endYear}
             placeholder="Lifelong"
+            allowEmpty={true}
             onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-            onChange={(e) => {
+            onChange={(val) => {
               setLastFilled(`expense-item-${item.id}`, 4)
-              onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
+              onUpdate({ endYear: val })
             }}
             className="w-20 h-7 border border-zinc-300 dark:border-zinc-700 rounded-lg px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
@@ -395,17 +397,17 @@ function SubItemRow({
             <span className="absolute left-2.5 text-xs font-bold text-zinc-500 pointer-events-none">
               ₹
             </span>
-            <input
-              type="number"
+            <NumberInput
               min={0}
               value={item.amount || ''}
               placeholder="0"
+              fallbackValue={0}
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={(e) => {
+              onChange={(val) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
-                onUpdate({ amount: e.target.value === '' ? 0 : Number(e.target.value) })
+                onUpdate({ amount: val ?? 0 })
               }}
-              className="w-24 sm:w-28 h-9 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              className="w-24 sm:w-28 h-9 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
             />
           </div>
 
@@ -433,17 +435,18 @@ function SubItemRow({
               <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
                 Every
               </span>
-              <input
-                type="number"
+              <NumberInput
                 min={1}
                 max={30}
+                integerOnly={true}
                 value={item.everyNYears ?? 5}
+                fallbackValue={5}
                 onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-                onChange={(e) => {
+                onChange={(val) => {
                   setLastFilled(`expense-item-${item.id}`, 4)
-                  onUpdate({ everyNYears: Number(e.target.value) })
+                  onUpdate({ everyNYears: val ?? 5 })
                 }}
-                className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900"
               />
               <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
                 yrs
@@ -513,14 +516,14 @@ function SubItemRow({
 
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-500 font-medium">Start Year:</span>
-            <input
-              type="number"
+            <NumberInput
               min={1}
+              integerOnly={true}
               value={item.startYear}
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={(e) => {
+              onChange={(val) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
-                onUpdate({ startYear: Number(e.target.value) })
+                onUpdate({ startYear: val ?? 1 })
               }}
               className="w-16 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
@@ -528,15 +531,16 @@ function SubItemRow({
 
           <div className="flex items-center gap-1.5">
             <span className="text-zinc-500 font-medium">End Year:</span>
-            <input
-              type="number"
-              min={1}
-              value={item.endYear ?? ''}
+            <NumberInput
+              min={item.startYear}
+              integerOnly={true}
+              value={item.endYear}
               placeholder="Lifelong"
+              allowEmpty={true}
               onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-              onChange={(e) => {
+              onChange={(val) => {
                 setLastFilled(`expense-item-${item.id}`, 4)
-                onUpdate({ endYear: e.target.value ? Number(e.target.value) : undefined })
+                onUpdate({ endYear: val })
               }}
               className="w-20 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
             />
@@ -729,17 +733,17 @@ function CategoryPanel({
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="relative flex items-center">
                 <span className="absolute left-3.5 text-sm font-bold text-zinc-400">₹</span>
-                <input
-                  type="number"
+                <NumberInput
                   min={0}
                   value={cat.parentAmount ?? ''}
                   placeholder="0"
+                  fallbackValue={0}
                   onFocus={() => setLastFilled(`category-${cat.id}`, 4)}
-                  onChange={(e) => {
+                  onChange={(val) => {
                     setLastFilled(`category-${cat.id}`, 4)
-                    updateCategory(cat.id, { parentAmount: Number(e.target.value) })
+                    updateCategory(cat.id, { parentAmount: val ?? 0 })
                   }}
-                  className="w-44 h-11 border border-zinc-300 dark:border-zinc-700 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  className="w-44 h-11 border border-zinc-300 dark:border-zinc-700 rounded-xl pl-8 pr-3 text-sm font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
                 />
               </div>
 

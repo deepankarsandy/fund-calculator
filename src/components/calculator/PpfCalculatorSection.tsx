@@ -26,6 +26,7 @@ import {
 } from '@/domain/calculations/ppf'
 import { getStoredPpfInputs, saveStoredPpfInputs, saveStoredPpfResults } from '@/lib/ppfStorage'
 import { cn } from '@/lib/cn'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 export function PpfCalculatorSection() {
   const [inputs, setInputs] = useState<PpfCalculationInputs>(() => getStoredPpfInputs())
@@ -52,22 +53,24 @@ export function PpfCalculatorSection() {
     }))
   }
 
-  const handleAnnualDepositChange = (val: number) => {
-    const capped = Math.max(0, Math.min(MAX_PPF_ANNUAL_DEPOSIT, val))
-    setInputs((prev) => ({
-      ...prev,
-      annualDeposit: capped,
-      monthlyDeposit: Math.min(12500, Math.round(capped / 12)),
-    }))
+  const handleAnnualDepositChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        annualDeposit: val,
+        monthlyDeposit: Math.min(12500, Math.round(val / 12)),
+      }))
+    }
   }
 
-  const handleMonthlyDepositChange = (val: number) => {
-    const capped = Math.max(0, Math.min(12500, val))
-    setInputs((prev) => ({
-      ...prev,
-      monthlyDeposit: capped,
-      annualDeposit: Math.min(MAX_PPF_ANNUAL_DEPOSIT, capped * 12),
-    }))
+  const handleMonthlyDepositChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        monthlyDeposit: val,
+        annualDeposit: Math.min(MAX_PPF_ANNUAL_DEPOSIT, val * 12),
+      }))
+    }
   }
 
   const handleStartModeChange = (mode: PpfStartMode) => {
@@ -111,11 +114,13 @@ export function PpfCalculatorSection() {
     })
   }
 
-  const handleExistingCorpusChange = (corpus: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      existingCorpus: Math.max(0, corpus),
-    }))
+  const handleExistingCorpusChange = (corpus: number | undefined) => {
+    if (corpus !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        existingCorpus: corpus,
+      }))
+    }
   }
 
   const handleTenureChange = (tenureYears: number) => {
@@ -154,18 +159,22 @@ export function PpfCalculatorSection() {
     }))
   }
 
-  const handleTaxSlabChange = (rate: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      taxSlabRatePercent: Math.max(0, Math.min(50, rate)),
-    }))
+  const handleTaxSlabChange = (rate: number | undefined) => {
+    if (rate !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        taxSlabRatePercent: rate,
+      }))
+    }
   }
 
-  const handleInflationChange = (rate: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      inflationRatePercent: Math.max(0, Math.min(20, rate)),
-    }))
+  const handleInflationChange = (rate: number | undefined) => {
+    if (rate !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        inflationRatePercent: rate,
+      }))
+    }
   }
 
   const handleReset = () => {
@@ -339,13 +348,13 @@ export function PpfCalculatorSection() {
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-semibold">
                     ₹
                   </span>
-                  <input
-                    type="number"
-                    min="500"
+                  <NumberInput
+                    min={500}
                     max={MAX_PPF_ANNUAL_DEPOSIT}
-                    step="500"
+                    step={500}
+                    fallbackValue={150000}
                     value={inputs.annualDeposit || ''}
-                    onChange={(e) => handleAnnualDepositChange(Number(e.target.value))}
+                    onChange={handleAnnualDepositChange}
                     className="w-full pl-6 pr-2 py-1 text-xs font-bold rounded-lg border border-border bg-background text-right"
                   />
                 </div>
@@ -406,13 +415,13 @@ export function PpfCalculatorSection() {
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-semibold">
                     ₹
                   </span>
-                  <input
-                    type="number"
-                    min="500"
-                    max="12500"
-                    step="500"
+                  <NumberInput
+                    min={500}
+                    max={12500}
+                    step={500}
+                    fallbackValue={12500}
                     value={inputs.monthlyDeposit || ''}
-                    onChange={(e) => handleMonthlyDepositChange(Number(e.target.value))}
+                    onChange={handleMonthlyDepositChange}
                     className="w-full pl-6 pr-2 py-1 text-xs font-bold rounded-lg border border-border bg-background text-right"
                   />
                 </div>
@@ -527,12 +536,12 @@ export function PpfCalculatorSection() {
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-muted-foreground font-semibold">
                       ₹
                     </span>
-                    <input
-                      type="number"
-                      min="0"
-                      step="1000"
+                    <NumberInput
+                      min={0}
+                      step={1000}
+                      fallbackValue={0}
                       value={inputs.existingCorpus || ''}
-                      onChange={(e) => handleExistingCorpusChange(Number(e.target.value))}
+                      onChange={handleExistingCorpusChange}
                       placeholder="e.g. 5,00,000"
                       className="w-full pl-6 pr-2.5 py-1 text-xs font-bold rounded-lg border border-border bg-background"
                     />
@@ -727,13 +736,13 @@ export function PpfCalculatorSection() {
                     Tax Slab (for 80C Savings)
                   </label>
                   <div className="flex items-center gap-1.5">
-                    <input
-                      type="number"
-                      min="0"
-                      max="50"
-                      step="1"
+                    <NumberInput
+                      min={0}
+                      max={50}
+                      step={1}
+                      fallbackValue={20}
                       value={inputs.taxSlabRatePercent}
-                      onChange={(e) => handleTaxSlabChange(Number(e.target.value))}
+                      onChange={handleTaxSlabChange}
                       className="w-20 px-2 py-1 rounded-lg border border-border bg-background text-right font-bold"
                     />
                     <span className="text-muted-foreground">%</span>
@@ -746,13 +755,13 @@ export function PpfCalculatorSection() {
                 <div className="space-y-1">
                   <label className="font-semibold text-foreground">Inflation Rate</label>
                   <div className="flex items-center gap-1.5">
-                    <input
-                      type="number"
-                      min="0"
-                      max="15"
-                      step="0.1"
+                    <NumberInput
+                      min={0}
+                      max={15}
+                      step={0.1}
+                      fallbackValue={6.0}
                       value={inputs.inflationRatePercent}
-                      onChange={(e) => handleInflationChange(Number(e.target.value))}
+                      onChange={handleInflationChange}
                       className="w-20 px-2 py-1 rounded-lg border border-border bg-background text-right font-bold"
                     />
                     <span className="text-muted-foreground">%</span>
