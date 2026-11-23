@@ -53,7 +53,7 @@ export const DEFAULT_PAGE_HEADERS: Record<string, HeaderConfig> = {
   },
   profile: {
     title: 'Fund Calculator',
-    subtitle: 'User Profile & Calculator Defaults (DOB, Retirement, Inflation)',
+    subtitle: 'User Profile & Calculator Defaults',
     currentActive: 'profile',
     showPrivateBadge: true,
     showStepper: false,
