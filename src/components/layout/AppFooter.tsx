@@ -103,7 +103,7 @@ export function AppFooter() {
                   onClick={() => navigateToFD()}
                   className="text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                 >
-                  Fixed Deposit (FD)
+                  Fixed Deposit (FD) & PPF
                 </button>
               </li>
               <li>

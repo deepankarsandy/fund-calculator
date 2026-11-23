@@ -39,7 +39,7 @@ export const DEFAULT_PAGE_HEADERS: Record<string, HeaderConfig> = {
   },
   fd: {
     title: 'Fund Calculator',
-    subtitle: 'Financial Planning Suite · Fixed Deposit (FD)',
+    subtitle: 'Financial Planning Suite · Fixed Deposit (FD) & PPF',
     currentActive: 'fd',
     showPrivateBadge: true,
     showStepper: false,

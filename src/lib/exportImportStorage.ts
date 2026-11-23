@@ -9,6 +9,11 @@ import {
   CUSTOM_PLAN_RESULTS_STORAGE_KEY,
 } from '@/lib/investmentStorage'
 import { FD_INPUTS_STORAGE_KEY, FD_RESULTS_STORAGE_KEY } from '@/lib/fdStorage'
+import {
+  PPF_INPUTS_STORAGE_KEY,
+  PPF_RESULTS_STORAGE_KEY,
+  FD_PAGE_TAB_STORAGE_KEY,
+} from '@/lib/ppfStorage'
 import { LOAN_EMI_INPUTS_STORAGE_KEY, LOAN_EMI_RESULTS_STORAGE_KEY } from '@/lib/loanEmiStorage'
 import { LINKED_CALCULATORS_STORAGE_KEY } from '@/lib/linkedCalculatorsStorage'
 import { applyTheme, getSavedTheme } from '@/lib/theme'
@@ -72,11 +77,17 @@ export const STORAGE_SECTIONS: StorageSectionConfig[] = [
   },
   {
     id: 'fd',
-    name: 'Fixed Deposit (FD) Calculator',
-    shortTitle: 'Fixed Deposit',
+    name: 'Fixed Deposit (FD) & PPF Calculator',
+    shortTitle: 'Fixed Deposit & PPF',
     description:
-      'Deposit amounts, interest rates, compounding frequencies, and maturity projections.',
-    keys: [FD_INPUTS_STORAGE_KEY, FD_RESULTS_STORAGE_KEY],
+      'Deposit amounts, interest rates, compounding frequencies, PPF 15-year tenure & extensions, and maturity projections.',
+    keys: [
+      FD_INPUTS_STORAGE_KEY,
+      FD_RESULTS_STORAGE_KEY,
+      PPF_INPUTS_STORAGE_KEY,
+      PPF_RESULTS_STORAGE_KEY,
+      FD_PAGE_TAB_STORAGE_KEY,
+    ],
     icon: 'landmark',
   },
   {

@@ -1,6 +1,7 @@
 import { getStoredSipInputs, StoredSipData } from '@/lib/sipStorage'
 import { getStoredFdInputs } from '@/lib/fdStorage'
 import { getStoredLoanEmiInputs } from '@/lib/loanEmiStorage'
+import { getStoredPpfInputs } from '@/lib/ppfStorage'
 import {
   calculateSip,
   calculateSwp,
@@ -11,6 +12,7 @@ import {
 } from '@/domain/calculations/sip'
 import { calculateFd, FdCalculationInputs } from '@/domain/calculations/fd'
 import { calculateLoanEmi, LoanEmiCalculationInputs } from '@/domain/calculations/loanEmi'
+import { calculatePpf, PpfCalculationInputs } from '@/domain/calculations/ppf'
 import type { OtherIncome, FutureLumpSum } from '@/domain/models/assets'
 import type { ExpenseCategory, ExpenseItem } from '@/domain/models/expense'
 
@@ -51,10 +53,15 @@ export interface LinkedLoanConfig {
   }
 }
 
+export interface LinkedPpfConfig {
+  enabled: boolean
+}
+
 export interface LinkedCalculatorsConfig {
   sip: LinkedSipConfig
   fd: LinkedFdConfig
   loan: LinkedLoanConfig
+  ppf: LinkedPpfConfig
 }
 
 export const DEFAULT_LINKED_CALCULATORS_CONFIG: LinkedCalculatorsConfig = {
@@ -85,6 +92,9 @@ export const DEFAULT_LINKED_CALCULATORS_CONFIG: LinkedCalculatorsConfig = {
       personal: false,
       custom: false,
     },
+  },
+  ppf: {
+    enabled: false,
   },
 }
 
@@ -118,6 +128,10 @@ export function getLinkedCalculatorsConfig(): LinkedCalculatorsConfig {
             ...DEFAULT_LINKED_CALCULATORS_CONFIG.loan.enabledTypes,
             ...(parsed.loan?.enabledTypes || {}),
           },
+        },
+        ppf: {
+          ...DEFAULT_LINKED_CALCULATORS_CONFIG.ppf,
+          ...(parsed.ppf || {}),
         },
       }
     }
@@ -311,6 +325,56 @@ export function getFdSummaries(stored?: FdCalculationInputs): Record<FdLinkedTyp
     cumulative: cumSummary,
     monthly: monSummary,
     quarterly: qtrSummary,
+  }
+}
+
+export interface PpfSummary {
+  label: string
+  shortDescription: string
+  annualDeposit: number
+  monthlyDeposit: number
+  depositFrequency: 'yearly' | 'monthly'
+  annualInterestRate: number
+  tenureYears: number
+  contributionYears: number
+  maturityAmount: number
+  totalPrincipal: number
+  totalInterest: number
+  totalTaxSaved80C: number
+  isExtended: boolean
+  isConfigured: boolean
+}
+
+export function getPpfSummary(stored?: PpfCalculationInputs): PpfSummary {
+  const inputs = stored || getStoredPpfInputs()
+  const res = calculatePpf(inputs)
+
+  const isConfigured =
+    (inputs.annualDeposit > 0 || (inputs.startMode === 'existing' && inputs.existingCorpus > 0)) &&
+    res.maturityAmount > 0
+
+  return {
+    label: `PPF Account (${res.tenureYears} Years · 100% Tax-Free)`,
+    shortDescription:
+      res.extensionYears > 0
+        ? `Govt sovereign scheme extended by ${res.extensionYears} yrs with EEE tax exemption`
+        : 'Govt sovereign scheme with 15-yr statutory lock-in & EEE tax exemption',
+    annualDeposit:
+      inputs.depositFrequency === 'yearly' ? inputs.annualDeposit : inputs.monthlyDeposit * 12,
+    monthlyDeposit:
+      inputs.depositFrequency === 'monthly'
+        ? inputs.monthlyDeposit
+        : Math.round(inputs.annualDeposit / 12),
+    depositFrequency: inputs.depositFrequency,
+    annualInterestRate: inputs.annualInterestRate,
+    tenureYears: res.tenureYears,
+    contributionYears: res.contributionYears,
+    maturityAmount: res.maturityAmount,
+    totalPrincipal: res.totalPrincipalDeposited,
+    totalInterest: res.totalInterestEarned,
+    totalTaxSaved80C: res.totalTaxSaved80C,
+    isExtended: res.extensionYears > 0,
+    isConfigured,
   }
 }
 
@@ -518,6 +582,19 @@ export function buildLinkedIncomeItems(config?: LinkedCalculatorsConfig): {
         })
       }
     })
+  }
+
+  // 3. PPF Calculator
+  if (cfg.ppf?.enabled) {
+    const ppfSummary = getPpfSummary()
+    if (ppfSummary && ppfSummary.isConfigured && ppfSummary.maturityAmount > 0) {
+      futureContributions.push({
+        id: 'linked-ppf-maturity',
+        label: `PPF Maturity (PPF Calculator - ${ppfSummary.tenureYears} yrs, Tax-Free)`,
+        amount: ppfSummary.maturityAmount,
+        year: ppfSummary.tenureYears,
+      })
+    }
   }
 
   return { futureContributions, otherIncome }
