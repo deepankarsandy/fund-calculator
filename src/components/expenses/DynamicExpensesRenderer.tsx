@@ -393,6 +393,9 @@ function SubItemRow({
 
   // For family category items, show the ExpenseWindowPanel always (not in "More").
   const showWindowPanel = isFamilyCategory
+  const isCustomItem = Boolean(
+    item.isCustom || item.id.startsWith('custom_') || item.categoryId === 'custom'
+  )
 
   return (
     <div
@@ -406,21 +409,35 @@ function SubItemRow({
       )}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <input
-          type="text"
-          value={item.name}
-          onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
-          onChange={(e) => {
-            setLastFilled(`expense-item-${item.id}`, 4)
-            onUpdate({ name: e.target.value })
-          }}
-          className={cn(
-            'flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500',
-            cleanViewActive
-              ? 'px-2.5 py-1.5 h-8 bg-white/70 dark:bg-zinc-900/70'
-              : 'px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900'
-          )}
-        />
+        {isCustomItem ? (
+          <input
+            type="text"
+            value={item.name}
+            placeholder="Expense name"
+            onFocus={() => setLastFilled(`expense-item-${item.id}`, 4)}
+            onChange={(e) => {
+              setLastFilled(`expense-item-${item.id}`, 4)
+              onUpdate({ name: e.target.value })
+            }}
+            className={cn(
+              'flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500',
+              cleanViewActive
+                ? 'px-2.5 py-1.5 h-8 bg-white/70 dark:bg-zinc-900/70'
+                : 'px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900'
+            )}
+          />
+        ) : (
+          <div
+            className={cn(
+              'flex-1 font-semibold text-xs sm:text-sm text-zinc-900 dark:text-zinc-100 flex items-center min-w-0 select-text',
+              cleanViewActive ? 'px-2 py-1.5 h-8' : 'px-2.5 py-2 h-9'
+            )}
+          >
+            <span className="truncate" title={item.name}>
+              {item.name}
+            </span>
+          </div>
+        )}
 
         <div className="flex items-center gap-1.5 shrink-0">
           <div className="relative flex items-center">
@@ -663,6 +680,7 @@ function CategoryPanel({
       type: 'recurring',
       notes: 'Custom user defined expense',
       skipped: false,
+      isCustom: true,
     }
     addExpenseItem(cat.id, newItem)
     setLastFilled(`expense-item-${newItem.id}`, 4)

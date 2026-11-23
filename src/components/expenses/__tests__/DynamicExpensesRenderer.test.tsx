@@ -162,4 +162,52 @@ describe('DynamicExpensesRenderer Clean View & Row Details', () => {
       root.unmount()
     })
   })
+
+  it('renders standard items with fixed label text and custom items with editable input', async () => {
+    let root: any
+    act(() => {
+      root = createRoot(container!)
+      root.render(<DynamicExpensesRenderer />)
+    })
+
+    const expandAllButton = Array.from(container?.querySelectorAll('button') || []).find((b) =>
+      b.textContent?.includes('Expand All')
+    )
+    act(() => {
+      expandAllButton?.click()
+    })
+
+    const rows = container?.querySelectorAll('.expense-item-row')
+    expect(rows?.length).toBeGreaterThan(0)
+
+    const firstRow = rows?.[0]
+    expect(firstRow).toBeDefined()
+
+    // First row is a standard item (e.g. rent / groceries / etc.), its name should not be in an editable text input
+    const standardNameInput = firstRow?.querySelector('input[type="text"]')
+    expect(standardNameInput).toBeNull()
+
+    // Add a custom line item
+    const addCustomBtn = Array.from(container?.querySelectorAll('button') || []).find((b) =>
+      b.textContent?.includes('Add Custom Line Item')
+    )
+    expect(addCustomBtn).toBeDefined()
+
+    act(() => {
+      addCustomBtn?.click()
+    })
+
+    // Now find the newly added custom item row by its custom ID
+    const customRow = Array.from(container?.querySelectorAll('.expense-item-row') || []).find((r) =>
+      r.id.startsWith('expense-item-custom_')
+    )
+    expect(customRow).toBeDefined()
+    const customNameInput = customRow?.querySelector('input[type="text"]') as HTMLInputElement
+    expect(customNameInput).not.toBeNull()
+    expect(customNameInput?.value).toBe('Custom Line Item')
+
+    act(() => {
+      root.unmount()
+    })
+  })
 })
