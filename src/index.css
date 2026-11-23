@@ -148,6 +148,24 @@ body {
   visibility: hidden;
 }
 
+/* Compact styling for Living Expenses section in clean view */
+.clean-view .calculator-page .expense-item-row {
+  border-width: 0 !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0.375rem !important;
+  padding-bottom: 0.375rem !important;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+
+.clean-view .calculator-page .expense-items-container > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.125rem !important;
+  margin-bottom: 0 !important;
+}
+
 /* Guard: Error and warning labels/texts must NEVER be hidden in any mode */
 .calculator-page .calc-warning,
 .calculator-page .calc-error,

@@ -10,6 +10,7 @@ import type { HouseholdMember } from '@/domain/models/household'
 import { cn } from '@/lib/cn'
 import { getStoredSettings, updateStoredSettings, setLastFilled } from '@/lib/settingsStorage'
 import { NumberInput } from '@/components/ui/NumberInput'
+import { useCleanView } from '@/lib/cleanView'
 
 // ─── localStorage-backed expanded categories ──────────────────────────────────
 
@@ -97,7 +98,7 @@ function DependentExpenseBanner({ members }: { members: HouseholdMember[] }) {
   if (dependents.length === 0) return null
 
   return (
-    <div className="rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-4 flex gap-3">
+    <div className="calc-info-box calc-clean-hide rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 p-4 flex gap-3">
       <span className="text-xl shrink-0">💡</span>
       <div className="text-sm text-amber-900 dark:text-amber-200">
         <p className="font-semibold">
@@ -222,6 +223,7 @@ interface ExpenseWindowPanelProps {
   userCurrentAge: number
   categoryInflationRate: number
   onUpdate: (patch: Partial<ExpenseItem>) => void
+  isCleanView?: boolean
 }
 
 function ExpenseWindowPanel({
@@ -230,6 +232,7 @@ function ExpenseWindowPanel({
   userCurrentAge,
   categoryInflationRate,
   onUpdate,
+  isCleanView,
 }: ExpenseWindowPanelProps) {
   const suggestions = getWindowSuggestions(item, members, userCurrentAge)
 
@@ -242,7 +245,14 @@ function ExpenseWindowPanel({
   const durationYears = item.endYear ? item.endYear - item.startYear + 1 : null
 
   return (
-    <div className="mt-2 bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50 rounded-xl p-3 space-y-3">
+    <div
+      className={cn(
+        'rounded-xl transition-all',
+        isCleanView
+          ? 'mt-1 bg-blue-50/40 dark:bg-blue-950/20 border-0 p-2 space-y-2'
+          : 'mt-2 bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/50 p-3 space-y-3'
+      )}
+    >
       <div className="flex items-center gap-2">
         <span className="text-[11px] font-bold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
           ⏱ Expense Window
@@ -358,6 +368,7 @@ function SubItemRow({
   members,
   userCurrentAge,
   categoryInflationRate,
+  isCleanView,
 }: {
   item: ExpenseItem
   onUpdate: (patch: Partial<ExpenseItem>) => void
@@ -366,8 +377,19 @@ function SubItemRow({
   members: HouseholdMember[]
   userCurrentAge: number
   categoryInflationRate: number
+  isCleanView?: boolean
 }) {
-  const [showDetails, setShowDetails] = useState(false)
+  const cleanViewHook = useCleanView()
+  const cleanViewActive = isCleanView ?? cleanViewHook.isCleanView
+
+  // When clean mode is off (normal default mode), on each row, always show the 'more' option as on,
+  // user can click on the 'less' button to show less.
+  // When clean mode is on, it defaults to compact (showDetails = false).
+  const [showDetails, setShowDetails] = useState(!cleanViewActive)
+
+  useEffect(() => {
+    setShowDetails(!cleanViewActive)
+  }, [cleanViewActive])
 
   // For family category items, show the ExpenseWindowPanel always (not in "More").
   const showWindowPanel = isFamilyCategory
@@ -376,7 +398,10 @@ function SubItemRow({
     <div
       id={`expense-item-${item.id}`}
       className={cn(
-        'border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2 text-sm bg-white dark:bg-zinc-900 shadow-xs transition-colors',
+        'expense-item-row transition-all text-sm',
+        cleanViewActive
+          ? 'border-0 border-transparent shadow-none rounded-lg p-1.5 sm:p-2 space-y-1 bg-transparent my-0'
+          : 'border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 space-y-2 bg-white dark:bg-zinc-900 shadow-xs',
         item.skipped && 'opacity-40'
       )}
     >
@@ -389,7 +414,12 @@ function SubItemRow({
             setLastFilled(`expense-item-${item.id}`, 4)
             onUpdate({ name: e.target.value })
           }}
-          className="flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className={cn(
+            'flex-1 font-semibold text-xs sm:text-sm border border-zinc-200 dark:border-zinc-800 rounded-lg text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500',
+            cleanViewActive
+              ? 'px-2.5 py-1.5 h-8 bg-white/70 dark:bg-zinc-900/70'
+              : 'px-3 py-2 bg-zinc-50/50 dark:bg-zinc-900'
+          )}
         />
 
         <div className="flex items-center gap-1.5 shrink-0">
@@ -407,7 +437,10 @@ function SubItemRow({
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ amount: val ?? 0 })
               }}
-              className="w-24 sm:w-28 h-9 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className={cn(
+                'w-24 sm:w-28 border border-zinc-200 dark:border-zinc-800 rounded-lg pl-6 pr-2 text-xs text-right font-bold bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-1 focus:ring-blue-500',
+                cleanViewActive ? 'h-8 py-1' : 'h-9'
+              )}
             />
           </div>
 
@@ -419,7 +452,10 @@ function SubItemRow({
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ frequency: e.target.value as Frequency })
               }}
-              className="h-9 appearance-none border border-zinc-200 dark:border-zinc-800 rounded-lg pl-2.5 pr-6 text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer"
+              className={cn(
+                'appearance-none border border-zinc-200 dark:border-zinc-800 rounded-lg pl-2.5 pr-6 text-xs font-semibold bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-1 focus:ring-blue-500 cursor-pointer',
+                cleanViewActive ? 'h-8 py-1' : 'h-9'
+              )}
             >
               {Object.entries(FREQUENCY_LABELS).map(([k, label]) => (
                 <option key={k} value={k}>
@@ -431,7 +467,12 @@ function SubItemRow({
           </div>
 
           {item.frequency === 'every_n_years' && (
-            <div className="flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-lg">
+            <div
+              className={cn(
+                'flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg',
+                cleanViewActive ? 'px-1.5 py-0.5' : 'px-2 py-1'
+              )}
+            >
               <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
                 Every
               </span>
@@ -446,7 +487,10 @@ function SubItemRow({
                   setLastFilled(`expense-item-${item.id}`, 4)
                   onUpdate({ everyNYears: val ?? 5 })
                 }}
-                className="w-10 h-7 border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900"
+                className={cn(
+                  'border rounded text-xs text-center font-bold bg-white dark:bg-zinc-900',
+                  cleanViewActive ? 'w-9 h-6' : 'w-10 h-7'
+                )}
               />
               <span className="text-[11px] font-semibold text-zinc-600 dark:text-zinc-400">
                 yrs
@@ -468,7 +512,10 @@ function SubItemRow({
           <button
             type="button"
             onClick={onRemove}
-            className="text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+            className={cn(
+              'text-red-500 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer',
+              cleanViewActive ? 'p-1' : 'p-1.5'
+            )}
             title="Delete item"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -476,7 +523,7 @@ function SubItemRow({
         </div>
       </div>
 
-      {item.notes && !showDetails && !showWindowPanel && (
+      {item.notes && !showWindowPanel && (
         <p className="calc-helper-text calc-clean-hide text-[11px] text-zinc-600 dark:text-zinc-400 pl-1 flex items-center gap-1.5">
           <Info className="w-3 h-3 text-blue-600 dark:text-blue-400 shrink-0" />
           <span>{item.notes}</span>
@@ -498,12 +545,20 @@ function SubItemRow({
           userCurrentAge={userCurrentAge}
           categoryInflationRate={categoryInflationRate}
           onUpdate={onUpdate}
+          isCleanView={cleanViewActive}
         />
       )}
 
       {/* Non-family: existing "More" details panel */}
       {!showWindowPanel && showDetails && (
-        <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs bg-zinc-50 dark:bg-zinc-900/60 p-2.5 rounded-lg">
+        <div
+          className={cn(
+            'grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs rounded-lg transition-all',
+            cleanViewActive
+              ? 'pt-1.5 p-2 bg-zinc-100/60 dark:bg-zinc-800/40 border-0'
+              : 'pt-2.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/60 p-2.5'
+          )}
+        >
           <label className="flex items-center gap-2 cursor-pointer font-medium text-zinc-800 dark:text-zinc-200">
             <input
               type="checkbox"
@@ -525,7 +580,10 @@ function SubItemRow({
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ startYear: val ?? 1 })
               }}
-              className="w-16 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
+              className={cn(
+                'border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900',
+                cleanViewActive ? 'w-14 h-6' : 'w-16 h-7'
+              )}
             />
           </div>
 
@@ -542,7 +600,10 @@ function SubItemRow({
                 setLastFilled(`expense-item-${item.id}`, 4)
                 onUpdate({ endYear: val })
               }}
-              className="w-20 h-7 border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900"
+              className={cn(
+                'border border-zinc-200 dark:border-zinc-800 rounded px-1.5 text-xs text-center font-bold bg-white dark:bg-zinc-900',
+                cleanViewActive ? 'w-18 h-6' : 'w-20 h-7'
+              )}
             />
           </div>
         </div>
@@ -566,6 +627,7 @@ function CategoryPanel({
   totalCovered: number
   dependentsCount: number
 }) {
+  const { isCleanView } = useCleanView()
   const { updateCategory, addExpenseItem, updateExpenseItem, removeExpenseItem } =
     useScenarioStore()
   const isFamilyCategory = cat.id === 'family'
@@ -626,7 +688,10 @@ function CategoryPanel({
 
   return (
     <div
-      className="p-4 space-y-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl"
+      className={cn(
+        'border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 rounded-b-xl transition-all',
+        isCleanView ? 'p-2 sm:p-3 space-y-2' : 'p-4 space-y-4'
+      )}
       id={`category-${cat.id}`}
     >
       <div className="calc-info-box calc-clean-hide text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2 bg-zinc-100/90 dark:bg-zinc-900/90 border border-zinc-200 dark:border-zinc-800 p-3 rounded-lg leading-relaxed">
@@ -717,7 +782,14 @@ function CategoryPanel({
       {/* Parent Total Mode */}
       {isParentMode ? (
         <div className="space-y-4">
-          <div className="space-y-3 bg-white dark:bg-zinc-900 p-4 rounded-xl border-2 border-blue-500/50 shadow-xs">
+          <div
+            className={cn(
+              'space-y-3 rounded-xl transition-all',
+              isCleanView
+                ? 'p-2 sm:p-2.5 border-0 bg-transparent shadow-none'
+                : 'p-4 bg-white dark:bg-zinc-900 border-2 border-blue-500/50 shadow-xs'
+            )}
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="text-xs font-bold text-zinc-900 dark:text-zinc-100">
                 Lump-Sum Total for {cat.label}
@@ -815,7 +887,7 @@ function CategoryPanel({
         </div>
       ) : (
         /* Sub-items Mode */
-        <div className="space-y-2.5">
+        <div className={cn('expense-items-container', isCleanView ? 'space-y-0.5' : 'space-y-2.5')}>
           {cat.items
             .filter((item) => !String(item.id || '').startsWith('linked-'))
             .map((item) => (
@@ -828,13 +900,17 @@ function CategoryPanel({
                 members={members}
                 userCurrentAge={userCurrentAge}
                 categoryInflationRate={cat.defaultInflationRate}
+                isCleanView={isCleanView}
               />
             ))}
 
           <button
             type="button"
             onClick={handleAddCustomItem}
-            className="flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 py-2 px-3.5 rounded-xl transition-all cursor-pointer shadow-xs"
+            className={cn(
+              'flex items-center gap-2 text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 border border-blue-200 dark:border-blue-800/60 rounded-xl transition-all cursor-pointer shadow-xs',
+              isCleanView ? 'py-1.5 px-3 mt-1' : 'py-2 px-3.5'
+            )}
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Add Custom Line Item</span>
