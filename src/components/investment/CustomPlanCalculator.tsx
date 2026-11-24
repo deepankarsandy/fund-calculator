@@ -26,6 +26,7 @@ import {
   DEFAULT_CUSTOM_PLAN_INPUTS,
   buildScheduleFromInputs,
 } from '@/domain/calculations/customPlan'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface CustomPlanCalculatorProps {
   inputs: CustomPlanInputs
@@ -263,12 +264,13 @@ Generated via Fund Calculator (100% Private & Open Source)
             </div>
             <div className="space-y-1">
               <label className="text-xs font-bold text-foreground">Starting Age</label>
-              <input
-                type="number"
+              <NumberInput
                 min={0}
                 max={90}
+                integerOnly={true}
+                fallbackValue={30}
                 value={inputs.startAge}
-                onChange={(e) => updateInputs({ startAge: Math.max(0, Number(e.target.value)) })}
+                onChange={(val) => updateInputs({ startAge: val ?? 30 })}
                 className="w-full px-3 py-1.5 text-xs font-semibold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
@@ -341,14 +343,12 @@ Generated via Fund Calculator (100% Private & Open Source)
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1000}
                       step={5000}
+                      fallbackValue={1000}
                       value={inputs.annualInvestment}
-                      onChange={(e) =>
-                        updateInputs({ annualInvestment: Math.max(0, Number(e.target.value)) })
-                      }
+                      onChange={(val) => updateInputs({ annualInvestment: val ?? 1000 })}
                       className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -398,14 +398,12 @@ Generated via Fund Calculator (100% Private & Open Source)
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={10000}
                       step={50000}
+                      fallbackValue={10000}
                       value={inputs.totalInvestment}
-                      onChange={(e) =>
-                        updateInputs({ totalInvestment: Math.max(0, Number(e.target.value)) })
-                      }
+                      onChange={(val) => updateInputs({ totalInvestment: val ?? 10000 })}
                       className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -606,14 +604,12 @@ Generated via Fund Calculator (100% Private & Open Source)
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1000}
                       step={10000}
+                      fallbackValue={1000}
                       value={inputs.annualPayout}
-                      onChange={(e) =>
-                        updateInputs({ annualPayout: Math.max(0, Number(e.target.value)) })
-                      }
+                      onChange={(val) => updateInputs({ annualPayout: val ?? 1000 })}
                       className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                   </div>
@@ -670,14 +666,12 @@ Generated via Fund Calculator (100% Private & Open Source)
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={0}
                       step={50000}
+                      fallbackValue={0}
                       value={inputs.maturityLumpSum}
-                      onChange={(e) =>
-                        updateInputs({ maturityLumpSum: Math.max(0, Number(e.target.value)) })
-                      }
+                      onChange={(val) => updateInputs({ maturityLumpSum: val ?? 0 })}
                       className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
@@ -839,23 +833,23 @@ Generated via Fund Calculator (100% Private & Open Source)
                         <tr key={row.year} className="hover:bg-muted/30">
                           <td className="p-2 font-bold text-foreground">Yr {row.year}</td>
                           <td className="p-2">
-                            <input
-                              type="number"
+                            <NumberInput
                               min={0}
+                              fallbackValue={0}
                               value={row.invested}
-                              onChange={(e) =>
-                                handleCustomRowChange(row.year, 'invested', e.target.value)
+                              onChange={(val) =>
+                                handleCustomRowChange(row.year, 'invested', val ?? 0)
                               }
                               className="w-24 px-1.5 py-1 text-xs border border-border rounded bg-background text-right focus:outline-none focus:ring-1 focus:ring-purple-500"
                             />
                           </td>
                           <td className="p-2">
-                            <input
-                              type="number"
+                            <NumberInput
                               min={0}
+                              fallbackValue={0}
                               value={row.received}
-                              onChange={(e) =>
-                                handleCustomRowChange(row.year, 'received', e.target.value)
+                              onChange={(val) =>
+                                handleCustomRowChange(row.year, 'received', val ?? 0)
                               }
                               className="w-24 px-1.5 py-1 text-xs border border-border rounded bg-background text-right focus:outline-none focus:ring-1 focus:ring-purple-500 font-semibold text-emerald-600 dark:text-emerald-400"
                             />

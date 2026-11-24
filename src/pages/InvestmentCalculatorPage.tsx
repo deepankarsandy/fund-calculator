@@ -38,6 +38,7 @@ import {
   getStoredInvestmentTab,
   saveStoredInvestmentTab,
 } from '@/lib/investmentStorage'
+import { NumberInput } from '@/components/ui/NumberInput'
 import { CustomPlanCalculator } from '@/components/investment/CustomPlanCalculator'
 
 interface InvestmentCalculatorPageProps {
@@ -88,40 +89,50 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
     }
   }
 
-  const handlePrincipalChange = (val: number) => {
-    setInputs((prev) => ({ ...prev, initialInvestment: Math.max(0, val) }))
+  const handlePrincipalChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({ ...prev, initialInvestment: val }))
+    }
   }
 
-  const handleYearsChange = (val: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      timeHorizonYears: Math.max(1, Math.min(50, val)),
-    }))
+  const handleYearsChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        timeHorizonYears: val,
+      }))
+    }
   }
 
-  const handleSimpleRateChange = (val: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      simpleReturnRate: Math.max(0, Math.min(50, val)),
-    }))
+  const handleSimpleRateChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        simpleReturnRate: val,
+      }))
+    }
   }
 
-  const handleAssetWeightChange = (id: string, weight: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      allocations: prev.allocations.map((a) =>
-        a.id === id ? { ...a, allocationPercent: Math.max(0, Math.min(100, weight)) } : a
-      ),
-    }))
+  const handleAssetWeightChange = (id: string, weight: number | undefined) => {
+    if (weight !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        allocations: prev.allocations.map((a) =>
+          a.id === id ? { ...a, allocationPercent: weight } : a
+        ),
+      }))
+    }
   }
 
-  const handleAssetReturnChange = (id: string, rate: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      allocations: prev.allocations.map((a) =>
-        a.id === id ? { ...a, expectedReturnRate: Math.max(0, Math.min(50, rate)) } : a
-      ),
-    }))
+  const handleAssetReturnChange = (id: string, rate: number | undefined) => {
+    if (rate !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        allocations: prev.allocations.map((a) =>
+          a.id === id ? { ...a, expectedReturnRate: rate } : a
+        ),
+      }))
+    }
   }
 
   const handleReset = () => {
@@ -300,12 +311,12 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                         ₹
                       </span>
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1000}
                         step={10000}
+                        fallbackValue={1000}
                         value={inputs.initialInvestment}
-                        onChange={(e) => handlePrincipalChange(Number(e.target.value))}
+                        onChange={handlePrincipalChange}
                         className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
@@ -353,13 +364,14 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                       className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                     />
                     <div className="relative w-28 shrink-0">
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1}
                         max={50}
                         step={1}
+                        integerOnly={true}
+                        fallbackValue={10}
                         value={inputs.timeHorizonYears}
-                        onChange={(e) => handleYearsChange(Number(e.target.value))}
+                        onChange={handleYearsChange}
                         className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                       />
                     </div>
@@ -448,15 +460,13 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                               <label className="text-[10px] text-muted-foreground block mb-1">
                                 Expected Return (% p.a.)
                               </label>
-                              <input
-                                type="number"
+                              <NumberInput
                                 min={0}
                                 max={40}
                                 step={0.5}
+                                fallbackValue={10}
                                 value={asset.expectedReturnRate}
-                                onChange={(e) =>
-                                  handleAssetReturnChange(asset.id, Number(e.target.value))
-                                }
+                                onChange={(val) => handleAssetReturnChange(asset.id, val)}
                                 className="w-full px-2 py-1 text-xs font-bold bg-background border border-border rounded text-right focus:outline-none focus:ring-1 focus:ring-blue-500"
                               />
                             </div>
@@ -489,13 +499,13 @@ export default function InvestmentCalculatorPage({ onBackToHome }: InvestmentCal
                         className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       />
                       <div className="relative w-28 shrink-0">
-                        <input
-                          type="number"
+                        <NumberInput
                           min={1}
                           max={40}
                           step={0.5}
+                          fallbackValue={12}
                           value={inputs.simpleReturnRate}
-                          onChange={(e) => handleSimpleRateChange(Number(e.target.value))}
+                          onChange={handleSimpleRateChange}
                           className="w-full px-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>

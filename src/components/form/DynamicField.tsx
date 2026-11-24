@@ -3,6 +3,7 @@ import { FieldConfig } from '@/config/formFields'
 import { formatCrore } from '@/lib/currency'
 import { cn } from '@/lib/cn'
 import { setLastFilled } from '@/lib/settingsStorage'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface DynamicFieldProps {
   field: FieldConfig
@@ -76,21 +77,21 @@ export function DynamicField({ field, value, onChange }: DynamicFieldProps) {
                 {field.prefix}
               </span>
             )}
-            <input
+            <NumberInput
               id={field.id}
-              type="number"
               min={field.min}
               max={field.max}
               step={field.step}
               value={currentValue ?? ''}
               placeholder={field.placeholder}
+              allowEmpty={true}
               onFocus={handleFocus}
-              onChange={(e) => {
+              onChange={(val) => {
                 setLastFilled(field.id)
-                onChange(e.target.value === '' ? '' : Number(e.target.value))
+                onChange(val === undefined ? '' : val)
               }}
               className={cn(
-                'w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none',
+                'w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm font-medium bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 dark:placeholder:text-zinc-600 shadow-xs focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 dark:focus:border-blue-500 transition-all duration-150',
                 field.prefix ? 'pl-8' : 'pl-3.5',
                 field.suffix ? 'pr-16' : 'pr-3.5'
               )}

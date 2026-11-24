@@ -5,6 +5,7 @@ import { StepResults } from '@/components/steps/StepResults'
 import {
   LinkedSipInflowCard,
   LinkedFdInflowCard,
+  LinkedPpfInflowCard,
 } from '@/components/wizard/LinkedIncomeCalculatorsCard'
 import { useScenarioStore } from '@/store/useScenarioStore'
 import { Info } from 'lucide-react'
@@ -95,9 +96,10 @@ export function DynamicStepRenderer({ step, onViewLogic }: DynamicStepRendererPr
             </div>
           </div>
 
-          {/* Linked SIP and FD Calculator Cards */}
+          {/* Linked SIP, FD, and PPF Calculator Cards */}
           <LinkedSipInflowCard />
           <LinkedFdInflowCard />
+          <LinkedPpfInflowCard />
         </div>
       )}
 

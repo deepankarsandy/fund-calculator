@@ -34,6 +34,7 @@ import {
   saveStoredSipInputs,
   saveStoredSipResults,
 } from '@/lib/sipStorage'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface SipCalculatorPageProps {
   onBackToHome: () => void
@@ -71,54 +72,68 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
   }
 
   // SIP input handlers
-  const handleSipMonthlyChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      sip: { ...prev.sip, monthlyInvestment: Math.max(0, val) },
-    }))
+  const handleSipMonthlyChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        sip: { ...prev.sip, monthlyInvestment: val },
+      }))
+    }
   }
 
-  const handleSipReturnChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      sip: { ...prev.sip, annualReturnRate: Math.max(0, Math.min(50, val)) },
-    }))
+  const handleSipReturnChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        sip: { ...prev.sip, annualReturnRate: val },
+      }))
+    }
   }
 
-  const handleSipYearsChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      sip: { ...prev.sip, timeHorizonYears: Math.max(1, Math.min(50, val)) },
-    }))
+  const handleSipYearsChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        sip: { ...prev.sip, timeHorizonYears: val },
+      }))
+    }
   }
 
   // SWP input handlers
-  const handleSwpCorpusChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      swp: { ...prev.swp, initialInvestment: Math.max(0, val) },
-    }))
+  const handleSwpCorpusChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        swp: { ...prev.swp, initialInvestment: val },
+      }))
+    }
   }
 
-  const handleSwpMonthlyChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      swp: { ...prev.swp, monthlyWithdrawal: Math.max(0, val) },
-    }))
+  const handleSwpMonthlyChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        swp: { ...prev.swp, monthlyWithdrawal: val },
+      }))
+    }
   }
 
-  const handleSwpReturnChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      swp: { ...prev.swp, annualReturnRate: Math.max(0, Math.min(50, val)) },
-    }))
+  const handleSwpReturnChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        swp: { ...prev.swp, annualReturnRate: val },
+      }))
+    }
   }
 
-  const handleSwpYearsChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      swp: { ...prev.swp, timeHorizonYears: Math.max(1, Math.min(50, val)) },
-    }))
+  const handleSwpYearsChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        swp: { ...prev.swp, timeHorizonYears: val },
+      }))
+    }
   }
 
   // COMBO (SIP to SWP) input handlers
@@ -155,38 +170,46 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
     })
   }
 
-  const handleComboSipMonthlyChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      combo: { ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS), monthlySip: Math.max(0, val) },
-    }))
+  const handleComboSipMonthlyChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        combo: { ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS), monthlySip: val },
+      }))
+    }
   }
 
-  const handleComboSipReturnChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      combo: {
-        ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS),
-        sipReturnRate: Math.max(0, Math.min(40, val)),
-      },
-    }))
+  const handleComboSipReturnChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        combo: {
+          ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS),
+          sipReturnRate: val,
+        },
+      }))
+    }
   }
 
-  const handleComboSwpMonthlyChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      combo: { ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS), monthlySwp: Math.max(0, val) },
-    }))
+  const handleComboSwpMonthlyChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        combo: { ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS), monthlySwp: val },
+      }))
+    }
   }
 
-  const handleComboSwpReturnChange = (val: number) => {
-    setData((prev) => ({
-      ...prev,
-      combo: {
-        ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS),
-        swpReturnRate: Math.max(0, Math.min(40, val)),
-      },
-    }))
+  const handleComboSwpReturnChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setData((prev) => ({
+        ...prev,
+        combo: {
+          ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS),
+          swpReturnRate: val,
+        },
+      }))
+    }
   }
 
   const handleReset = () => {
@@ -378,12 +401,12 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={500}
                       step={500}
+                      fallbackValue={500}
                       value={sipInputs.monthlyInvestment}
-                      onChange={(e) => handleSipMonthlyChange(Number(e.target.value))}
+                      onChange={handleSipMonthlyChange}
                       className="w-full pl-6 pr-2.5 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -431,13 +454,13 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
                   <div className="relative w-28 shrink-0">
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={50}
                       step={0.5}
+                      fallbackValue={12}
                       value={sipInputs.annualReturnRate}
-                      onChange={(e) => handleSipReturnChange(Number(e.target.value))}
+                      onChange={handleSipReturnChange}
                       className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -493,13 +516,14 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                   <div className="relative w-28 shrink-0">
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={50}
                       step={1}
+                      integerOnly={true}
+                      fallbackValue={10}
                       value={sipInputs.timeHorizonYears}
-                      onChange={(e) => handleSipYearsChange(Number(e.target.value))}
+                      onChange={handleSipYearsChange}
                       className="w-full pl-2.5 pr-8 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -631,16 +655,18 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                             LTCG Tax Rate (%)
                           </label>
                           <div className="relative">
-                            <input
-                              type="number"
+                            <NumberInput
+                              min={0}
+                              max={50}
                               step={0.5}
+                              fallbackValue={12.5}
                               value={sipInputs.taxRatePercent ?? 12.5}
-                              onChange={(e) =>
+                              onChange={(val) =>
                                 setData((prev) => ({
                                   ...prev,
                                   sip: {
                                     ...prev.sip,
-                                    taxRatePercent: Number(e.target.value),
+                                    taxRatePercent: val ?? 12.5,
                                   },
                                 }))
                               }
@@ -663,16 +689,17 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                             <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                               ₹
                             </span>
-                            <input
-                              type="number"
+                            <NumberInput
+                              min={0}
                               step={5000}
+                              fallbackValue={125000}
                               value={sipInputs.taxExemptionAmount ?? 125000}
-                              onChange={(e) =>
+                              onChange={(val) =>
                                 setData((prev) => ({
                                   ...prev,
                                   sip: {
                                     ...prev.sip,
-                                    taxExemptionAmount: Number(e.target.value),
+                                    taxExemptionAmount: val ?? 125000,
                                   },
                                 }))
                               }
@@ -691,16 +718,18 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                         Inflation Rate for Real Value Discounting (% p.a.)
                       </label>
                       <div className="relative w-32">
-                        <input
-                          type="number"
+                        <NumberInput
+                          min={0}
+                          max={30}
                           step={0.5}
+                          fallbackValue={6.0}
                           value={sipInputs.inflationRatePercent ?? 6.0}
-                          onChange={(e) =>
+                          onChange={(val) =>
                             setData((prev) => ({
                               ...prev,
                               sip: {
                                 ...prev.sip,
-                                inflationRatePercent: Number(e.target.value),
+                                inflationRatePercent: val ?? 6.0,
                               },
                             }))
                           }
@@ -882,12 +911,12 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={100000}
                       step={100000}
+                      fallbackValue={100000}
                       value={swpInputs.initialInvestment}
-                      onChange={(e) => handleSwpCorpusChange(Number(e.target.value))}
+                      onChange={handleSwpCorpusChange}
                       className="w-full pl-6 pr-2.5 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
@@ -938,12 +967,12 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                       ₹
                     </span>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1000}
                       step={1000}
+                      fallbackValue={1000}
                       value={swpInputs.monthlyWithdrawal}
-                      onChange={(e) => handleSwpMonthlyChange(Number(e.target.value))}
+                      onChange={handleSwpMonthlyChange}
                       className="w-full pl-6 pr-2.5 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
@@ -991,13 +1020,13 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                   />
                   <div className="relative w-28 shrink-0">
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={30}
                       step={0.5}
+                      fallbackValue={8.5}
                       value={swpInputs.annualReturnRate}
-                      onChange={(e) => handleSwpReturnChange(Number(e.target.value))}
+                      onChange={handleSwpReturnChange}
                       className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -1053,13 +1082,14 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                     className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                   />
                   <div className="relative w-28 shrink-0">
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={50}
                       step={1}
+                      integerOnly={true}
+                      fallbackValue={15}
                       value={swpInputs.timeHorizonYears}
-                      onChange={(e) => handleSwpYearsChange(Number(e.target.value))}
+                      onChange={handleSwpYearsChange}
                       className="w-full pl-2.5 pr-8 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
                     <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -1525,12 +1555,12 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                           ₹
                         </span>
-                        <input
-                          type="number"
+                        <NumberInput
                           min={500}
                           step={500}
+                          fallbackValue={500}
                           value={comboInputs.monthlySip}
-                          onChange={(e) => handleComboSipMonthlyChange(Number(e.target.value))}
+                          onChange={handleComboSipMonthlyChange}
                           className="w-full pl-6 pr-2.5 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                       </div>
@@ -1577,13 +1607,13 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                         className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       />
                       <div className="relative w-28 shrink-0">
-                        <input
-                          type="number"
+                        <NumberInput
                           min={1}
                           max={35}
                           step={0.5}
+                          fallbackValue={12}
                           value={comboInputs.sipReturnRate}
-                          onChange={(e) => handleComboSipReturnChange(Number(e.target.value))}
+                          onChange={handleComboSipReturnChange}
                           className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -1719,12 +1749,12 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                         <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                           ₹
                         </span>
-                        <input
-                          type="number"
+                        <NumberInput
                           min={1000}
                           step={1000}
+                          fallbackValue={1000}
                           value={comboInputs.monthlySwp}
-                          onChange={(e) => handleComboSwpMonthlyChange(Number(e.target.value))}
+                          onChange={handleComboSwpMonthlyChange}
                           className="w-full pl-6 pr-2.5 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-amber-500"
                         />
                       </div>
@@ -1771,13 +1801,13 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                         className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                       />
                       <div className="relative w-28 shrink-0">
-                        <input
-                          type="number"
+                        <NumberInput
                           min={1}
                           max={25}
                           step={0.5}
+                          fallbackValue={8}
                           value={comboInputs.swpReturnRate}
-                          onChange={(e) => handleComboSwpReturnChange(Number(e.target.value))}
+                          onChange={handleComboSwpReturnChange}
                           className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -1913,16 +1943,18 @@ export default function SipCalculatorPage({ onBackToHome }: SipCalculatorPagePro
                           Inflation Discounting Rate (% p.a.)
                         </label>
                         <div className="relative w-32">
-                          <input
-                            type="number"
+                          <NumberInput
+                            min={0}
+                            max={30}
                             step={0.5}
+                            fallbackValue={6.0}
                             value={comboInputs.inflationRatePercent ?? 6.0}
-                            onChange={(e) =>
+                            onChange={(val) =>
                               setData((prev) => ({
                                 ...prev,
                                 combo: {
                                   ...(prev.combo || DEFAULT_SIP_TO_SWP_INPUTS),
-                                  inflationRatePercent: Number(e.target.value),
+                                  inflationRatePercent: val ?? 6.0,
                                 },
                               }))
                             }

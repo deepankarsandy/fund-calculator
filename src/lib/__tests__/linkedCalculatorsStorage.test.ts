@@ -4,6 +4,7 @@ import {
   saveLinkedCalculatorsConfig,
   getSipSummaries,
   getFdSummaries,
+  getPpfSummary,
   getLoanSummaries,
   buildLinkedIncomeItems,
   buildLinkedLoanExpenseItems,
@@ -320,6 +321,46 @@ describe('Linked Calculators Storage & Synchronization Logic', () => {
 
       expect(futureContributions.some((l) => l.id === 'linked-fd-cumulative')).toBe(false)
       expect(otherIncome.some((i) => i.id === 'linked-fd-monthly')).toBe(true)
+    })
+  })
+
+  describe('PPF Summaries & Linking', () => {
+    it('computes correct summary for PPF account', () => {
+      const summary = getPpfSummary()
+
+      expect(summary.isConfigured).toBe(true)
+      expect(summary.annualDeposit).toBe(150000)
+      expect(summary.tenureYears).toBe(15)
+      expect(summary.maturityAmount).toBeGreaterThan(4000000)
+      expect(summary.totalPrincipal).toBe(2250000)
+      expect(summary.totalTaxSaved80C).toBeGreaterThan(0)
+    })
+
+    it('injects PPF maturity into futureContributions when enabled', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.sip, enabled: false },
+        fd: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.fd, enabled: false },
+        ppf: { enabled: true },
+      }
+      const { futureContributions } = buildLinkedIncomeItems(cfg)
+
+      expect(futureContributions.length).toBe(1)
+      expect(futureContributions[0].id).toBe('linked-ppf-maturity')
+      expect(futureContributions[0].amount).toBeGreaterThan(4000000)
+      expect(futureContributions[0].year).toBe(15)
+    })
+
+    it('excludes PPF maturity when ppf.enabled is false', () => {
+      const cfg = {
+        ...DEFAULT_LINKED_CALCULATORS_CONFIG,
+        sip: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.sip, enabled: false },
+        fd: { ...DEFAULT_LINKED_CALCULATORS_CONFIG.fd, enabled: false },
+        ppf: { enabled: false },
+      }
+      const { futureContributions } = buildLinkedIncomeItems(cfg)
+
+      expect(futureContributions.some((f) => f.id === 'linked-ppf-maturity')).toBe(false)
     })
   })
 

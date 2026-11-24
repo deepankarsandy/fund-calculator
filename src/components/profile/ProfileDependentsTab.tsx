@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import type { HouseholdMember, Relationship } from '@/domain/models/household'
 import { cn } from '@/lib/cn'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface ProfileDependentsTabProps {
   dependents: HouseholdMember[]
@@ -353,16 +354,17 @@ export function ProfileDependentsTab({
                   {/* Current Age */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-foreground">Current Age (Years)</label>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={0}
                       max={120}
+                      integerOnly={true}
                       value={dep.age}
-                      onChange={(e) =>
+                      onChange={(val) =>
                         handleUpdate(idx, {
-                          age: Math.max(0, Math.min(120, parseInt(e.target.value, 10) || 0)),
+                          age: val ?? 0,
                         })
                       }
+                      fallbackValue={0}
                       className="w-full h-10 border border-border rounded-xl px-3 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                     />
                   </div>
@@ -377,18 +379,17 @@ export function ProfileDependentsTab({
                         {isChild ? 'Default: 25 yrs' : 'Leave empty for lifelong'}
                       </span>
                     </div>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={120}
-                      value={dep.supportUntilAge ?? ''}
-                      onChange={(e) => {
-                        const val = e.target.value === '' ? undefined : parseInt(e.target.value, 10)
+                      integerOnly={true}
+                      allowEmpty={true}
+                      value={dep.supportUntilAge}
+                      onChange={(val) =>
                         handleUpdate(idx, {
-                          supportUntilAge:
-                            val !== undefined ? Math.max(1, Math.min(120, val)) : undefined,
+                          supportUntilAge: val,
                         })
-                      }}
+                      }
                       placeholder={isChild ? 'e.g. 25 (independence)' : 'Lifelong if empty'}
                       className="w-full h-10 border border-border rounded-xl px-3 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                     />

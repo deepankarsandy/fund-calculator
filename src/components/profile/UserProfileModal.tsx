@@ -31,6 +31,7 @@ import { useScenarioStore } from '@/store/useScenarioStore'
 import { cn } from '@/lib/cn'
 import { ProfileSyncConfirmModal } from './ProfileSyncConfirmModal'
 import { ProfileDependentsTab } from './ProfileDependentsTab'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface UserProfileModalProps {
   isOpen: boolean
@@ -126,17 +127,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const [showSavedToast, setShowSavedToast] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
 
-  // Local input string states so users can clear, backspace, and type numbers freely without premature clamping
-  const [retirementAgeInput, setRetirementAgeInput] = useState<string>(
-    String(storedProfile.retirementAge || 60)
-  )
-  const [targetAgeInput, setTargetAgeInput] = useState<string>(
-    String(storedProfile.targetAge || 85)
-  )
-  const [currentAgeInput, setCurrentAgeInput] = useState<string>(
-    String(storedProfile.currentAge || 30)
-  )
-
   // Sync internal state when storedProfile changes or modal opens
   useEffect(() => {
     if (isOpen) {
@@ -145,9 +135,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         ...storedProfile,
         dob: normalizedDob,
       })
-      setRetirementAgeInput(String(storedProfile.retirementAge || 60))
-      setTargetAgeInput(String(storedProfile.targetAge || 85))
-      setCurrentAgeInput(String(storedProfile.currentAge || 30))
       setShowSavedToast(false)
       setShowConfirmModal(false)
     }
@@ -167,7 +154,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         ...prev,
         currentAge: age,
       }))
-      setCurrentAgeInput(String(age))
     }
   }
 
@@ -179,7 +165,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
       currentAge: safeAge,
       dob: approxDob,
     }))
-    setCurrentAgeInput(String(safeAge))
   }
 
   const handleSectorInflationChange = (key: keyof SectorInflationRates, val: number) => {
@@ -203,14 +188,11 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
   const executeSave = () => {
     setShowConfirmModal(false)
 
-    // Ensure final validated numbers from inputs
-    const numRetire = parseInt(retirementAgeInput, 10)
     const minAge = Math.max(18, formData.currentAge)
-    const finalRetire = isNaN(numRetire) ? 60 : Math.max(minAge, Math.min(100, numRetire))
+    const finalRetire = Math.max(minAge, Math.min(100, formData.retirementAge || 60))
 
-    const numTarget = parseInt(targetAgeInput, 10)
     const minTarget = Math.max(finalRetire + 1, 65)
-    const finalTarget = isNaN(numTarget) ? 85 : Math.max(minTarget, Math.min(120, numTarget))
+    const finalTarget = Math.max(minTarget, Math.min(120, formData.targetAge || 85))
 
     const payload: UserProfile = {
       ...formData,
@@ -241,9 +223,6 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
         ...defaults,
         dob: normalizedDob,
       })
-      setRetirementAgeInput(String(defaults.retirementAge))
-      setTargetAgeInput(String(defaults.targetAge))
-      setCurrentAgeInput(String(defaults.currentAge))
       if (autoSyncCalculators) {
         syncProfileToCalculators(defaults)
         applyProfileDefaultsToWizard(defaults)
@@ -451,26 +430,16 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-foreground">Current Age (Years)</label>
                     <div className="flex items-center gap-2">
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1}
                         max={110}
-                        value={currentAgeInput}
-                        onChange={(e) => {
-                          const val = e.target.value
-                          setCurrentAgeInput(val)
-                          if (val !== '') {
-                            const parsed = parseInt(val, 10)
-                            if (!isNaN(parsed) && parsed >= 1) {
-                              setFormData((p) => ({ ...p, currentAge: parsed }))
-                            }
-                          }
-                        }}
-                        onBlur={() => {
-                          const parsed = parseInt(currentAgeInput, 10)
-                          const safeAge = isNaN(parsed) ? 30 : Math.max(1, Math.min(110, parsed))
+                        integerOnly={true}
+                        value={formData.currentAge}
+                        onChange={(val) => {
+                          const safeAge = val ?? 30
                           handleAgeChange(safeAge)
                         }}
+                        fallbackValue={30}
                         className="w-full h-11 border border-border rounded-xl px-3.5 text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
                       <span className="text-xs font-semibold text-muted-foreground px-2 py-1 bg-muted rounded-lg shrink-0">
@@ -495,28 +464,18 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       {workingYearsRemaining} working yrs left
                     </span>
                   </div>
-                  <input
-                    type="number"
+                  <NumberInput
                     min={Math.max(18, formData.currentAge)}
                     max={100}
-                    value={retirementAgeInput}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setRetirementAgeInput(val)
-                      if (val !== '') {
-                        const parsed = parseInt(val, 10)
-                        if (!isNaN(parsed)) {
-                          setFormData((p) => ({ ...p, retirementAge: parsed }))
-                        }
-                      }
-                    }}
-                    onBlur={() => {
-                      const parsed = parseInt(retirementAgeInput, 10)
-                      const minAge = Math.max(18, formData.currentAge)
-                      const validAge = isNaN(parsed) ? 60 : Math.max(minAge, Math.min(100, parsed))
-                      setRetirementAgeInput(String(validAge))
-                      setFormData((p) => ({ ...p, retirementAge: validAge }))
-                    }}
+                    integerOnly={true}
+                    value={formData.retirementAge}
+                    onChange={(val) =>
+                      setFormData((p) => ({
+                        ...p,
+                        retirementAge: val ?? 60,
+                      }))
+                    }
+                    fallbackValue={60}
                     className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                   />
                   <p className="text-[11px] text-muted-foreground">
@@ -533,30 +492,18 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       {retirementYears} yrs in retirement
                     </span>
                   </div>
-                  <input
-                    type="number"
+                  <NumberInput
                     min={Math.max(formData.retirementAge + 1, 65)}
                     max={120}
-                    value={targetAgeInput}
-                    onChange={(e) => {
-                      const val = e.target.value
-                      setTargetAgeInput(val)
-                      if (val !== '') {
-                        const parsed = parseInt(val, 10)
-                        if (!isNaN(parsed)) {
-                          setFormData((p) => ({ ...p, targetAge: parsed }))
-                        }
-                      }
-                    }}
-                    onBlur={() => {
-                      const parsed = parseInt(targetAgeInput, 10)
-                      const minTarget = Math.max(formData.retirementAge + 1, 65)
-                      const validTarget = isNaN(parsed)
-                        ? 85
-                        : Math.max(minTarget, Math.min(120, parsed))
-                      setTargetAgeInput(String(validTarget))
-                      setFormData((p) => ({ ...p, targetAge: validTarget }))
-                    }}
+                    integerOnly={true}
+                    value={formData.targetAge}
+                    onChange={(val) =>
+                      setFormData((p) => ({
+                        ...p,
+                        targetAge: val ?? 85,
+                      }))
+                    }
+                    fallbackValue={85}
                     className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                   />
                   <p className="text-[11px] text-muted-foreground">
@@ -722,18 +669,18 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                       }
                       className="flex-1 accent-blue-600 cursor-pointer"
                     />
-                    <input
-                      type="number"
+                    <NumberInput
                       min={1}
                       max={20}
                       step={0.1}
                       value={formData.overallInflationRate}
-                      onChange={(e) =>
+                      onChange={(val) =>
                         setFormData((p) => ({
                           ...p,
-                          overallInflationRate: Math.max(0, parseFloat(e.target.value) || 0),
+                          overallInflationRate: val ?? 6.0,
                         }))
                       }
+                      fallbackValue={6.0}
                       className="w-20 px-2 py-1 text-sm bg-background border border-input rounded-lg font-bold text-center"
                     />
                   </div>
@@ -787,18 +734,15 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                             </p>
                           </div>
                           <div className="flex items-center gap-1 shrink-0">
-                            <input
-                              type="number"
+                            <NumberInput
                               min={0}
                               max={25}
                               step={0.5}
                               value={currentRate}
-                              onChange={(e) =>
-                                handleSectorInflationChange(
-                                  sector.key,
-                                  parseFloat(e.target.value) || 0
-                                )
+                              onChange={(val) =>
+                                handleSectorInflationChange(sector.key, val ?? sector.suggested)
                               }
+                              fallbackValue={sector.suggested}
                               className="w-16 px-2 py-1 text-xs bg-background border border-input rounded-lg font-bold text-right"
                             />
                             <span className="text-xs font-bold text-muted-foreground">%</span>
@@ -821,24 +765,20 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <label className="text-xs font-bold text-foreground">
                     Current Monthly Take-Home Income
                   </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">
-                      ₹
-                    </span>
-                    <input
-                      type="number"
-                      min={0}
-                      step={5000}
-                      value={formData.monthlyIncome}
-                      onChange={(e) =>
-                        setFormData((p) => ({
-                          ...p,
-                          monthlyIncome: Math.max(0, parseInt(e.target.value, 10) || 0),
-                        }))
-                      }
-                      className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
+                  <NumberInput
+                    min={0}
+                    step={5000}
+                    value={formData.monthlyIncome}
+                    onChange={(val) =>
+                      setFormData((p) => ({
+                        ...p,
+                        monthlyIncome: val ?? 0,
+                      }))
+                    }
+                    fallbackValue={0}
+                    prefix="₹"
+                    className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
                   <p className="text-[11px] text-muted-foreground">
                     Net monthly earnings after employer deductions.
                   </p>
@@ -856,25 +796,21 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                   <label className="text-xs font-bold text-foreground">
                     Expected Annual Salary Increment (%)
                   </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      max={30}
-                      step={0.5}
-                      value={formData.annualIncomeGrowthRate}
-                      onChange={(e) =>
-                        setFormData((p) => ({
-                          ...p,
-                          annualIncomeGrowthRate: Math.max(0, parseFloat(e.target.value) || 0),
-                        }))
-                      }
-                      className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                    />
-                    <span className="text-xs font-bold text-muted-foreground px-2 py-1 bg-muted rounded-lg">
-                      % / Year
-                    </span>
-                  </div>
+                  <NumberInput
+                    min={0}
+                    max={30}
+                    step={0.5}
+                    value={formData.annualIncomeGrowthRate}
+                    onChange={(val) =>
+                      setFormData((p) => ({
+                        ...p,
+                        annualIncomeGrowthRate: val ?? 8.0,
+                      }))
+                    }
+                    fallbackValue={8.0}
+                    suffix="% / Year"
+                    className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                  />
                   <p className="text-[11px] text-muted-foreground">
                     Standard annual career appraisal in India (~7-10%).
                   </p>
@@ -893,27 +829,20 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <label className="text-xs font-bold text-foreground">
                       Existing Investable Corpus Today
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">
-                        ₹
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        step={50000}
-                        value={formData.existingInvestableCorpus}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            existingInvestableCorpus: Math.max(
-                              0,
-                              parseInt(e.target.value, 10) || 0
-                            ),
-                          }))
-                        }
-                        className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                    <NumberInput
+                      min={0}
+                      step={50000}
+                      value={formData.existingInvestableCorpus}
+                      onChange={(val) =>
+                        setFormData((p) => ({
+                          ...p,
+                          existingInvestableCorpus: val ?? 0,
+                        }))
+                      }
+                      fallbackValue={0}
+                      prefix="₹"
+                      className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    />
                     <p className="text-[11px] text-muted-foreground">
                       Liquid mutual funds, FDs, stocks, savings (excluding primary home).
                     </p>
@@ -923,24 +852,20 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <label className="text-xs font-bold text-foreground">
                       Default Monthly SIP Amount
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">
-                        ₹
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        step={1000}
-                        value={formData.monthlySipInvestment}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            monthlySipInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                          }))
-                        }
-                        className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                    <NumberInput
+                      min={0}
+                      step={1000}
+                      value={formData.monthlySipInvestment}
+                      onChange={(val) =>
+                        setFormData((p) => ({
+                          ...p,
+                          monthlySipInvestment: val ?? 0,
+                        }))
+                      }
+                      fallbackValue={0}
+                      prefix="₹"
+                      className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    />
                     <p className="text-[11px] text-muted-foreground">
                       Baseline for systematic investment calculator.
                     </p>
@@ -953,24 +878,20 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <label className="text-xs font-bold text-foreground">
                       Monthly EPF / PF Contribution
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">
-                        ₹
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        step={1000}
-                        value={formData.monthlyPfInvestment}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            monthlyPfInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                          }))
-                        }
-                        className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                    <NumberInput
+                      min={0}
+                      step={1000}
+                      value={formData.monthlyPfInvestment}
+                      onChange={(val) =>
+                        setFormData((p) => ({
+                          ...p,
+                          monthlyPfInvestment: val ?? 0,
+                        }))
+                      }
+                      fallbackValue={0}
+                      prefix="₹"
+                      className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    />
                     <p className="text-[11px] text-muted-foreground">
                       Provident Fund deductions (Employee + Employer share).
                     </p>
@@ -981,24 +902,20 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <label className="text-xs font-bold text-foreground">
                       Monthly NPS Contribution
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-bold">
-                        ₹
-                      </span>
-                      <input
-                        type="number"
-                        min={0}
-                        step={1000}
-                        value={formData.monthlyNpsInvestment}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            monthlyNpsInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                          }))
-                        }
-                        className="w-full pl-7 pr-3 py-2 text-sm bg-background border border-input rounded-xl font-bold focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                    <NumberInput
+                      min={0}
+                      step={1000}
+                      value={formData.monthlyNpsInvestment}
+                      onChange={(val) =>
+                        setFormData((p) => ({
+                          ...p,
+                          monthlyNpsInvestment: val ?? 0,
+                        }))
+                      }
+                      fallbackValue={0}
+                      prefix="₹"
+                      className="w-full h-10 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    />
                     <p className="text-[11px] text-muted-foreground">
                       National Pension System Tier 1 monthly contribution.
                     </p>
@@ -1068,23 +985,21 @@ export function UserProfileModal({ isOpen, onClose }: UserProfileModalProps) {
                     <label className="text-xs font-bold text-foreground">
                       Equity LTCG Tax Rate
                     </label>
-                    <div className="flex items-center gap-1.5">
-                      <input
-                        type="number"
-                        min={0}
-                        max={30}
-                        step={0.5}
-                        value={formData.ltcgTaxRate}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            ltcgTaxRate: Math.max(0, parseFloat(e.target.value) || 0),
-                          }))
-                        }
-                        className="w-full px-3 py-2 text-sm bg-background border border-input rounded-xl font-bold"
-                      />
-                      <span className="text-xs font-bold text-muted-foreground">%</span>
-                    </div>
+                    <NumberInput
+                      min={0}
+                      max={30}
+                      step={0.5}
+                      value={formData.ltcgTaxRate}
+                      onChange={(val) =>
+                        setFormData((p) => ({
+                          ...p,
+                          ltcgTaxRate: val ?? 12.5,
+                        }))
+                      }
+                      fallbackValue={12.5}
+                      suffix="%"
+                      className="w-full h-11 border border-input rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500"
+                    />
                     <p className="text-[10px] text-muted-foreground">
                       12.5% per Indian Budget 2024.
                     </p>

@@ -27,6 +27,7 @@ import {
   saveStoredLoanEmiInputs,
   saveStoredLoanEmiResults,
 } from '@/lib/loanEmiStorage'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface LoanEmiCalculatorPageProps {
   onBackToHome: () => void
@@ -49,22 +50,28 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
     saveStoredLoanEmiResults(results)
   }, [inputs, results])
 
-  const handleAmountChange = (val: number) => {
-    setInputs((prev) => ({ ...prev, loanAmount: Math.max(0, val) }))
+  const handleAmountChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({ ...prev, loanAmount: val }))
+    }
   }
 
-  const handleRateChange = (val: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      annualInterestRate: Math.max(0, Math.min(30, val)),
-    }))
+  const handleRateChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        annualInterestRate: val,
+      }))
+    }
   }
 
-  const handleYearsChange = (val: number) => {
-    setInputs((prev) => ({
-      ...prev,
-      tenureYears: Math.max(0, Math.min(35, val)),
-    }))
+  const handleYearsChange = (val: number | undefined) => {
+    if (val !== undefined) {
+      setInputs((prev) => ({
+        ...prev,
+        tenureYears: val,
+      }))
+    }
   }
 
   const handleLoanTypePreset = (type: LoanTypePreset) => {
@@ -238,12 +245,13 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
                   <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
                     ₹
                   </span>
-                  <input
-                    type="number"
+                  <NumberInput
                     min={10000}
+                    max={100000000}
                     step={50000}
+                    fallbackValue={10000}
                     value={inputs.loanAmount}
-                    onChange={(e) => handleAmountChange(Number(e.target.value))}
+                    onChange={handleAmountChange}
                     className="w-full pl-6 pr-2 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -291,13 +299,13 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-emerald-600"
                 />
                 <div className="relative w-28 shrink-0">
-                  <input
-                    type="number"
+                  <NumberInput
                     min={1}
                     max={30}
                     step={0.1}
+                    fallbackValue={8.5}
                     value={inputs.annualInterestRate}
-                    onChange={(e) => handleRateChange(Number(e.target.value))}
+                    onChange={handleRateChange}
                     className="w-full pl-2.5 pr-7 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-emerald-500"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">
@@ -402,13 +410,14 @@ export default function LoanEmiCalculatorPage({ onBackToHome }: LoanEmiCalculato
                   className="w-full h-2 bg-muted rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
                 <div className="relative w-28 shrink-0">
-                  <input
-                    type="number"
+                  <NumberInput
                     min={1}
                     max={40}
                     step={1}
+                    integerOnly={true}
+                    fallbackValue={20}
                     value={inputs.tenureYears}
-                    onChange={(e) => handleYearsChange(Number(e.target.value))}
+                    onChange={handleYearsChange}
                     className="w-full pl-2.5 pr-8 py-1.5 text-xs font-bold bg-background border border-border rounded-lg text-right focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                   <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-bold text-muted-foreground">

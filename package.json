@@ -1,7 +1,7 @@
 {
   "name": "lifetime-cost-corpus-calculator",
   "private": true,
-  "version": "0.3.1",
+  "version": "0.4.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -37,6 +37,7 @@
     "@types/react-dom": "^18.3.7",
     "@vitejs/plugin-react": "^4.7.0",
     "@vitest/ui": "^2.1.4",
+    "component-tagger": "^4.0.0",
     "jsdom": "^25.0.1",
     "prettier": "^3.10.1",
     "tailwindcss": "^4.3.5",

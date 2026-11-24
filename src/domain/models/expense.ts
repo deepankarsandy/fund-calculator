@@ -33,6 +33,7 @@ export interface ExpenseItem {
   notes: string
   skipped: boolean
   linkedMemberRelationship?: string
+  isCustom?: boolean
 }
 
 export interface ExpenseCategory {

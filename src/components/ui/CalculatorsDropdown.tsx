@@ -60,10 +60,10 @@ export const FINANCIAL_CALCULATORS: CalculatorDefinition[] = [
   },
   {
     id: 'fd',
-    name: 'Fixed Deposit (FD)',
-    shortDesc: 'Bank FD quarterly compounding, interest payouts & maturity',
+    name: 'Fixed Deposit (FD) & PPF',
+    shortDesc: 'Bank FD & Public Provident Fund (PPF) compounding, rules & maturity',
     longDesc:
-      'Compute maturity amounts and effective yields across standard, cumulative, and monthly payout fixed deposits.',
+      'Compute maturity amounts and effective yields across standard, cumulative, and monthly payout fixed deposits, plus 15-year EEE Public Provident Fund (PPF).',
     category: 'helper',
     status: 'active',
     icon: Landmark,

@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import {
   ArrowLeft,
   User,
@@ -12,6 +12,8 @@ import {
   Landmark,
   BadgePercent,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Download,
   Upload,
   AlertTriangle,
@@ -34,12 +36,21 @@ import { navigateToExportImport } from '@/lib/router'
 import { cn } from '@/lib/cn'
 import { ProfileSyncConfirmModal } from '@/components/profile/ProfileSyncConfirmModal'
 import { ProfileDependentsTab } from '@/components/profile/ProfileDependentsTab'
+import { NumberInput } from '@/components/ui/NumberInput'
 
 interface ProfilePageProps {
   onBackToHome: () => void
 }
 
 type ProfileTab = 'personal' | 'dependents' | 'inflation' | 'income_tax' | 'returns'
+
+interface ProfileTabItem {
+  id: ProfileTab
+  label: string
+  shortLabel: string
+  icon: React.ComponentType<{ className?: string }>
+  badge?: number
+}
 
 const SECTOR_METADATA: {
   key: keyof SectorInflationRates
@@ -127,6 +138,53 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
   const [autoSyncCalculators, setAutoSyncCalculators] = useState(true)
   const [showSavedToast, setShowSavedToast] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+
+  const cardRef = useRef<HTMLDivElement>(null)
+
+  const tabs: ProfileTabItem[] = useMemo(
+    () => [
+      { id: 'personal', label: 'Personal & Horizon', shortLabel: 'Personal', icon: User },
+      {
+        id: 'dependents',
+        label: 'Dependents',
+        shortLabel: 'Dependents',
+        icon: Users,
+        badge: formData.dependents?.length,
+      },
+      { id: 'inflation', label: 'Inflation Defaults', shortLabel: 'Inflation', icon: TrendingUp },
+      {
+        id: 'income_tax',
+        label: 'Income, Savings & Tax',
+        shortLabel: 'Income & Tax',
+        icon: Wallet,
+      },
+      { id: 'returns', label: 'Returns & Interest', shortLabel: 'Returns', icon: BadgePercent },
+    ],
+    [formData.dependents?.length]
+  )
+
+  const currentTabIndex = tabs.findIndex((t) => t.id === activeTab)
+  const prevTab = currentTabIndex > 0 ? tabs[currentTabIndex - 1] : null
+  const nextTab = currentTabIndex < tabs.length - 1 ? tabs[currentTabIndex + 1] : null
+
+  const handleTabChange = (tabId: ProfileTab, shouldScroll = false) => {
+    setActiveTab(tabId)
+    if (shouldScroll && cardRef.current) {
+      cardRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
+  }
+
+  const handlePrevTab = () => {
+    if (prevTab) {
+      handleTabChange(prevTab.id, true)
+    }
+  }
+
+  const handleNextTab = () => {
+    if (nextTab) {
+      handleTabChange(nextTab.id, true)
+    }
+  }
 
   // Local input string states so users can clear, backspace, and type numbers freely without premature clamping
   const [retirementAgeInput, setRetirementAgeInput] = useState<string>(
@@ -328,90 +386,46 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
         </div>
 
         {/* Tabbed Card Container */}
-        <div className="bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
-          {/* Tab Navigation */}
-          <div className="flex items-center gap-1 px-4 py-2.5 border-b border-border bg-muted/30 overflow-x-auto text-xs font-semibold">
-            <button
-              type="button"
-              onClick={() => setActiveTab('personal')}
-              className={cn(
-                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
-                activeTab === 'personal'
-                  ? 'bg-blue-600 text-white font-bold shadow-xs'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <User className="w-4 h-4" />
-              <span>Personal & Horizon</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('dependents')}
-              className={cn(
-                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
-                activeTab === 'dependents'
-                  ? 'bg-blue-600 text-white font-bold shadow-xs'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Users className="w-4 h-4" />
-              <span>Dependents</span>
-              {formData.dependents && formData.dependents.length > 0 && (
-                <span
-                  className={cn(
-                    'text-[10px] px-1.5 py-0.5 rounded-full font-bold',
-                    activeTab === 'dependents'
-                      ? 'bg-white/20 text-white'
-                      : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
-                  )}
-                >
-                  {formData.dependents.length}
-                </span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('inflation')}
-              className={cn(
-                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
-                activeTab === 'inflation'
-                  ? 'bg-blue-600 text-white font-bold shadow-xs'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <TrendingUp className="w-4 h-4" />
-              <span>Inflation Defaults</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('income_tax')}
-              className={cn(
-                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
-                activeTab === 'income_tax'
-                  ? 'bg-blue-600 text-white font-bold shadow-xs'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <Wallet className="w-4 h-4" />
-              <span>Income, Savings & Tax</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab('returns')}
-              className={cn(
-                'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
-                activeTab === 'returns'
-                  ? 'bg-blue-600 text-white font-bold shadow-xs'
-                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
-              )}
-            >
-              <BadgePercent className="w-4 h-4" />
-              <span>Returns & Interest</span>
-            </button>
+        <div
+          ref={cardRef}
+          className="bg-card border border-border rounded-2xl shadow-sm scroll-mt-[70px] sm:scroll-mt-[85px]"
+        >
+          {/* Sticky Tab Navigation */}
+          <div className="sticky top-[60px] sm:top-[75px] z-10 bg-card/95 backdrop-blur-md border-b border-border rounded-t-2xl shadow-2xs">
+            <div className="flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-2.5 overflow-x-auto text-xs font-semibold no-scrollbar">
+              {tabs.map((tab) => {
+                const Icon = tab.icon
+                const isActive = activeTab === tab.id
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => handleTabChange(tab.id)}
+                    className={cn(
+                      'px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 shrink-0 cursor-pointer',
+                      isActive
+                        ? 'bg-blue-600 text-white font-bold shadow-xs'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                    )}
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span>{tab.label}</span>
+                    {tab.badge !== undefined && tab.badge > 0 && (
+                      <span
+                        className={cn(
+                          'text-[10px] px-1.5 py-0.5 rounded-full font-bold',
+                          isActive
+                            ? 'bg-white/20 text-white'
+                            : 'bg-blue-100 text-blue-700 dark:bg-blue-900/60 dark:text-blue-300'
+                        )}
+                      >
+                        {tab.badge}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
           </div>
 
           {/* Form Content */}
@@ -570,31 +584,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         {workingYearsRemaining} working yrs left
                       </span>
                     </div>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={Math.max(18, formData.currentAge)}
                       max={100}
-                      value={retirementAgeInput}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setRetirementAgeInput(val)
-                        if (val !== '') {
-                          const parsed = parseInt(val, 10)
-                          if (!isNaN(parsed)) {
-                            setFormData((p) => ({ ...p, retirementAge: parsed }))
-                          }
+                      integerOnly={true}
+                      fallbackValue={60}
+                      value={formData.retirementAge}
+                      onChange={(val) => {
+                        if (val !== undefined) {
+                          setRetirementAgeInput(String(val))
+                          setFormData((p) => ({ ...p, retirementAge: val }))
                         }
                       }}
-                      onBlur={() => {
-                        const parsed = parseInt(retirementAgeInput, 10)
-                        const minAge = Math.max(18, formData.currentAge)
-                        const validAge = isNaN(parsed)
-                          ? 60
-                          : Math.max(minAge, Math.min(100, parsed))
-                        setRetirementAgeInput(String(validAge))
-                        setFormData((p) => ({ ...p, retirementAge: validAge }))
-                      }}
-                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all font-bold"
                     />
                     <p className="text-[11px] text-muted-foreground">
                       Age when active salary stops and withdrawals begin.
@@ -610,31 +612,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         {retirementYears} yrs in retirement
                       </span>
                     </div>
-                    <input
-                      type="number"
+                    <NumberInput
                       min={Math.max(formData.retirementAge + 1, 65)}
                       max={120}
-                      value={targetAgeInput}
-                      onChange={(e) => {
-                        const val = e.target.value
-                        setTargetAgeInput(val)
-                        if (val !== '') {
-                          const parsed = parseInt(val, 10)
-                          if (!isNaN(parsed)) {
-                            setFormData((p) => ({ ...p, targetAge: parsed }))
-                          }
+                      integerOnly={true}
+                      fallbackValue={85}
+                      value={formData.targetAge}
+                      onChange={(val) => {
+                        if (val !== undefined) {
+                          setTargetAgeInput(String(val))
+                          setFormData((p) => ({ ...p, targetAge: val }))
                         }
                       }}
-                      onBlur={() => {
-                        const parsed = parseInt(targetAgeInput, 10)
-                        const minTarget = Math.max(formData.retirementAge + 1, 65)
-                        const validTarget = isNaN(parsed)
-                          ? 85
-                          : Math.max(minTarget, Math.min(120, parsed))
-                        setTargetAgeInput(String(validTarget))
-                        setFormData((p) => ({ ...p, targetAge: validTarget }))
-                      }}
-                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      className="w-full h-11 border border-border rounded-xl px-3.5 text-sm bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all font-bold"
                     />
                     <p className="text-[11px] text-muted-foreground">
                       Corpus lasts up to this age (85–90 safeguards against longevity risk).
@@ -767,18 +757,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                         }
                         className="flex-1 accent-blue-600 cursor-pointer"
                       />
-                      <input
-                        type="number"
+                      <NumberInput
                         min={1}
                         max={20}
                         step={0.1}
+                        fallbackValue={6.0}
                         value={formData.overallInflationRate}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            overallInflationRate: Math.max(0, parseFloat(e.target.value) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              overallInflationRate: val,
+                            }))
+                          }
+                        }}
                         className="w-24 h-11 px-3 text-sm bg-background border border-border rounded-xl font-bold text-center"
                       />
                     </div>
@@ -840,18 +832,17 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                               </p>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
-                              <input
-                                type="number"
+                              <NumberInput
                                 min={0}
                                 max={25}
                                 step={0.5}
+                                fallbackValue={sector.suggested}
                                 value={currentRate}
-                                onChange={(e) =>
-                                  handleSectorInflationChange(
-                                    sector.key,
-                                    parseFloat(e.target.value) || 0
-                                  )
-                                }
+                                onChange={(val) => {
+                                  if (val !== undefined) {
+                                    handleSectorInflationChange(sector.key, val)
+                                  }
+                                }}
                                 className="w-18 h-9 px-2 text-xs bg-background border border-border rounded-lg font-bold text-right"
                               />
                               <span className="text-xs font-bold text-muted-foreground">%</span>
@@ -878,17 +869,19 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
                         ₹
                       </span>
-                      <input
-                        type="number"
+                      <NumberInput
                         min={0}
                         step={5000}
+                        fallbackValue={0}
                         value={formData.monthlyIncome}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            monthlyIncome: Math.max(0, parseInt(e.target.value, 10) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              monthlyIncome: val,
+                            }))
+                          }
+                        }}
                         className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
                     </div>
@@ -910,18 +903,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       Expected Annual Salary Increment (%)
                     </label>
                     <div className="flex items-center gap-2">
-                      <input
-                        type="number"
+                      <NumberInput
                         min={0}
                         max={30}
                         step={0.5}
+                        fallbackValue={8.0}
                         value={formData.annualIncomeGrowthRate}
-                        onChange={(e) =>
-                          setFormData((p) => ({
-                            ...p,
-                            annualIncomeGrowthRate: Math.max(0, parseFloat(e.target.value) || 0),
-                          }))
-                        }
+                        onChange={(val) => {
+                          if (val !== undefined) {
+                            setFormData((p) => ({
+                              ...p,
+                              annualIncomeGrowthRate: val,
+                            }))
+                          }
+                        }}
                         className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
                       />
                       <span className="text-xs font-bold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
@@ -946,27 +941,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Existing Investable Corpus Today
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={50000}
-                          value={formData.existingInvestableCorpus}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              existingInvestableCorpus: Math.max(
-                                0,
-                                parseInt(e.target.value, 10) || 0
-                              ),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={50000}
+                        value={formData.existingInvestableCorpus}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            existingInvestableCorpus: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Liquid mutual funds, FDs, savings (excluding primary home).
                       </p>
@@ -976,24 +964,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Default Monthly SIP Amount
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlySipInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlySipInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlySipInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlySipInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Baseline for systematic investment calculator.
                       </p>
@@ -1006,24 +990,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Monthly EPF / PF Contribution
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlyPfInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlyPfInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlyPfInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlyPfInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         Provident Fund deductions (Employee + Employer).
                       </p>
@@ -1034,24 +1014,20 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Monthly NPS Contribution
                       </label>
-                      <div className="relative flex items-center">
-                        <span className="absolute left-3.5 text-sm font-bold text-muted-foreground pointer-events-none">
-                          ₹
-                        </span>
-                        <input
-                          type="number"
-                          min={0}
-                          step={1000}
-                          value={formData.monthlyNpsInvestment}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              monthlyNpsInvestment: Math.max(0, parseInt(e.target.value, 10) || 0),
-                            }))
-                          }
-                          className="w-full h-11 pl-8 pr-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
-                        />
-                      </div>
+                      <NumberInput
+                        min={0}
+                        step={1000}
+                        value={formData.monthlyNpsInvestment}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            monthlyNpsInvestment: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={0}
+                        prefix="₹"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[11px] text-muted-foreground">
                         National Pension System Tier 1 monthly contribution.
                       </p>
@@ -1123,25 +1099,21 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
                       <label className="text-xs font-bold text-foreground">
                         Equity LTCG Tax Rate
                       </label>
-                      <div className="flex items-center gap-1.5">
-                        <input
-                          type="number"
-                          min={0}
-                          max={30}
-                          step={0.5}
-                          value={formData.ltcgTaxRate}
-                          onChange={(e) =>
-                            setFormData((p) => ({
-                              ...p,
-                              ltcgTaxRate: Math.max(0, parseFloat(e.target.value) || 0),
-                            }))
-                          }
-                          className="w-full h-11 px-3.5 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs"
-                        />
-                        <span className="text-xs font-bold text-muted-foreground px-3 py-2.5 bg-muted rounded-xl h-11 flex items-center shrink-0">
-                          %
-                        </span>
-                      </div>
+                      <NumberInput
+                        min={0}
+                        max={30}
+                        step={0.5}
+                        value={formData.ltcgTaxRate}
+                        onChange={(val) =>
+                          setFormData((p) => ({
+                            ...p,
+                            ltcgTaxRate: val ?? 0,
+                          }))
+                        }
+                        fallbackValue={12.5}
+                        suffix="%"
+                        className="w-full h-11 border border-border rounded-xl text-sm font-bold bg-background text-foreground shadow-xs focus:outline-hidden focus:ring-2 focus:ring-blue-500/25 focus:border-blue-600 transition-all"
+                      />
                       <p className="text-[10px] text-muted-foreground">
                         12.5% per Indian Budget 2024.
                       </p>
@@ -1285,32 +1257,78 @@ export default function ProfilePage({ onBackToHome }: ProfilePageProps) {
           </div>
 
           {/* Action Footer */}
-          <div className="px-5 sm:px-7 py-4 border-t border-border bg-muted/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <label className="flex items-center gap-2 text-xs font-semibold text-muted-foreground cursor-pointer select-none">
+          <div className="px-4 sm:px-6 md:px-7 py-4 border-t border-border bg-muted/30 rounded-b-2xl space-y-3.5">
+            {/* Top row: Auto-apply checkbox on its own line */}
+            <label className="flex items-start sm:items-center gap-2 text-xs font-semibold text-muted-foreground cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={autoSyncCalculators}
                 onChange={(e) => setAutoSyncCalculators(e.target.checked)}
-                className="w-4 h-4 rounded-sm text-blue-600 focus:ring-blue-500 cursor-pointer"
+                className="w-4 h-4 rounded-sm text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0 mt-0.5 sm:mt-0"
               />
-              <span>Auto-apply these defaults to all 5 calculators immediately</span>
+              <span className="leading-snug">
+                Auto-apply these defaults to all 5 calculators immediately
+              </span>
             </label>
 
-            <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+            {/* Bottom row: Next-Prev and Save buttons */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-1 border-t border-border/40">
+              {/* Tab Navigation Controls (Prev / Next) */}
+              <div className="flex items-center justify-between sm:justify-start gap-1 bg-background border border-border rounded-xl p-1 shadow-2xs shrink-0 w-full sm:w-auto">
+                <button
+                  type="button"
+                  onClick={handlePrevTab}
+                  disabled={!prevTab}
+                  className={cn(
+                    'inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0',
+                    !prevTab
+                      ? 'text-muted-foreground/40 cursor-not-allowed opacity-50'
+                      : 'text-foreground hover:bg-muted cursor-pointer'
+                  )}
+                  title={prevTab ? `Go to previous tab: ${prevTab.label}` : 'Already on first tab'}
+                  aria-label="Previous tab"
+                >
+                  <ChevronLeft className="w-4 h-4 shrink-0" />
+                  <span className="whitespace-nowrap">Prev Tab</span>
+                </button>
+
+                <div className="px-2.5 text-[11px] font-bold text-muted-foreground select-none whitespace-nowrap text-center">
+                  Tab {currentTabIndex + 1} of {tabs.length}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleNextTab}
+                  disabled={!nextTab}
+                  className={cn(
+                    'inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap shrink-0',
+                    !nextTab
+                      ? 'text-muted-foreground/40 cursor-not-allowed opacity-50'
+                      : 'text-foreground hover:bg-muted cursor-pointer'
+                  )}
+                  title={nextTab ? `Go to next tab: ${nextTab.label}` : 'Already on last tab'}
+                  aria-label="Next tab"
+                >
+                  <span className="whitespace-nowrap">Next Tab</span>
+                  <ChevronRight className="w-4 h-4 shrink-0" />
+                </button>
+              </div>
+
+              {/* Save Button */}
               <button
                 type="button"
                 onClick={handleSave}
-                className="w-full sm:w-auto px-6 py-2.5 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs hover:shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all"
+                className="w-full sm:w-auto px-6 py-2.5 text-xs font-extrabold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-xs hover:shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all shrink-0 whitespace-nowrap"
               >
                 {showSavedToast ? (
                   <>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-300" />
-                    <span>Saved to Profile & Calculators!</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0" />
+                    <span className="whitespace-nowrap">Saved to Profile & Calculators!</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4" />
-                    <span>Save Profile Defaults</span>
+                    <Sparkles className="w-4 h-4 shrink-0" />
+                    <span className="whitespace-nowrap">Save Profile Defaults</span>
                   </>
                 )}
               </button>
